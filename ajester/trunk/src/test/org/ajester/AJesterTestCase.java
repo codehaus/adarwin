@@ -4,7 +4,6 @@ package org.ajester;
 import org.ajester.testmodel.code.BooleanReturn;
 import org.ajester.testmodel.code.IfEqualsStatement;
 import org.ajester.testmodel.code.ProblematicIfEqualsStatement;
-import org.ajester.testmodel.code.ProblematicIfNotEqualsStatement;
 import org.ajester.testmodel.test.BooleanReturnTestCase;
 import org.ajester.testmodel.test.IfEqualsStatementTestCase;
 import org.ajester.testmodel.test.ProblematicIfStatementTestCase;
