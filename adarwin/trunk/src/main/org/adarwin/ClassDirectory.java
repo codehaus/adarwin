@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import org.adarwin.rule.Rule;
 
-public class ClassDirectory extends CodeBase {
+public class ClassDirectory implements Code {
     private String directory;
 
     public ClassDirectory(String directory) {

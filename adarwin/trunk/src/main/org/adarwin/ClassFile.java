@@ -16,7 +16,7 @@ import java.io.InputStream;
 import org.adarwin.rule.Rule;
 import org.objectweb.asm.ClassReader;
 
-public class ClassFile extends CodeBase {
+public class ClassFile implements Code {
 	private InputStream inputStream;
 
 	public static InputStream getClassInputStream(Class clazz) {

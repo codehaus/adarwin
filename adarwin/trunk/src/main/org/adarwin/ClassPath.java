@@ -17,7 +17,7 @@ import java.util.StringTokenizer;
 
 import org.adarwin.rule.Rule;
 
-public class ClassPath extends CodeBase {
+public class ClassPath implements Code {
 	private Code[] path;
 
 	public ClassPath(Code[] path) {

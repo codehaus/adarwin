@@ -18,9 +18,13 @@
     </description>
     <url>http://wiki.codehaus.org/adarwin</url>
     <issueTrackingUrl>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10240</issueTrackingUrl>
+    <siteAddress>codehaus.org</siteAddress>
+    <siteDirectory>/www/adarwin.codehaus.org</siteDirectory>
+    <distributionDirectory>/www/dist.codehaus.org/adarwin/distributions/</distributionDirectory>
 
     <developers>
         <developer>
+			<name>Stacy Curl</name>
             <id>stacy</id>
             <email>stacy@digitalcompulsion.com</email>
             <roles>
@@ -63,7 +67,6 @@
 
         <dependency>
             <id>mockobjects</id>
-            <!--<version>core-0.08dev-20030318</version> -->
             <version>core-0.09</version>
         </dependency>
 
