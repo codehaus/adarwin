@@ -27,7 +27,7 @@ public class ClassListTestCase extends TestCase {
 
 		Code code = new ClassFile(InPackageA.class);
 
-		assertEquals(Collections.EMPTY_SET, code.evaluate(rule).getMatchingClasses());
+		assertFalse(code.evaluate(rule).iterator().hasNext());
 	}
 
 	public void testOneMatch() throws IOException {
@@ -35,7 +35,7 @@ public class ClassListTestCase extends TestCase {
 
 		Code code = new ClassFile(InPackageB.class);
 
-		assertEquals(createSet(InPackageB.class), code.evaluate(rule).getMatchingClasses());
+		assertEquals(InPackageB.class.getName(), code.evaluate(rule).iterator().next());
 	}
 
 	private Set createSet(Class[] classes) {

@@ -11,6 +11,7 @@
 package org.adarwin;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 public class Result {
@@ -32,15 +33,9 @@ public class Result {
 	public int getCount() {
 		return (result ? 1 : 0);
 	}
-
-	public Set getMatchingClasses() {
-		Set result = new HashSet();
-
-		if (getResult()) {
-			result.add(className);
-		}
-
-		return result;
+	
+	public Iterator iterator() {
+		return getMatchingClasses().iterator();
 	}
 
 	public final boolean getResult() {
@@ -49,5 +44,15 @@ public class Result {
 
 	public void setClassName(String className) {
 		this.className = className;
+	}
+
+	private Set getMatchingClasses() {
+		Set result = new HashSet();
+
+		if (getResult()) {
+			result.add(className);
+		}
+
+		return result;
 	}
 }

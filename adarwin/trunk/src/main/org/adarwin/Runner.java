@@ -133,7 +133,7 @@ public class Runner {
 		if (result.getCount() > 0) {
 			logger.log(result.getCount() + " classes violated: " + ruleExpression);
 			if (getPrint()) {
-				for (Iterator iterator = result.getMatchingClasses().iterator(); iterator.hasNext();) {
+				for (Iterator iterator = result.iterator(); iterator.hasNext();) {
 					logger.log("  " + (String) iterator.next());
 				}
 			}

@@ -23,8 +23,8 @@ import com.mockobjects.dynamic.OrderedMock;
 
 public class RunnerTestCase extends TestCase {
 	private static final String CLASSPATH = "target/test-classes";
-	private static final String RULE = "package(org.adarwin.testmodel.a)";
-	private static final String SECOND_RULE = "package(org.adarwin.testmodel.x)";
+	private static final String RULE = "src(package(org.adarwin.testmodel.a))";
+	private static final String SECOND_RULE = "src(package(org.adarwin.testmodel.x))";
 	private static final String COMPOSITE_RULE = RULE + ", " + SECOND_RULE;
 	private OrderedMock mockLogger;
 	private Runner runner;
