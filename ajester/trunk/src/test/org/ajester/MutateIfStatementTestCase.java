@@ -7,7 +7,6 @@ public class MutateIfStatementTestCase extends TestCase {
 	public void testMutatingIFEQCausesIfStatementTestIfEqualToFail() throws Exception {
 		TestResults results = new TestRunnerWrapper().run(
 			"org.ajester.testmodel.IfStatementTestCase",
-			"org.ajester.testmodel.IfStatement",
 			new IfStatementCodeAdapter("org.ajester.testmodel.IfStatement", "ifEqual"));
 		
 		assertEquals(1, results.getFailures().size());
@@ -20,7 +19,6 @@ public class MutateIfStatementTestCase extends TestCase {
 	public void testMutatingIFNECausesIfStatementIfNotEqualToFail() throws Exception {
 		TestResults results = new TestRunnerWrapper().run(
 			"org.ajester.testmodel.IfStatementTestCase",
-			"org.ajester.testmodel.IfStatement",
 			new IfStatementCodeAdapter("org.ajester.testmodel.IfStatement", "ifNotEqual"));
 		
 		assertEquals(1, results.getFailures().size());
