@@ -7,8 +7,8 @@ import java.io.OutputStream;
 
 import junit.framework.TestCase;
 
+import org.adarwin.Logger;
 import org.adarwin.ant.ADarwinTask;
-import org.adarwin.ant.ADarwinTask.ILogger;
 import org.apache.tools.ant.BuildException;
 
 import com.mockobjects.dynamic.OrderedMock;
@@ -23,9 +23,9 @@ public class ADarwinTaskTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		mockLogger = new OrderedMock(ADarwinTask.ILogger.class);
+		mockLogger = new OrderedMock(Logger.class);
 		task = new ADarwinTask();
-		task.setLogger((ILogger) mockLogger.proxy());
+		task.setLogger((Logger) mockLogger.proxy());
 		task.setBinding("rules.properties");
 		task.setClassPath(CLASSPATH);
 		mockLogger.expect("log", "Evaluating rules against: " + CLASSPATH);

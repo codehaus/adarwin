@@ -12,8 +12,6 @@ Make the counter more accurate!
 
 Add code to test that true rules always work, regardless of the amount of code
 
-Rename Grammar to Bindings
-
 Write tests for rules file (white-space, parathesis, extra-parameters, variables)
 
 Write tests for ant task (missing parameters, conflicting parameters)
