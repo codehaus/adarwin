@@ -11,7 +11,6 @@
 package org.adarwin;
 
 import org.adarwin.rule.ClassRule;
-import org.adarwin.rule.MethodRule;
 import org.adarwin.rule.PackageRule;
 import org.adarwin.rule.Rule;
 
@@ -34,19 +33,14 @@ public abstract class RuleTestCase extends TestCase {
 		return new ClassRule(className(clazz).replaceAll("\\.", "\\."));
 	}
 
-	public Rule createMethodRule(Method method) {
-		return MethodRule.create(method.getReturnType(), method.getMethodName(),
-			method.getParameterTypes());
+	public CodeElement createMethodDeclaration(String methodName, Class returnType, Class[] parameterTypes) {
+		return MethodDeclaration.createDeclaration(Integer.class.getName(), returnType.getName(),
+			methodName, RuleTestCase.convertClassArrayToStringArray(parameterTypes));
 	}
 
-	public MethodDeclaration createMethodDeclaration(String methodName, Class returnType, Class[] parameterTypes) {
-		return new MethodDeclaration(Integer.class.getName(), methodName,
-			returnType.getName(), RuleTestCase.convertClassArrayToStringArray(parameterTypes));
-	}
-
-	public MethodDeclaration createMethodDeclaration(String methodName, Class returnType) {
-		return new MethodDeclaration(Integer.class.getName(), methodName,
-			returnType.getName(), new String[0]);
+	public CodeElement createMethodDeclaration(String methodName, Class returnType) {
+		return MethodDeclaration.createDeclaration(Integer.class.getName(), returnType.getName(),
+			methodName, new String[0]);
 	}
 
 	public static InputStream getInputStream(Class clazz) {

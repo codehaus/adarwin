@@ -79,13 +79,13 @@ public class RuleClassVisitor implements ClassVisitor {
 		String[] parameterNames = typeParser.parameterTypes(desc);
 
 		if (isConstructor(methodName)) {
-			dependancies.add(ConstructorInvocation.createDeclaration(className, parameterNames));
+			dependancies.add(Constructor.createDeclaration(className, parameterNames));
 		}
 		else {
 			inspect(CodeElement.createUses(typeParser.returnType(desc)));
 
-			dependancies.add(new MethodDeclaration(className, methodName,
-				typeParser.returnType(desc), parameterNames));
+			dependancies.add(MethodDeclaration.createDeclaration(className, typeParser.returnType(desc),
+				methodName, parameterNames));
 		}
 
 		if (exceptions != null) {
@@ -135,7 +135,7 @@ public class RuleClassVisitor implements ClassVisitor {
         	String[] parameterTypes = typeParser.parameterTypes(desc);
 
 			if (isConstructor(methodName)) {
-        		inspect(ConstructorInvocation.createInvocation(className, parameterTypes));
+        		inspect(Constructor.createInvocation(className, parameterTypes));
         	}
         	else {
         		if (Class.class.getName().equals(className) && "forName".equals(methodName)) {
@@ -144,7 +144,7 @@ public class RuleClassVisitor implements ClassVisitor {
 
             	inspect(CodeElement.createUses(typeParser.returnType(desc)));
 
-        		inspect(MethodInvocation.create(className, typeParser.returnType(desc), methodName,
+        		inspect(MethodDeclaration.createInvocation(className, typeParser.returnType(desc), methodName,
         			parameterTypes));
         	}
         }
