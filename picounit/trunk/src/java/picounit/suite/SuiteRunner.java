@@ -1,19 +1,24 @@
 package picounit.suite;
 
+import picounit.impl.MethodRunner;
 import picounit.impl.RegistryListener;
 
 public class SuiteRunner implements RegistryListener {
 	private final SuiteMatcher suiteMatcher;
-	private final SuiteOperator suiteOperator;
+	private final SuiteScopeFactory suiteScopeFactory;
+	private final MethodRunner methodRunner;
 
-	public SuiteRunner(SuiteMatcher suiteMatcher, SuiteOperator suiteOperator) {
+	public SuiteRunner(SuiteMatcher suiteMatcher, SuiteScopeFactory suiteScopeFactory,
+		MethodRunner methodRunner) {
+		
 		this.suiteMatcher = suiteMatcher;
-		this.suiteOperator = suiteOperator;
+		this.suiteScopeFactory = suiteScopeFactory;
+		this.methodRunner = methodRunner;
 	}
 
 	public void registryEvent(Class someClass) {
 		if (suiteMatcher.matches(someClass)) {
-			suiteOperator.operate(someClass);
+			methodRunner.invokeMatchingMethods(someClass, "suite", suiteScopeFactory);
 		}
 	}
 }

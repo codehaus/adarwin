@@ -1,8 +1,6 @@
 package picounit.impl;
 
 
-
-
 public interface ResultListener {
 	void enter(Scope scope);
 

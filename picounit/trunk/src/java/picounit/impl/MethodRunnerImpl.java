@@ -19,13 +19,60 @@ public class MethodRunnerImpl implements MethodRunner {
 		this.resultListener = resultListener;
 	}
 
-	public void runWrapped(Class someClass, Method method, Scope scope) {
+	/*
+	 * This method invokes all matching methods, but invokes the arounds first.
+	 */
+	public void invokeMatchingMethods(Class someClass, String prefix, ScopeFactory scopeFactory) {
+		resultListener.enter(scopeFactory.createClassScope(someClass));
+
+		Method[] methods = someClass.getMethods();
+
+		for (int index = 0; index < methods.length; index++) {
+			Method method = methods[index];
+
+			if (method.getName().startsWith(prefix)) {
+				runWrapped(someClass, method, scopeFactory.createMethodScope(method));
+			}
+		}
+
+		resultListener.exit();
+	}
+
+	/*
+	 * This method invokes one matching method
+	 */
+	public void invokeMethod(Object object, String methodName, Resolver resolver) {
+		Method[] methods = object.getClass().getMethods();
+
+		for (int index = 0; index < methods.length; index++) {
+			Method method = methods[index];
+
+			if (method.getName().equals(methodName)) {
+				try {
+					method.invoke(object, resolver.getComponents(method.getParameterTypes()));
+				}
+				catch (IllegalArgumentException e) {
+					e.printStackTrace();
+				}
+				catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+				catch (InvocationTargetException e) {
+					e.printStackTrace();
+				}
+
+				break;
+			}
+		}
+	}
+
+	private void runWrapped(Class someClass, Method method, Scope scope) {
 		try {
 			Object object = picoResolver.getComponent(someClass);
 
 			aroundRunner.before(object, method);
 
-			runMethod(method, scope, object);
+			runMethod(method, object, scope);
 
 			aroundRunner.after(object, method);
 		}
@@ -34,7 +81,7 @@ public class MethodRunnerImpl implements MethodRunner {
 		}
 	}
 
-	private void runMethod(Method method, Scope scope, Object object) {
+	private void runMethod(Method method, Object object, Scope scope) {
 		try {
 			resultListener.enter(scope);
 

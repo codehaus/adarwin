@@ -7,13 +7,12 @@ import picounit.test.TestSuite;
 
 public class MainSuite implements Suite {
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException {
-		new MainRunner().run(MainSuite.class);
+		MainRunner.create().run(MainSuite.class).print();
 	}
 
 	public void suite(Runner runner) {
-		runner.run(MethodInvokerTest.class);
 		runner.run(VerifyTest.class);
-		
+
 		runner.run(AroundSuite.class);
 		runner.run(RunnerSuite.class);
 		runner.run(TestSuite.class);

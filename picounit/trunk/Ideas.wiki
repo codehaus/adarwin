@@ -10,7 +10,8 @@
     
   - Create a Runner component definition, plus registration.
   
-  
+  - Gather metrics: number of mocks per unit, verifications per test, have Test wide success
+    criteria: fail a test if it performs too many verifications.
   
   
   

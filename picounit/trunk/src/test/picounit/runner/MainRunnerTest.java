@@ -21,16 +21,14 @@ import picounit.around.mock.MockResolver;
 import picounit.around.mock.MockResolverImpl;
 import picounit.around.setup.SetUpAround;
 import picounit.around.setup.SetUpAroundImpl;
+import picounit.impl.DelegatingResultListener;
 import picounit.impl.Logger;
 import picounit.impl.LoggerImpl;
-import picounit.impl.MethodInvoker;
-import picounit.impl.MethodInvokerImpl;
 import picounit.impl.MethodRunner;
 import picounit.impl.MethodRunnerImpl;
 import picounit.impl.PicoResolver;
 import picounit.impl.Registry;
-import picounit.impl.Report;
-import picounit.impl.ReportImpl;
+import picounit.impl.ResultListener;
 import picounit.impl.UserPicoResolver;
 import picounit.impl.VerifyImpl;
 import picounit.mocker.easymock.MockerImpl;
@@ -38,15 +36,11 @@ import picounit.pico.DynamicHeirarchyPicoContainer;
 import picounit.pico.PicoResolverImpl;
 import picounit.suite.SuiteMatcher;
 import picounit.suite.SuiteMatcherImpl;
-import picounit.suite.SuiteOperator;
-import picounit.suite.SuiteOperatorImpl;
 import picounit.suite.SuiteRunner;
 import picounit.suite.SuiteScopeFactory;
 import picounit.suite.SuiteScopeFactoryImpl;
 import picounit.test.TestMatcher;
 import picounit.test.TestMatcherImpl;
-import picounit.test.TestOperator;
-import picounit.test.TestOperatorImpl;
 import picounit.test.TestRunner;
 import picounit.test.TestScopeFactory;
 import picounit.test.TestScopeFactoryImpl;
@@ -59,10 +53,8 @@ public class MainRunnerTest implements Test {
 	private DynamicHeirarchyPicoContainer userContainer;
 	private MutablePicoContainer infrastructureContainer;
 	private Registry registry;
+	private DelegatingResultListener delegatingResultListener;
 	
-	// Unit
-	private MainRunner suiteRunner;
-
 
 	public MainRunnerTest(Mocker mocker) {
 		this.mocker = mocker;
@@ -70,52 +62,58 @@ public class MainRunnerTest implements Test {
 
 	public void mock(MutablePicoContainer overrideableContainer,
 		DynamicHeirarchyPicoContainer userContainer,
-		MutablePicoContainer infrastructureContainer, Registry registry) {
+		MutablePicoContainer infrastructureContainer, Registry registry,
+		DelegatingResultListener delegatingResultListener) {
 
 		this.overrideableContainer = overrideableContainer;
 		this.userContainer = userContainer;
 		this.infrastructureContainer = infrastructureContainer;
 		this.registry = registry;
+		this.delegatingResultListener = delegatingResultListener;
+	}
 
-		this.suiteRunner = new MainRunner(overrideableContainer, userContainer,
-			infrastructureContainer, registry);
+	private MainRunner create() {
+		return new MainRunner(overrideableContainer, userContainer, infrastructureContainer, registry,
+			delegatingResultListener);
 	}
 
 	public void testRunNonSuite() {
 		expectInfrastructure();
 		expectRegisterTest(ExampleTest.class);
-		mocker.ignoreReturn(infrastructureContainer.getComponentInstance(Report.class));
 
 		mocker.replay();
 
-		suiteRunner.run(ExampleTest.class);
+		MainRunner mainRunner = create();
+		mainRunner.run(ExampleTest.class);
 	}
 
 	public void testRunSuite() {
 		expectInfrastructure();
 		expectRegisterTest(SuiteImpl.class);
-		mocker.ignoreReturn(infrastructureContainer.getComponentInstance(Report.class));
 
 		mocker.replay();
 
-		suiteRunner.run(SuiteImpl.class);
+		MainRunner mainRunner = create();
+		mainRunner.run(SuiteImpl.class);
 	}
 
 	public void testAddFixture() {
-		expectRegister(Fixture.class, FixtureImpl.class);
 		expectInfrastructure();
+		expectRegister(Fixture.class, FixtureImpl.class);
 		expectRegisterTest(TestRequireingNonStandardFixture.class);
-		mocker.ignoreReturn(infrastructureContainer.getComponentInstance(Report.class));
 
 		mocker.replay();
 
-		suiteRunner.registerInfrastructure(Fixture.class, FixtureImpl.class)
+		MainRunner mainRunner = create();
+		mainRunner.registerInfrastructure(Fixture.class, FixtureImpl.class)
 			.run(TestRequireingNonStandardFixture.class);
 	}
 	
 	private void expectInfrastructure() {
 		mocker.ignoreReturn(infrastructureContainer.registerComponentInstance(
 			Registry.class, mocker.instanceOf(Registry.class)));
+		mocker.ignoreReturn(infrastructureContainer.registerComponentInstance(
+			ResultListener.class, mocker.instanceOf(DelegatingResultListener.class)));
 		mocker.ignoreReturn(overrideableContainer.registerComponentInstance(
 			Runner.class, mocker.instanceOf(Runner.class)));
 
@@ -125,9 +123,7 @@ public class MainRunnerTest implements Test {
 
 		expectRegister(PicoResolver.class, PicoResolverImpl.class);
 		expectRegisterFixture(UserPicoResolver.class, mocker.instanceOf(PicoResolver.class)); 
-		expectRegister(Report.class, ReportImpl.class);
 
-		expectRegister(MethodInvoker.class, MethodInvokerImpl.class);
 		expectRegister(MethodRunner.class, MethodRunnerImpl.class);
 
 		// Runner
@@ -139,13 +135,11 @@ public class MainRunnerTest implements Test {
 		// Suite Runner
 		expectRegister(SuiteScopeFactory.class, SuiteScopeFactoryImpl.class);
 		expectRegister(SuiteMatcher.class, SuiteMatcherImpl.class);
-		expectRegister(SuiteOperator.class, SuiteOperatorImpl.class);
 		expectRegister(SuiteRunner.class);
 
 		// Test Runner
 		expectRegister(TestScopeFactory.class, TestScopeFactoryImpl.class);
 		expectRegister(TestMatcher.class, TestMatcherImpl.class);
-		expectRegister(TestOperator.class, TestOperatorImpl.class);
 		expectRegister(TestRunner.class);
 
 		// Context Around

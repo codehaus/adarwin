@@ -17,5 +17,5 @@ public interface Registry {
 	void applyFilter(Filter filter);
 	
 	void push();
-	void pop();
+	void pop();	
 }

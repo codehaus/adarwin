@@ -2,7 +2,7 @@ package picounit.around.mock;
 
 import picounit.Mocker;
 import picounit.Test;
-import picounit.impl.MethodInvoker;
+import picounit.impl.MethodRunner;
 
 import java.lang.reflect.Method;
 
@@ -10,21 +10,21 @@ import java.lang.reflect.Method;
 public class MockAroundImpl implements MockAround {
 	private final Mocker mocker;
 	private final MockResolver mockResolver;
-	private final MethodInvoker methodInvoker;
+	private final MethodRunner methodRunner;
 
 	public MockAroundImpl(Mocker mocker, MockResolver mockResolver,
-		MethodInvoker methodInvoker) {
+		MethodRunner methodRunner) {
 
 		this.mocker = mocker;
 		this.mockResolver = mockResolver;
-		this.methodInvoker = methodInvoker;
+		this.methodRunner = methodRunner;
 	}
 
 	public void before(Object object, Method method) {
 		if (matches(object)) {	
 			mocker.reset();
 	
-			methodInvoker.invokeMatchingMethods(object, "mock", mockResolver);
+			methodRunner.invokeMethod(object, "mock", mockResolver);
 		}
 	}
 

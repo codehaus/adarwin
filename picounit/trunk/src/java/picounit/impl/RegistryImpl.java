@@ -79,23 +79,27 @@ public class RegistryImpl implements Registry {
 
 	public void registerTest(Class testClass) {
 		callStack.add(0, testClass);
-
+		
 		if (filter.passes(callStack)) {
 			userContainer.registerComponent(
 				new ConstructorInjectionComponentAdapter(testClass, testClass));
-
-			dispatchEvent(testClass);
-
+		
+			for (Iterator iterator = listeners.iterator(); iterator.hasNext(); ) {
+				RegistryListener registryListener = (RegistryListener) iterator.next();
+			
+				registryListener.registryEvent(testClass);
+			}
+		
 			userContainer.unregisterComponent(testClass);
 		}
-
+		
 		callStack.remove(0);
 	}
 
 	private void dispatchEvent(Class component) {
 		for (Iterator iterator = listeners.iterator(); iterator.hasNext(); ) {
 			RegistryListener registryListener = (RegistryListener) iterator.next();
-
+		
 			registryListener.registryEvent(component);
 		}
 	}

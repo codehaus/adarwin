@@ -1,21 +1,19 @@
 package picounit.runner;
 
 import picounit.MainRunner;
+import picounit.Runner;
 import picounit.Test;
 import picounit.Verify;
 import picounit.impl.Logger;
 import picounit.impl.NullLogger;
-import picounit.impl.Report;
+import picounit.impl.ReportImpl;
 
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 
 public class ReportingTest implements Test {
-	// Fixtures
-	private Report report;
-
 	// Unit
-	private final MainRunner suiteRunner = new MainRunner(false);
+	private final Runner runner = MainRunner.create();
 
 	public static class WooWooLogger implements Logger {
 
@@ -33,9 +31,9 @@ public class ReportingTest implements Test {
 	}
 	
 	public void testPassingTest(Verify verify) {
-	 	suiteRunner.registerFixture(Logger.class, NullLogger.class).run(PassingTest.class);
-
-	 	report = (Report) suiteRunner.get(Report.class);
+		ReportImpl report = new ReportImpl();
+		
+	 	runner.registerFixture(Logger.class, NullLogger.class).run(PassingTest.class, report);
 
 	 	verify.equal(1, report.visitedCount(Test.class));
 	 	verify.equal(2, report.visitedCount(Method.class));
@@ -48,9 +46,9 @@ public class ReportingTest implements Test {
 	}
 
 	public void testFailingTest(Verify verify) {
-		suiteRunner.run(FailingTest.class);
-
-		report = (Report) suiteRunner.get(Report.class);
+		ReportImpl report = new ReportImpl();
+	
+		runner.run(FailingTest.class, report);
 
 	 	verify.equal(1, report.visitedCount(Test.class));
 	 	verify.equal(2, report.visitedCount(Method.class));

@@ -21,17 +21,15 @@ public class AroundRunnerImpl implements AroundRunner {
 		this.resultListener = resultListener;
 	}
 
-	public void registryEvent(Class testClass) {
-		if (isAround(testClass)) {
-			arounds.add(testClass);
+	public void registryEvent(Class someClass) {
+		if (isAround(someClass)) {
+			arounds.add(someClass);
 		}
 	}
 
 	public void before(Object object, Method method) {
 		for (Iterator iterator = arounds.iterator(); iterator.hasNext(); ) {
-			Class aroundClass = (Class) iterator.next();
-
-			Around around = (Around) picoResolver.getComponent(aroundClass);
+			Around around = nextAround(iterator);
 
 			resultListener.enter(new ScopeImpl(Around.class, around));
 
@@ -41,19 +39,21 @@ public class AroundRunnerImpl implements AroundRunner {
 
 	public void after(Object object, java.lang.reflect.Method method) {
 		for (Iterator iterator = reverse(arounds).iterator(); iterator.hasNext(); ) {
-			Class aroundClass = (Class) iterator.next();
-	
-			Around around = (Around) picoResolver.getComponent(aroundClass);
+			Around around = nextAround(iterator);
 
 			try {
 				around.after(object, method);
-				
+
 				resultListener.exit();
 			}
 			catch (Throwable throwable) {
 				resultListener.exit(throwable);	
 			}
 		}
+	}
+
+	private Around nextAround(Iterator iterator) {
+		return (Around) picoResolver.getComponent((Class) iterator.next());
 	}
 
 	public int hashCode() {

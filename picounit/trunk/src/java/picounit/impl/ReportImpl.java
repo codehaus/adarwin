@@ -10,24 +10,15 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ReportImpl implements Report {
+public class ReportImpl implements ResultListener {
 	private final Date start;
-	private final Logger logger;
 
 	private final Collection visited = new LinkedList();
 	
 	private List stack = new LinkedList();
 
-
-	public ReportImpl(Logger logger, PicoResolver picoResolver) {
-		this.logger = logger;
+	public ReportImpl() {
 		this.start = new Date();
-	}
-
-	public void registryEvent(Class someClass) {
-		if (Reporter.class.isAssignableFrom(someClass)) {
-			
-		}
 	}
 	
 	public Scope[] matching(ScopeFilter scopeFilter) {
@@ -74,7 +65,7 @@ public class ReportImpl implements Report {
 	public void enter(Scope scope) {
 		visited.add(scope);
 		if (Method.class.equals(scope.getType())) {
-			logger.info(".");
+			System.out.print(".");
 		}
 
 		stack.add(0, scope);
@@ -100,8 +91,8 @@ public class ReportImpl implements Report {
 
 	public String toString() {
 		StringBuffer stringBuffer = new StringBuffer();
-		Scope[] failures = //matching(ScopeFilter.FAILING_FILTER); 
-			matching(new FailingTypeFilter(Method.class));
+		Scope[] failures = matching(ScopeFilter.FAILING_FILTER); 
+			//matching(new FailingTypeFilter(Method.class));
 
 		for (int index = 0; index < failures.length; index++) {
 			stringBuffer.append("Failure[" + (index + 1) + "] = " + failures[index].value() + "\n");
@@ -119,6 +110,6 @@ public class ReportImpl implements Report {
 		return "\n" + start + " - " + now + " (" + (now.getTime() - start.getTime())/1000.0 + ")" + 
 			"\nSuites: " + visitedCount(Suite.class) + ", Tests: " + visitedCount(Test.class) +
 			", Methods: " + visitedCount(Method.class) + ", Successes: " + successesCount(Method.class) +
-			", Failures: " + failuresCount(Method.class) + "\n\n" + stringBuffer.toString();
+			", Failures: " + failuresCount() + "\n\n" + stringBuffer.toString();
 	} 
 }

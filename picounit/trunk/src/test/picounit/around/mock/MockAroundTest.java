@@ -5,7 +5,7 @@ import picounit.Runner;
 import picounit.Test;
 import picounit.TestInstance;
 import picounit.Verify;
-import picounit.impl.MethodInvoker;
+import picounit.impl.MethodRunner;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,26 +14,26 @@ public class MockAroundTest implements Test {
 	// Mocks
 	private Mocker mocker;
 	private MockResolver mockResolver;
-	private MethodInvoker methodInvoker;
 	private TestInstance testInstance;
+	private MethodRunner methodRunner;
 
 	// Unit
 	private MockAround mockAround;
 
-	public void mock(Mocker mocker, MockResolver mockResolver, MethodInvoker methodInvoker,
-		TestInstance testInstance) {
+	public void mock(Mocker mocker, MockResolver mockResolver, TestInstance testInstance,
+		MethodRunner methodRunner) {
 
 		this.mocker = mocker;
 		this.mockResolver = mockResolver;
-		this.methodInvoker = methodInvoker;
 		this.testInstance = testInstance;
+		this.methodRunner = methodRunner;
 
-		this.mockAround = new MockAroundImpl(mocker, mockResolver, methodInvoker);
+		this.mockAround = new MockAroundImpl(mocker, mockResolver, methodRunner);
 	}
 	
 	public void testBefore(Mocker mocker) {
 		this.mocker.reset();
-		methodInvoker.invokeMatchingMethods(testInstance, "mock", mockResolver); 
+		methodRunner.invokeMethod(testInstance, "mock", mockResolver); 
 
 	 	mocker.replay();
 

@@ -14,14 +14,18 @@ public class ContextAroundImpl implements ContextAround {
 	}
 
 	public void before(Object object, Method method) {
-		if (object instanceof Suite) {
+		if (matches(object)) {
 			registry.push();
 		}
 	}
 
 	public void after(Object object, java.lang.reflect.Method method) {
-		if (object instanceof Suite) {
+		if (matches(object)) {
 			registry.pop();
 		}
+	}
+
+	private boolean matches(Object object) {
+		return object instanceof Suite;
 	}
 }
