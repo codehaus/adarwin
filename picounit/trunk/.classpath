@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/java"/>
+	<classpathentry output="test-classes" kind="src" path="src/test"/>
+	<classpathentry output="test-classes" kind="src" path="src/test-example"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/easymock-1.0.1b.jar"/>
+	<classpathentry kind="lib" path="lib/junit-3.8.1.jar"/>
+	<classpathentry kind="lib" path="lib/picocontainer-1.0.jar"/>
+	<classpathentry kind="output" path="classes"/>
+</classpath>

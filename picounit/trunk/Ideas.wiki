@@ -1,0 +1,51 @@
+  - Run a single test by using a filter
+  - Run slowest tests using a filter
+  - Reorder the tests using combination of reruns and filters. eg normal order = {1, 2, 3}, desire {3, 2, 1}
+    run {3}, {2}, {1}. desire {1, 3, 2}, run {1, 3}, {2}.
+  - Use heirarchicical containers for the tests. When a test/suite is registered, register in a child container
+    pop this container when the suite ends.
+    
+  - Use renderers, change reportImpl tp reporter, make it a registrationlistener, listening for renderers,
+    provide one for each runner.
+    
+  - Create a Runner component definition, plus registration.
+  
+  
+  
+  
+  
+Original = {1, 2, 3}
+
+Desired = {1, 3, 2}
+
+Run = {1, 3}, {2}
+
+Original = {1.1, 1.2, 1.3, 2.1, 2.2, 2.3}
+
+Desired = {1.1, 1.3, 2.2, 2.3, 2.1, 1.2}
+
+Run = {1{1,3}, 2{2,3}, 2{1}, 1{2}}
+
+Routine:
+
+let L = last test, N = next test
+L has heirarchy l1/l2/l3. Heirarchy is suite heirarchy, not package
+N has heirarchy n1/n2/n3
+
+if (L < N) pop L and N until L < N
+
+Maths problem: Minimal loosing of ordering to minimise popping.
+
+Should consider test method order as irrelevant
+
+- How can fixtures / overrideables be pushed into the userContainer and popped after
+there are finished. Finished = in around.after.
+
+- How can filtering be stack based, the filter needs to be removed as a property of the RegistryImpl
+and pushed into pico, the registryImpl should obtain the current instance
+
+- Use classLoading to inject a public method on TestCase picoSetUp() that invokes
+  {protected void setUp() throws Exception}
+  
+ - Use classLoading to inject a public method on TestCase picoTearDown() that invokes
+  {protected void tearDown() throws Exception}
