@@ -7,7 +7,8 @@ import junit.framework.TestCase;
 public class MutatorFactoryTestCase extends TestCase {
 	public void testSomething() throws Exception {
 		MutatorFactory mutatorFactory = new MutatorFactory(BooleanReturnMutator.class);
-		Mutator mutator = mutatorFactory.createMutator(BooleanReturn.LOCATION);
+		Mutator mutator = mutatorFactory.createMutator(
+			new CodeLocationMatcher(BooleanReturn.LOCATION));
 		
 		assertNotNull(mutator);
 		assertEquals(BooleanReturnMutator.class, mutator.getClass());

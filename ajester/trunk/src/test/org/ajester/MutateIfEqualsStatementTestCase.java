@@ -9,7 +9,8 @@ import junit.framework.TestFailure;
 public class MutateIfEqualsStatementTestCase extends TestCase {
 	public void testMutatingIFEQCausesIfStatementTestIfEqualToFail() throws Exception {
 		Report report = new TestRunnerWrapper().run(IfEqualsStatementTestCase.class,
-			new IfStatementMutator(IfEqualsStatement.LOCATION));
+			new IfStatementMatcher(new CodeLocationMatcher(IfEqualsStatement.LOCATION)),
+			new IfStatementInstructionMutator());
 		
 		assertEquals(1, report.getFailures().size());
 		TestFailure failure = (TestFailure) report.getFailures().toArray()[0];

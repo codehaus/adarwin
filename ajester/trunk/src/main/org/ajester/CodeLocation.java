@@ -1,6 +1,6 @@
 package org.ajester;
 
-public class CodeLocation implements CodeMatcher {
+public class CodeLocation {
 	private final String className;
 	private final String methodName;
 
@@ -19,15 +19,6 @@ public class CodeLocation implements CodeMatcher {
 
 	public String getMethodName() {
 		return methodName;
-	}
-
-	public boolean matches(String className) {
-		return getClassName().equals(className);
-	}
-
-	public boolean matches(CodeLocation codeLocation) {
-//		System.out.println(this + ".matches(" + codeLocation + ")");
-		return equals(codeLocation);
 	}
 
 	public boolean equals(Object obj) {
