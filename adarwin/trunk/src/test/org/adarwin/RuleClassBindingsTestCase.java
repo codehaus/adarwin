@@ -21,7 +21,7 @@ import org.adarwin.rule.NotRule;
 import org.adarwin.rule.Rule;
 import org.adarwin.rule.TrueRule;
 
-public class GrammarTestCase extends TestCase {
+public class RuleClassBindingsTestCase extends TestCase {
     public void testSingleMapping() {
         String rule = "rule";
 		RuleClassBindings ruleClassBindings = new RuleClassBindings(rule, TrueRule.class);
