@@ -1,6 +1,6 @@
 package picounit.test;
 
-import picounit.runner.Reporter;
+import picounit.impl.Reporter;
 
 public class TestReporter implements Reporter {
 }

@@ -1,4 +1,4 @@
-package picounit.runner;
+package picounit.impl;
 
 public interface Reporter {
 }

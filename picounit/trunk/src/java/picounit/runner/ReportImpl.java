@@ -2,8 +2,13 @@ package picounit.runner;
 
 import picounit.Suite;
 import picounit.Test;
+import picounit.impl.FailingTypeFilter;
 import picounit.impl.Logger;
+import picounit.impl.PassingTypeFilter;
 import picounit.impl.PicoResolver;
+import picounit.impl.Reporter;
+import picounit.impl.ScopeFilter;
+import picounit.impl.ScopeTypeFilter;
 
 import java.lang.reflect.Method;
 import java.util.Collection;

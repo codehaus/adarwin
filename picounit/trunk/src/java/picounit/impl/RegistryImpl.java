@@ -1,10 +1,8 @@
-package picounit.runner;
+package picounit.impl;
 
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.ConstructorInjectionComponentAdapter;
 
-import picounit.impl.EveryThingFilter;
-import picounit.impl.Filter;
 import picounit.pico.DynamicHeirarchyPicoContainer;
 
 import java.util.Collection;

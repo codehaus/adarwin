@@ -2,7 +2,7 @@ package picounit.test;
 
 import picounit.impl.Equals;
 import picounit.impl.MethodRunner;
-import picounit.runner.ResultListener;
+import picounit.impl.ResultListener;
 
 import java.lang.reflect.Method;
 

@@ -29,6 +29,7 @@ import picounit.impl.MethodInvokerImpl;
 import picounit.impl.MethodRunner;
 import picounit.impl.MethodRunnerImpl;
 import picounit.impl.PicoResolver;
+import picounit.impl.Registry;
 import picounit.impl.UserPicoResolver;
 import picounit.impl.VerifyImpl;
 import picounit.mocker.easymock.MockerImpl;
