@@ -73,7 +73,7 @@ public class VerifyImpl implements Verify {
 		if (expected == actual) {
 			return;
 		}
-		if (expected == null && actual != null) {
+		if (oneNullOtherNotNull(expected, actual)) {
 			fail = true;
 		}
 		else if (expected.getClass().isArray() && actual.getClass().isArray()) {
@@ -193,5 +193,10 @@ public class VerifyImpl implements Verify {
 		else {
 			return object.toString();
 		}
+	}
+
+	private boolean oneNullOtherNotNull(Object expected, Object actual) {
+		return (expected == null && actual != null) ||
+			(expected != null && actual == null);
 	}
 }

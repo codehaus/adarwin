@@ -14,13 +14,8 @@ public class ReportingTest implements Test {
 	// Unit
 	private ReportImpl report;
 
-	// Mocks
-	private MethodInvoker methodInvoker;
-
 	public void mock(MethodInvoker methodInvoker) {
-		this.report = new ReportImpl(methodInvoker);
-		
-		this.methodInvoker = methodInvoker;
+		this.report = new ReportImpl();
 	}
 	
 	public void testStartsOutWithAllCountsZero(Verify verify) {
@@ -30,8 +25,6 @@ public class ReportingTest implements Test {
 	}
 
 	public void testAddEvents(Mocker mocker, Verify verify) {
-		methodInvoker.invokeMethod(TestInstance.testOne);
-		
 		mocker.replay();
 
 		report.enter(new ScopeImpl(Test.TEST, Test.class, TestInstance.class));

@@ -39,7 +39,7 @@ public class RegistryImpl implements Registry {
 
 	public void registerInfrastructure(Class component) {
 		infrastructureContainer.registerComponentImplementation(component);
-		
+
 		dispatchEvent(component);
 
 		addListener(component);
@@ -47,6 +47,14 @@ public class RegistryImpl implements Registry {
 
 	public void registerInfrastructure(Class interfaceClass, Class implementationClass) {
 		infrastructureContainer.registerComponentImplementation(interfaceClass, implementationClass);
+
+		dispatchEvent(interfaceClass);
+
+		addListener(interfaceClass);
+	}
+	
+	public void registerInfrastructure(Class interfaceClass, Object implementation) {
+		infrastructureContainer.registerComponentInstance(interfaceClass, implementation);
 
 		dispatchEvent(interfaceClass);
 
@@ -94,6 +102,10 @@ public class RegistryImpl implements Registry {
 		}
 		
 		callStack.remove(0);
+	}
+	
+	public Object getComponentInstance(Object componentKey) {
+		return infrastructureContainer.getComponentInstance(componentKey);
 	}
 
 	private void dispatchEvent(Class component) {

@@ -16,10 +16,10 @@ public class SuiteGeneratorTest implements Test {
 //		verify.equal(SingleTestMethod.class.getName(), testSuite.getName());
 //		verify.equal(1, testSuite.countTestCases());
 	}
-	
+
 	public void testGenerateTestSuiteForSingleSuite(Verify verify) {
 //		System.out.println("\n testGenerateTestSuiteForSingleSuite");
-		
+
 		TestSuite testSuite = suiteGenerator.generate(SuiteWithSingleTest.class);
 	}
 	

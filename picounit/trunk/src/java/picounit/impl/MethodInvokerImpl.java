@@ -8,23 +8,21 @@ import java.lang.reflect.Method;
 
 public class MethodInvokerImpl implements MethodInvoker {
 	private final UserPicoResolver picoResolver;
-	private final ResultListener resultListener;
 	private final AroundRunner aroundRunner;
 
 	public MethodInvokerImpl(UserPicoResolver picoResolver, ResultListener resultListener,
 		AroundRunner aroundRunner) {
 
 		this.picoResolver = picoResolver;
-		this.resultListener = resultListener;
 		this.aroundRunner = aroundRunner;
 	}
 
-	public void invokeMethod(Method method) {
+	public void invokeMethod(Method method, ResultListener resultListener) {
 		try {
 			Object object = picoResolver.getComponent(method.getDeclaringClass());
 
 			aroundRunner.before(object, method);
-		
+
 			method.invoke(object, picoResolver.getComponents(method.getParameterTypes()));
 		
 			aroundRunner.after(object, method);

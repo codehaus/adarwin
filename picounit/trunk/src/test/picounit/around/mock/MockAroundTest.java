@@ -1,14 +1,12 @@
 package picounit.around.mock;
 
+import picounit.MainRunner;
 import picounit.Mocker;
 import picounit.Runner;
 import picounit.Test;
 import picounit.TestInstance;
 import picounit.Verify;
 import picounit.impl.MethodRunner;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class MockAroundTest implements Test {
 	// Mocks
@@ -48,40 +46,32 @@ public class MockAroundTest implements Test {
 		mockAround.after(testInstance, TestInstance.testOne);
 	}
 	
-	public void testExample(Mocker mocker, Verify verify, Runner runner) throws Throwable {
-		List list = (List) mocker.mock(List.class);
+	public void testExample(Verify verify) throws Throwable {
+		StringBuffer stringBuffer = new StringBuffer();
 
-		List objects = new LinkedList();
-		
-		runner.registerFixture(objects)
+		MainRunner.create().registerFixture(stringBuffer)
 			.run(ExampleTest.class);
 
-		Object[] actual = objects.toArray();
-
-		verify.equal(4, actual.length);
-		verify.equal(list.getClass(), actual[0].getClass());
-		verify.equal("testOne", actual[1]);
-		verify.equal(list.getClass(), actual[2].getClass());
-		verify.equal("testTwo", actual[3]);
+		verify.equal("mock testOne mock testTwo ", stringBuffer.toString());
 	}
 
 	public static class ExampleTest implements Test {
-		private final List objects;
+		private final StringBuffer stringBuffer;
 
-		public ExampleTest(List objects) {
-			this.objects = objects;
+		public ExampleTest(StringBuffer stringBuffer) {
+			this.stringBuffer = stringBuffer;
 		}
 
-		public void mock(List list) {
-			objects.add(list);
+		public void mock() {
+			stringBuffer.append("mock ");
 		}
 
 		public void testOne() {
-			objects.add("testOne");
+			stringBuffer.append("testOne ");
 		}
 		
 		public void testTwo() {
-			objects.add("testTwo");
+			stringBuffer.append("testTwo ");
 		}
 	}
 }

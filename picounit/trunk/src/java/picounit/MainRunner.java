@@ -62,7 +62,7 @@ public class MainRunner {
 			resultListener).runner;
 	}
 
-	private MainRunner() {
+	protected MainRunner() {
 		this.runner = registerInfrastructure();
 	}
 
@@ -72,6 +72,10 @@ public class MainRunner {
 
 		this.runner = registerInfrastructure(infrastructureContainer, overrideableContainer, userContainer, registry,
 			delegatingResultListener);
+	}
+	
+	protected final Runner getRunner() {
+		return runner;
 	}
 
 	private Runner registerInfrastructure() {
@@ -100,7 +104,7 @@ public class MainRunner {
 		infrastructureContainer.registerComponentInstance(Registry.class, registry);
 		infrastructureContainer.registerComponentInstance(ResultListener.class, delegatingResultListener);
 		overrideableContainer.registerComponentInstance(Runner.class, runner);
-		
+
 		registry.registerInfrastructure(ReportImpl.class);
 		
 		registry.registerOverrideable(Logger.class, LoggerImpl.class);
@@ -116,13 +120,8 @@ public class MainRunner {
 		registry.registerInfrastructure(AroundMatcher.class, AroundMatcherImpl.class);
 		registry.registerInfrastructure(AroundRunnerImpl.class);
 
-		registry.registerInfrastructure(SuiteScopeFactory.class, SuiteScopeFactoryImpl.class);
-		registry.registerInfrastructure(SuiteMatcher.class, SuiteMatcherImpl.class);
-		registry.registerInfrastructure(SuiteRunner.class);
-
-		registry.registerInfrastructure(TestScopeFactory.class, TestScopeFactoryImpl.class);
-		registry.registerInfrastructure(TestMatcher.class, TestMatcherImpl.class);
-		registry.registerInfrastructure(TestRunner.class);
+		registerSuiteRunner(registry);
+		registeryTestRunner(registry);
 
 		registry.registerInfrastructure(ContextAround.class, ContextAroundImpl.class);
 
@@ -132,5 +131,17 @@ public class MainRunner {
 		registry.registerInfrastructure(MockResolver.class, MockResolverImpl.class);
 		
 		return runner;
+	}
+
+	protected void registerSuiteRunner(Registry registry) {
+		registry.registerInfrastructure(SuiteScopeFactory.class, SuiteScopeFactoryImpl.class);
+		registry.registerInfrastructure(SuiteMatcher.class, SuiteMatcherImpl.class);
+		registry.registerInfrastructure(SuiteRunner.class);
+	}
+
+	protected void registeryTestRunner(Registry registry) {
+		registry.registerInfrastructure(TestScopeFactory.class, TestScopeFactoryImpl.class);
+		registry.registerInfrastructure(TestMatcher.class, TestMatcherImpl.class);
+		registry.registerInfrastructure(TestRunner.class);
 	}
 }

@@ -9,11 +9,11 @@ import picounit.impl.ScopeFactory;
 
 
 public class MethodRunnerTest implements Test {
-	// Mocks
-	private ScopeFactory scopeFactory;
-
 	// Unit
 	private MethodRunner methodRunner;
+
+	// Mocks
+	private ScopeFactory scopeFactory;
 
 	public void mock(ScopeFactory scopeFactory) {
 		this.scopeFactory = scopeFactory;

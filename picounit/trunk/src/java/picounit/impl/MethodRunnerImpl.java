@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 public class MethodRunnerImpl implements MethodRunner {
 	public void invokeMatchingMethods(Class someClass, String prefix, ScopeFactory scopeFactory) {
 		scopeFactory.enterClass(someClass);
-
+		
 		Method[] methods = someClass.getMethods();
 
 		for (int index = 0; index < methods.length; index++) {
@@ -18,7 +18,7 @@ public class MethodRunnerImpl implements MethodRunner {
 				scopeFactory.runMethod(method);
 			}
 		}
-
+		
 		scopeFactory.exit();
 	}
 
