@@ -1,19 +1,19 @@
 package org.ajester;
 
 public class AJester {
-	private String codeClassName;
 	private String testClassName;
-	private MutatingClassAdapter classAdapter;
+	private Mutator mutator;
+	private Class codeClass;
 
-	public AJester(String codeClassName, String testClassName, MutatingClassAdapter classAdapter) {
-		this.codeClassName = codeClassName;
-		this.testClassName = testClassName;
-		this.classAdapter = classAdapter;
+	public AJester(Class codeClass, Class testCaseClass, Mutator mutator) {
+		this.codeClass = codeClass;
+		this.testClassName = testCaseClass.getName();
+		this.mutator = mutator;
 	}
 
 	public Report run() throws Exception {
 		TestRunnerWrapper runnerWrapper = new TestRunnerWrapper();
-		TestResults results = runnerWrapper.run(testClassName, classAdapter);
-		return new Report(codeClassName, results);
+		TestResults results = runnerWrapper.run(testClassName, mutator);
+		return new Report(codeClass.getName(), results);
 	}
 }

@@ -2,18 +2,16 @@ package org.ajester;
 
 import org.objectweb.asm.ClassReader;
 
-import java.io.FileOutputStream;
-
 import junit.runner.TestCaseClassLoader;
 import junit.runner.TestSuiteLoader;
 
 public class MutatingClassLoader extends TestCaseClassLoader implements TestSuiteLoader {
-	private MutatingClassAdapter mutatingClassAdapter;
+	private Mutator mutator;
 
-	public MutatingClassLoader(MutatingClassAdapter mutatingClassAdapter) {
-		this.mutatingClassAdapter = mutatingClassAdapter;
+	public MutatingClassLoader(Mutator mutator) {
+		this.mutator = mutator;
 	}
-	
+
 	public Class load(String suiteClassName) throws ClassNotFoundException {
 		return loadClass(suiteClassName, true);
 	}
@@ -22,34 +20,34 @@ public class MutatingClassLoader extends TestCaseClassLoader implements TestSuit
 		return loadClass(aClass.getName(), true);
 	}
 
-	public synchronized Class loadClass(String name, boolean resolve)
+	public synchronized Class loadClass(String className, boolean resolve)
 		throws ClassNotFoundException {
-
-		if (mutatingClassAdapter.shouldMutate(name)) {
-			return loadAndMutateClass(name);
+		
+		if (mutator != null && mutator.shouldMutate(className)) {
+			return loadAndMutateClass(mutator, className);
 		}
-		else if (name.equals(Coverage.class.getName())) {
+		else if (className.equals(Coverage.class.getName())) {
 			return Coverage.class;
 		}
 		else {
-			return super.loadClass(name, resolve);
+			return super.loadClass(className, resolve);
 		}
 	}
-	
-	protected synchronized Class loadAndMutateClass(final String name)
+
+	private synchronized Class loadAndMutateClass(Mutator mutator, final String className)
 		throws ClassNotFoundException {
 		
-		String classResourceName = name.replace('.', '/') + ".class";
+		String classResourceName = className.replace('.', '/') + ".class";
 
 		try {
-			new ClassReader(getResourceAsStream(classResourceName)).accept(mutatingClassAdapter, false);
-			byte[] b = mutatingClassAdapter.getClassWriter().toByteArray();
+			new ClassReader(getResourceAsStream(classResourceName)).accept(mutator, false);
+			byte[] b = mutator.getClassWriter().toByteArray();
 			
-			return defineClass(name, b, 0, b.length);
+			return defineClass(className, b, 0, b.length);
 		} catch (Exception e) {
 			System.out.println("For some reason could not load: " + classResourceName);
 			e.printStackTrace();
-			throw new ClassNotFoundException(name, e);
+			throw new ClassNotFoundException(className, e);
 		}
 	}
 }

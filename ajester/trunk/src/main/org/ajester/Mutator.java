@@ -5,15 +5,19 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Label;
 
-class MutatingClassAdapter extends ClassAdapter implements CodeVisitor {
+abstract class Mutator extends ClassAdapter implements CodeVisitor {
 	private CodeVisitor codeVisitor;
 	private String currentClassName;
 	private String currentMethodName;
-	private String classToMutate;
+	private CodeLocation codeLocation;
 
-	public MutatingClassAdapter(String classToMutate) {
+	public Mutator(CodeLocation codeLocation) {
 		super(new ClassWriter(true));
-		this.classToMutate = classToMutate;
+		setCodeLocation(codeLocation);
+	}
+
+	public void setCodeLocation(CodeLocation codeLocation) {
+		this.codeLocation = codeLocation;
 	}
 
 	public ClassWriter getClassWriter() {
@@ -21,9 +25,14 @@ class MutatingClassAdapter extends ClassAdapter implements CodeVisitor {
 	}
 
 	public CodeVisitor visitMethod(final int access, final String name, final String desc, final String[] exceptions) {
-		currentMethodName = name;
-		codeVisitor = cv.visitMethod(access, name, desc, exceptions);
-		return this;
+		setMethodName(name);
+		setCodeVisitor(cv.visitMethod(access, name, desc, exceptions));
+		if (codeLocation.shouldMutate(getCurrentClassNameWithDots(), currentMethodName)) {
+			return this;
+		}
+		else {
+			return codeVisitor;
+		}
 	}
 
 	public void visit(int access, String name, String superName, String[] interfaces, String sourceFile) {
@@ -32,7 +41,7 @@ class MutatingClassAdapter extends ClassAdapter implements CodeVisitor {
 	}
 
 	public boolean shouldMutate(String className) {
-		return className.equals(classToMutate);
+		return codeLocation.shouldMutate(className);
 	}
 	
 	// CodeVisitor methods
@@ -119,12 +128,20 @@ class MutatingClassAdapter extends ClassAdapter implements CodeVisitor {
 		return currentMethodName;
 	}	
 
+	void setMethodName(String methodName) {
+		currentMethodName = methodName;
+	}
+
 	public String getCurrentClassName() {
 		return currentClassName;
 	}
 
-	public String getCurrentMethodName() {
-		return currentMethodName;
+	private String getCurrentClassNameWithDots() {
+		return getCurrentClassName().replace('/', '.');
 	}
 
+	void setCodeVisitor(CodeVisitor codeVisitor) {
+		this.codeVisitor = codeVisitor;
+	}
 }
+

@@ -7,12 +7,10 @@ import junit.framework.TestCase;
 
 public class MethodCoverageTestCase extends TestCase {
 	public void testCovered() throws Exception {
-		MethodCoverageClassAdapter methodCoverageClassAdapter =
-			new MethodCoverageClassAdapter(BooleanReturn.class.getName());
+		new TestRunnerWrapper().run(BooleanReturnTestCase.class,
+			new MethodCoverageMutator(BooleanReturn.GET_TRUE_LOCATION));
 
-		new TestRunnerWrapper().run(BooleanReturnTestCase.class.getName(),
-			methodCoverageClassAdapter);
-
-		assertTrue(Coverage.getMethodsCovered().contains("getTrue"));
+		assertTrue(Coverage.getMethodsCovered().contains(
+			BooleanReturn.GET_TRUE_LOCATION.getMethodName()));
 	}
 }
