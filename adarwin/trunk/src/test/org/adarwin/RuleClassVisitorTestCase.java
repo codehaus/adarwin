@@ -11,50 +11,62 @@
 package org.adarwin;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import junit.framework.TestCase;
 
 import org.adarwin.rule.ElementType;
 import org.adarwin.testmodel.HasZeroArgConstructor;
+import org.adarwin.testmodel.Simple;
 import org.adarwin.testmodel.UsesClassInPackageBInMethodThrowsClause;
 import org.adarwin.testmodel.a.InPackageA;
 import org.adarwin.testmodel.b.ExceptionInPackageB;
 
 public class RuleClassVisitorTestCase extends TestCase{
-	public void testSendsSummaryToRule() throws IOException {
-        ClassSummary expected = new ClassSummary(InPackageA.class.getName(),
-        	Constructor.EMPTY_CONSTRUCTOR, null,
-        	new CodeElement(InPackageA.class.getName(), ElementType.SOURCE));
+	public void testSource() throws IOException {
+		ClassSummary classSummary = new RuleClassVisitor().visit(new ClassFile(InPackageA.class));
 
-		assertEquals(expected, new RuleClassVisitor().visit(new ClassFile(InPackageA.class)));
+		assertTrue(classSummary.getDependancies().contains(
+			new CodeElement(InPackageA.class.getName(), ElementType.SOURCE)));
 	}
 	
 	public void testConstructor() throws IOException {
-		ClassSummary expected = new ClassSummary(HasZeroArgConstructor.class.getName(),
-			Constructor.EMPTY_CONSTRUCTOR, null,
-			new CodeElement(HasZeroArgConstructor.class.getName(), ElementType.SOURCE));
-			
-		assertEquals(expected,
-			new RuleClassVisitor().visit(new ClassFile(HasZeroArgConstructor.class)));
+		ClassSummary classSummary = new RuleClassVisitor().visit(
+			new ClassFile(HasZeroArgConstructor.class));
+		
+		assertTrue(classSummary.getConstructors().contains(Constructor.EMPTY_CONSTRUCTOR));
+	}
+	
+	public void testVoidReturnMethod() throws IOException {
+		ClassSummary classSummary = new RuleClassVisitor().visit(new ClassFile(Simple.class));
+		Method method = new Method(Simple.VOID_RETURN_METHOD, Void.TYPE, new Class[0]);
+		assertTrue(classSummary.getMethods().contains(method));
+	}
+	
+	public void testNoArgMethod() throws IOException {
+		ClassSummary classSummary = new RuleClassVisitor().visit(new ClassFile(Simple.class));
+		Method method = new Method(Simple.NO_ARG_METHOD, Integer.class, new Class[0]);
+		assertTrue(classSummary.getMethods().contains(method));
+	}
+
+	public void testSingleArgMethod() throws IOException {
+		ClassSummary classSummary = new RuleClassVisitor().visit(new ClassFile(Simple.class));
+		Method method = new Method(Simple.SINGLE_ARG_METHOD, Integer.class, new Class[] {String.class});
+		assertTrue(classSummary.getMethods().contains(method));
+	}
+	
+	public void testTwoArgMethod() throws IOException {
+		ClassSummary classSummary = new RuleClassVisitor().visit(new ClassFile(Simple.class));
+		Method method = new Method(Simple.TWO_ARG_METHOD, Integer.class,
+			new Class[] {String.class, String.class});
+		assertTrue(classSummary.getMethods().contains(method));
 	}
 	
 	public void testThrowsClause() throws IOException {
-		Set dependancies = new HashSet();
-
-		dependancies.add(new CodeElement(ExceptionInPackageB.class.getName(), ElementType.USES));
-		dependancies.add(new CodeElement(
-			UsesClassInPackageBInMethodThrowsClause.class.getName(), ElementType.SOURCE));
-		
-		ClassSummary expected = new ClassSummary(
-			UsesClassInPackageBInMethodThrowsClause.class.getName(),
-			ClassSummary.createSet(Constructor.EMPTY_CONSTRUCTOR),
-				Collections.EMPTY_SET, dependancies);
-
-		assertEquals(expected, new RuleClassVisitor().visit(
-			new ClassFile(UsesClassInPackageBInMethodThrowsClause.class)));
+		ClassSummary classSummary = new RuleClassVisitor().visit(
+			new ClassFile(UsesClassInPackageBInMethodThrowsClause.class));
+			
+		assertTrue(classSummary.getDependancies().contains(
+			new CodeElement(ExceptionInPackageB.class.getName(), ElementType.USES)));
 	}
 }
 

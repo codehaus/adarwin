@@ -15,6 +15,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.adarwin.Runner.UsageException;
+
 import junit.framework.TestCase;
 
 import com.mockobjects.dynamic.OrderedMock;
@@ -78,10 +80,10 @@ public class RunnerTest extends TestCase {
 		
 		try {
 			runner.run();
-			fail("BuildException expected");
+			fail("RuleException expected");
 		}
-		catch (RuleException be) {
-			assertEquals(Runner.BINDING + Runner.MISSING_OR_EMPTY, be.getMessage());
+		catch (RuleException e) {
+			assertEquals(Runner.BINDING + Runner.MISSING_OR_EMPTY, e.getMessage());
 		}
 	}
 	
@@ -90,10 +92,10 @@ public class RunnerTest extends TestCase {
 		
 		try {
 			runner.run();
-			fail("BuildException expected");
+			fail("RuleException expected");
 		}
-		catch (RuleException be) {
-			assertEquals(Runner.CLASSPATH + Runner.MISSING_OR_EMPTY, be.getMessage());
+		catch (RuleException e) {
+			assertEquals(Runner.CLASSPATH + Runner.MISSING_OR_EMPTY, e.getMessage());
 		}
 	}
 
@@ -103,20 +105,56 @@ public class RunnerTest extends TestCase {
 		
 		try {
 			runner.run();
-			fail("BuildException expected");
+			fail("RuleException expected");
 		}
-		catch (RuleException be) {
-			assertEquals("both ruleExpression and ruleFileName parameters are missing or empty", be.getMessage());
+		catch (RuleException e) {
+			assertEquals(Runner.RULE_EXPRESSION_AND_RULE_FILE_NAME_MISSING, e.getMessage());
+		}
+	}
+	
+	public void testMainMissingBinding() throws UsageException {
+		try {
+			new Runner.Main(new String[] {
+				"-c", "target/test-classes",
+				"-r", "false"
+			}).getRunner().run();
+			fail("RuleException expected");
+		} catch (RuleException e) {
+			assertEquals(Runner.BINDING + Runner.MISSING_OR_EMPTY, e.getMessage());
+		}
+	}
+
+	public void testMainMissingClassPath() throws UsageException {
+		try {
+			new Runner.Main(new String[] {
+				"-b", "rules.properties",
+				"-r", "false"
+			}).getRunner().run();
+			fail("RuleException expected");
+		} catch (RuleException e) {
+			assertEquals(Runner.CLASSPATH + Runner.MISSING_OR_EMPTY, e.getMessage());
+		}
+	}
+
+	public void testMainMissingRuleExpressionAndRuleFileName() throws UsageException {
+		try {
+			new Runner.Main(new String[] {
+				"-b", "rules.properties",
+				"-c", "target/test-classes"
+			}).getRunner().run();
+			fail("RuleException expected");
+		} catch (RuleException e) {
+			assertEquals(Runner.RULE_EXPRESSION_AND_RULE_FILE_NAME_MISSING, e.getMessage());
 		}
 	}
 
 	private void executeTask() {
 		try {
 			runner.run();
-			fail("BuildException expected");
+			fail("RuleException expected");
 		}		
-		catch (RuleException be) {
-			assertEquals(Runner.RULE_VIOLATED, be.getMessage());
+		catch (RuleException e) {
+			assertEquals(Runner.RULE_VIOLATED, e.getMessage());
 		}
 	}
 	

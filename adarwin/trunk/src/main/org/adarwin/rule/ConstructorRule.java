@@ -13,6 +13,7 @@ package org.adarwin.rule;
 import org.adarwin.ClassSummary;
 import org.adarwin.Constructor;
 import org.adarwin.RuleClassBindings;
+import org.adarwin.Util;
 
 public class ConstructorRule implements Rule {
 	private String[] parameterTypes;
@@ -26,7 +27,7 @@ public class ConstructorRule implements Rule {
 	}
 	
 	public ConstructorRule(Class[] parameterTypes) {
-		this(convertClassArrayToStringArray(parameterTypes));
+		this(Util.convertClassArrayToStringArray(parameterTypes));
 	}
 
 	public boolean inspect(ClassSummary classSummary) {
@@ -46,15 +47,5 @@ public class ConstructorRule implements Rule {
 		
 		buffer.append(')');
 		return buffer.toString();
-	}
-
-	private static String[] convertClassArrayToStringArray(Class[] classParameterTypes) {
-		String[] parameterTypes = new String[classParameterTypes.length];
-		
-		for (int cLoop = 0; cLoop < classParameterTypes.length; ++cLoop) {
-			parameterTypes[cLoop] = classParameterTypes[cLoop].getName();
-		}
-		
-		return parameterTypes;
 	}
 }

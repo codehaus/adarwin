@@ -28,6 +28,10 @@ public class Constructor {
 		this.exceptions = exceptions;
 	}
 
+	public Constructor(IType[] parameterTypes) {
+		this(getTypeNames(parameterTypes));
+	}
+
 	public String toString() {
 		synchronized (this) {
 			if (toString == null) {
@@ -70,5 +74,15 @@ public class Constructor {
 		Constructor other = (Constructor) obj;		
 		
 		return Arrays.equals(parameterTypes, other.parameterTypes);
+	}
+
+	private static String[] getTypeNames(IType[] types) {
+		String[] typeNames = new String[types.length];
+		
+		for (int pLoop = 0; pLoop < typeNames.length; pLoop++) {
+			typeNames[pLoop] = types[pLoop].getTypeName();
+		}
+		
+		return typeNames;
 	}
 }
