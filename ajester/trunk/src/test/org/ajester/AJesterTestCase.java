@@ -1,11 +1,12 @@
 package org.ajester;
 
-import org.ajester.testmodel.BooleanReturn;
-import org.ajester.testmodel.BooleanReturnTestCase;
-import org.ajester.testmodel.IfStatement;
-import org.ajester.testmodel.IfStatementTestCase;
-import org.ajester.testmodel.ProblematicIfStatement;
-import org.ajester.testmodel.ProblematicIfStatementTestCase;
+
+import org.ajester.testmodel.code.BooleanReturn;
+import org.ajester.testmodel.code.IfStatement;
+import org.ajester.testmodel.code.ProblematicIfStatement;
+import org.ajester.testmodel.test.BooleanReturnTestCase;
+import org.ajester.testmodel.test.IfStatementTestCase;
+import org.ajester.testmodel.test.ProblematicIfStatementTestCase;
 
 import java.util.HashSet;
 import java.util.Set;

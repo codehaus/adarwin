@@ -1,4 +1,4 @@
-package org.ajester.testmodel;
+package org.ajester.testmodel.code;
 
 import org.ajester.CodeLocation;
 

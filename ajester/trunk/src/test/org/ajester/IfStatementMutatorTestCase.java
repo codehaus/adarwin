@@ -1,6 +1,6 @@
 package org.ajester;
 
-import org.ajester.testmodel.IfStatement;
+import org.ajester.testmodel.code.IfStatement;
 import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Constants;
 import org.objectweb.asm.Label;

@@ -1,7 +1,7 @@
 package org.ajester;
 
-import org.ajester.testmodel.ProblematicBooleanReturn;
-import org.ajester.testmodel.ProblematicBooleanReturnTestCase;
+import org.ajester.testmodel.code.ProblematicBooleanReturn;
+import org.ajester.testmodel.test.ProblematicBooleanReturnTestCase;
 
 import junit.framework.TestCase;
 
