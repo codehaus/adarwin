@@ -1,8 +1,8 @@
 package picounit.junit;
 
-import junit.framework.TestSuite;
 import picounit.Test;
 import picounit.Verify;
+import junit.framework.TestSuite;
 
 public class SuiteGeneratorTest implements Test {
 	// Unit

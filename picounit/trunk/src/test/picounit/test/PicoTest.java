@@ -22,7 +22,7 @@ public class PicoTest implements Test {
 
 		verify.that(instance instanceof ArrayList);
 	}
-	
+
 	public void test3tier(Verify verify) {
 		MutablePicoContainer grandParent = new DefaultPicoContainer();
 		MutablePicoContainer parent = new DefaultPicoContainer(grandParent);

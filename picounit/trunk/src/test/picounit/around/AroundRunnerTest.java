@@ -35,11 +35,11 @@ public class AroundRunnerTest implements Test {
 
 		this.aroundRunner = new AroundRunnerImpl(picoResolver, resultListener);
 	}
-	
+
 	public void testBefore(Mocker mocker) {
 		mocker.expectAndReturn(picoResolver.getComponent(SetUpAround.class), setUpAround);
 		mocker.expectAndReturn(picoResolver.getComponent(MockAround.class), mockAround);
-		
+
 		resultListener.enter(new ScopeImpl(Around.class, setUpAround));
 		setUpAround.before(testInstance, TestInstance.testOne);
 

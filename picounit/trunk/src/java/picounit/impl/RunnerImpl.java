@@ -1,33 +1,58 @@
 package picounit.impl;
 
+import picounit.MainRunner;
 import picounit.Runner;
 
 public class RunnerImpl implements Runner {
-	private final Registry registry;
+	private final MainRunner mainRunner;
 
-	public RunnerImpl(Registry registry) {
-		this.registry = registry;
+	public RunnerImpl(MainRunner mainRunner) {
+		this.mainRunner = mainRunner;
 	}
 
 	public Runner registerFixture(Class interfaceClass, Class implementationClass) {
-		registry.registerFixture(interfaceClass, implementationClass);
+		mainRunner.registerFixture(interfaceClass, implementationClass);
+
+		return this;
+	}
+
+	public Runner registerFixture(Class implementationClass) {
+		mainRunner.registerFixture(implementationClass);
 		
 		return this;
 	}
 	
+	public Runner registerFixture(Class interfaceClass, Object implementation) {
+		mainRunner.registerFixture(interfaceClass, implementation);
+		
+		return this;
+	}
+
 	public Runner registerFixture(Object implementation) {
-		registry.registerFixture(implementation);
+		mainRunner.registerFixture(implementation);
 		
 		return this;
 	}
 
 	public Runner applyFilter(Filter filter) {
-		registry.applyFilter(filter);
-		
+		mainRunner.applyFilter(filter);
+
 		return this;
 	}
 
-	public void run(Class testClass) {
-		registry.registerTest(testClass);
+	public Runner run(Class testClass) {
+		mainRunner.run(testClass);
+
+		return this;
+	}
+
+	public Runner run(Class testClass, ResultListener resultListener) {
+		mainRunner.run(testClass, resultListener);
+
+		return this;
+	}
+
+	public void print() {
+		mainRunner.print();
 	}
 }

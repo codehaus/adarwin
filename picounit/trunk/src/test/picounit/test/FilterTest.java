@@ -13,7 +13,7 @@ import java.util.List;
 
 public class FilterTest implements Test {
 	// Fixtures
-	private MainRunner picoSuiteRunnerImpl;
+	private Runner runner;
 	private StringBuffer stringBuffer;
 	private Verify verify;
 	
@@ -27,43 +27,36 @@ public class FilterTest implements Test {
 		this.verify = verify;
 		this.stringBuffer = new StringBuffer();
 		
-		this.picoSuiteRunnerImpl = new MainRunner(false);
-		this.picoSuiteRunnerImpl.registerFixture(stringBuffer);
+		this.runner = MainRunner.create();
+		this.runner.registerFixture(stringBuffer);
 	}
-	
+
 	public void testRunNothing() {
-		picoSuiteRunnerImpl.applyFilter(new NothingFilter()).run(IgnoreTest.class);
+		runner.applyFilter(new NothingFilter()).run(IgnoreTest.class);
 
 		verify.equal("", stringBuffer.toString());
 	}
 
-	public void testRunOneTestClass(Runner runner) {
-//		StringBuffer stringBuffer = new StringBuffer();
-		
-//		runner.registerFixture(stringBuffer);
-		
+	public void testRunOneTestClass() {
 		Filter filter = new Filter() {
 			public boolean passes(List callStack) {
 				return matches(callStack, callStack(FilterSuite.class, DontIgnoreTest.class)); 
 			}
 		};
 
-//		runner.applyFilter(filter);
-//		runner.run(FilterSuite.class);
-		
-		picoSuiteRunnerImpl.applyFilter(filter).run(FilterSuite.class);
+		runner.applyFilter(filter).run(FilterSuite.class);
 
 		verify.equal("DontIgnoreTest ", stringBuffer.toString());
 	}
 
 	public void testRunSterlingTestOnlyInUKSuite() {
-		picoSuiteRunnerImpl.applyFilter(sterlingInUKFilter).run(UKSuite.class);
+		runner.applyFilter(sterlingInUKFilter).run(UKSuite.class);
 
 		verify.equal("SterlingTest ", stringBuffer.toString());
 	}
 
 	public void testDontRunSterlingTestInUSSuite() {
-		picoSuiteRunnerImpl.applyFilter(sterlingInUKFilter).run(USSuite.class);
+		runner.applyFilter(sterlingInUKFilter).run(USSuite.class);
 
 		verify.equal("", stringBuffer.toString());
 	}

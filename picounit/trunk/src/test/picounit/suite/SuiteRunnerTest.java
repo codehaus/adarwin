@@ -6,33 +6,38 @@ import picounit.Runner;
 import picounit.Suite;
 import picounit.Test;
 import picounit.Verify;
+import picounit.impl.MethodRunner;
 
 public class SuiteRunnerTest implements Test {
 	// Mocks
-	private SuiteOperator suiteOperator;
 	private SuiteMatcher suiteMatcher;
-	
+	private SuiteScopeFactory suiteScopeFactory;
+	private MethodRunner methodRunner;
+
 	// Fixtures
-	private MainRunner picoSuiteRunnerImpl;
+	private Runner runner;
 	private StringBuffer stringBuffer;
 
 	// Unit
 	private SuiteRunner suiteRunnerImpl;
 
-	public void mock(SuiteMatcher suiteMatcher, SuiteOperator suiteOperator) {
-		this.suiteMatcher = suiteMatcher;
-		this.suiteOperator = suiteOperator;
+	public void mock(SuiteMatcher suiteMatcher, SuiteScopeFactory suiteScopeFactory,
+		MethodRunner methodRunner) {
 		
-		this.stringBuffer = new StringBuffer();
-		this.picoSuiteRunnerImpl = new MainRunner(false);
-		this.picoSuiteRunnerImpl.registerFixture(stringBuffer);
+		this.suiteMatcher = suiteMatcher;
+		this.suiteScopeFactory = suiteScopeFactory;
+		this.methodRunner = methodRunner;
 
-		this.suiteRunnerImpl = new SuiteRunner(suiteMatcher, suiteOperator);
+		this.stringBuffer = new StringBuffer();
+		this.runner = MainRunner.create();
+		this.runner.registerFixture(stringBuffer);
+
+		this.suiteRunnerImpl = new SuiteRunner(suiteMatcher, suiteScopeFactory, methodRunner);
 	}
-	
+
 	public void testRunVisitsRegisteredTestClasses(Mocker mocker) {
 		mocker.expectAndReturn(suiteMatcher.matches(SuiteInstance.class), true);
-		suiteOperator.operate(SuiteInstance.class);
+		methodRunner.invokeMatchingMethods(SuiteInstance.class, "suite", suiteScopeFactory);
 
 		mocker.replay();
 
@@ -40,13 +45,13 @@ public class SuiteRunnerTest implements Test {
 	}
 	
 	public void testSuiteInvoked(Verify verify) {
-		picoSuiteRunnerImpl.run(SuiteInstance.class);
+		runner.run(SuiteInstance.class);
 
 		verify.equal("SuiteInstance.suite ", stringBuffer.toString());
 	}
 	
 	public void testTestsAndSuitesReferedToInSuiteInvoked(Verify verify) {
-		picoSuiteRunnerImpl.run(SuiteWithTests.class);
+		runner.run(SuiteWithTests.class);
 		
 		verify.equal("TestInstance.test SuiteInstance.suite ", stringBuffer.toString());
 	}

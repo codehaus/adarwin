@@ -16,11 +16,11 @@ public class ReportTest implements Test {
 
 	// Unit
 	private ReportImpl report;
-	
+
 	public void mock(Logger logger) {
 		this.logger = logger;
 
-		this.report = new ReportImpl(logger, null);
+		this.report = new ReportImpl();
 	}
 
 	public void testStartsOutWithAllCountsZero(Verify verify) {
@@ -30,8 +30,6 @@ public class ReportTest implements Test {
 	}
 
 	public void testAddEvents(Mocker mocker, Verify verify) {
-		logger.info(".");
-
 		mocker.replay();
 
 		report.enter(new ScopeImpl(Test.class, TestInstance.class));

@@ -5,83 +5,75 @@ import picounit.Mocker;
 import picounit.Test;
 import picounit.TestInstance;
 import picounit.Verify;
-import picounit.impl.MethodInvoker;
+import picounit.impl.MethodRunner;
 import picounit.impl.PicoResolver;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 public class SetUpAroundTest implements Test {
 	// Mocks
-	private MethodInvoker methodInvoker;
 	private TestInstance testInstance;
 	private PicoResolver picoResolver;
+	private MethodRunner methodRunner;
 
 	// Unit
 	private SetUpAround setUpAround;
 
-	public void mock(MethodInvoker methodInvoker, TestInstance testInstance,
-		PicoResolver picoResolver) {
+	public void mock(TestInstance testInstance, PicoResolver picoResolver,
+		MethodRunner methodRunner) {
 
-		this.methodInvoker = methodInvoker;
 		this.testInstance = testInstance;
 		this.picoResolver = picoResolver;
+		this.methodRunner = methodRunner;
 		
-		this.setUpAround = new SetUpAroundImpl(methodInvoker, picoResolver);
+		this.setUpAround = new SetUpAroundImpl(methodRunner, picoResolver);
 	}
 	
 	public void testBeforeInvokesSetUpMethods(Mocker mocker) {
-		methodInvoker.invokeMatchingMethods(testInstance, "setUp", picoResolver);
+		methodRunner.invokeMethod(testInstance, "setUp", picoResolver);
 		
 		mocker.replay();
 		
 	 	setUpAround.before(testInstance, TestInstance.testOne);
 	}
-	
+
 	public void testAfterInvokesTearDownMethods(Mocker mocker) {
-	 	methodInvoker.invokeMatchingMethods(testInstance, "tearDown", picoResolver);
+		methodRunner.invokeMethod(testInstance, "tearDown", picoResolver);
 
 		mocker.replay();
 
 		setUpAround.after(testInstance, TestInstance.testOne);
 	}
-	
-	public void testExample(Verify verify)
-		throws InstantiationException, IllegalAccessException {
 
-		StringBuffer stringBuffer = new StringBuffer();
-		LinkedList linkedList = new LinkedList();
-		
-		ExampleTest.objects.clear();
-		new MainRunner(false)
-			.registerFixture(stringBuffer)
-			.registerFixture(linkedList)
+	public void testCallsSetupBeforeAndTearDownAfterEachTestMethod(Verify verify) {
+		StringBuffer invocations = new StringBuffer();
+
+		MainRunner.create()
+			.registerFixture(invocations)
 			.run(ExampleTest.class);
 
-		List expected = Arrays.asList(new Object[] {stringBuffer, "testOne", linkedList,
-			stringBuffer, "testTwo", linkedList});
-
-		verify.equal(expected, ExampleTest.objects);
+		verify.equal("setUp testOne tearDown setUp testTwo tearDown ", invocations.toString());
 	}
-
+	
 	public static class ExampleTest implements Test {
-		public static final List objects = new LinkedList();
+		private final StringBuffer invocations;
 
-		public void setUp(StringBuffer stringBuffer) {
-			objects.add(stringBuffer);
+		public ExampleTest(StringBuffer invocations) {
+			this.invocations = invocations;
 		}
 
-		public void tearDown(LinkedList linkedList) {
-			objects.add(linkedList);
+		public void setUp() {
+			invocations.append("setUp ");
+		}
+
+		public void tearDown() {
+			invocations.append("tearDown ");
 		}
 
 		public void testOne() {
-			objects.add("testOne");
+			invocations.append("testOne ");
 		}
-		
+
 		public void testTwo() {
-			objects.add("testTwo");			
+			invocations.append("testTwo ");
 		}
 	}
 }

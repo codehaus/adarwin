@@ -1,7 +1,5 @@
 package picounit;
 
-
-
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
 
@@ -16,18 +14,18 @@ import picounit.around.mock.MockResolver;
 import picounit.around.mock.MockResolverImpl;
 import picounit.around.setup.SetUpAround;
 import picounit.around.setup.SetUpAroundImpl;
+import picounit.impl.DelegatingResultListener;
 import picounit.impl.Filter;
 import picounit.impl.Logger;
 import picounit.impl.LoggerImpl;
-import picounit.impl.MethodInvoker;
-import picounit.impl.MethodInvokerImpl;
 import picounit.impl.MethodRunner;
 import picounit.impl.MethodRunnerImpl;
 import picounit.impl.PicoResolver;
 import picounit.impl.Registry;
 import picounit.impl.RegistryImpl;
-import picounit.impl.Report;
 import picounit.impl.ReportImpl;
+import picounit.impl.ResultListener;
+import picounit.impl.ResultListenerImpl;
 import picounit.impl.RunnerImpl;
 import picounit.impl.UserPicoResolver;
 import picounit.impl.VerifyImpl;
@@ -37,15 +35,11 @@ import picounit.pico.DynamicHeirarchyPicoContainerImpl;
 import picounit.pico.PicoResolverImpl;
 import picounit.suite.SuiteMatcher;
 import picounit.suite.SuiteMatcherImpl;
-import picounit.suite.SuiteOperator;
-import picounit.suite.SuiteOperatorImpl;
 import picounit.suite.SuiteRunner;
 import picounit.suite.SuiteScopeFactory;
 import picounit.suite.SuiteScopeFactoryImpl;
 import picounit.test.TestMatcher;
 import picounit.test.TestMatcherImpl;
-import picounit.test.TestOperator;
-import picounit.test.TestOperatorImpl;
 import picounit.test.TestRunner;
 import picounit.test.TestScopeFactory;
 import picounit.test.TestScopeFactoryImpl;
@@ -57,31 +51,42 @@ public class MainRunner implements Runner {
 	private final MutablePicoContainer infrastructureContainer;
 
 	private final Registry registry;
+	private DelegatingResultListener delegatingResultListener;
+	private Runner runner;
 
-	private boolean infrastructureRegistered;
-	private boolean printReport;
-
-	public MainRunner() {
-		this(true);
+	public static Runner create() {
+		return new MainRunner().runner;
 	}
-		
-	public MainRunner(boolean printReport) {
-		this.printReport = printReport;
+
+	private MainRunner() {
 		this.overrideableContainer = new DefaultPicoContainer();
 		this.userContainer = new DynamicHeirarchyPicoContainerImpl(overrideableContainer); 
 		this.infrastructureContainer = new DefaultPicoContainer(userContainer);
 		this.registry = new RegistryImpl(infrastructureContainer, userContainer, overrideableContainer);
+		this.delegatingResultListener = new ResultListenerImpl();
+
+		this.delegatingResultListener.setDelegate(new ReportImpl());
+		this.runner = new RunnerImpl(this);
+
+		registerInfrastructureImpl();
 	}
 
 	public MainRunner(MutablePicoContainer overrideableContainer,
 		DynamicHeirarchyPicoContainer userContainer, MutablePicoContainer infrastructureContainer,
-		Registry registry) {
+		Registry registry, DelegatingResultListener resultListener) {
 
-		this.printReport = false;
 		this.overrideableContainer = overrideableContainer;
 		this.userContainer = userContainer;
 		this.infrastructureContainer = infrastructureContainer;
 		this.registry = registry;
+		this.delegatingResultListener = resultListener;
+		this.runner = new RunnerImpl(this);
+
+		registerInfrastructureImpl();
+	}
+
+	public void print() {
+		System.out.println(delegatingResultListener.getDelegate());
 	}
 
 	public Runner applyFilter(Filter filter) {
@@ -89,7 +94,7 @@ public class MainRunner implements Runner {
 
 		return this;
 	}
-	
+
 	public MainRunner registerInfrastructure(Class implementationClass) {
 		registry.registerInfrastructure(implementationClass);
 
@@ -125,74 +130,73 @@ public class MainRunner implements Runner {
 
 		return this;
 	}
-	
+
 	public Runner registerFixture(Object implementation) {
 		registry.registerFixture(implementation);
+
+		return this;
+	}
+
+	public Runner run(Class someClass, ResultListener resultListener) {
+		ResultListener previous = delegatingResultListener.setDelegate(resultListener);
+
+		runImpl(someClass);
+
+		delegatingResultListener.setDelegate(previous);
 		
 		return this;
 	}
 
-	public void run(Class testClass) {
-		registerInfrastructureImpl();
+	public Runner run(Class someClass) {
+		runImpl(someClass);
 
-		registry.registerTest(testClass);
+		return this;
+	}
 
-		if (printReport) {
-			System.out.println(infrastructureContainer.getComponentInstance(Report.class));
-		}
+	private void runImpl(Class someClass) {
+		registry.registerTest(someClass);
 	}
 
 	private void registerInfrastructureImpl() {
-		if (!infrastructureRegistered) {
-			infrastructureContainer.registerComponentInstance(Registry.class, registry);
-			overrideableContainer.registerComponentInstance(Runner.class, new RunnerImpl(registry));
+		infrastructureContainer.registerComponentInstance(Registry.class, registry);
+		infrastructureContainer.registerComponentInstance(ResultListener.class, delegatingResultListener);
+		overrideableContainer.registerComponentInstance(Runner.class, runner);
 
-			registerOverrideable(Logger.class, LoggerImpl.class);
-			registerOverrideable(Verify.class, VerifyImpl.class);
-			registerOverrideable(Mocker.class, MockerImpl.class);
+		registerOverrideable(Logger.class, LoggerImpl.class);
+		registerOverrideable(Verify.class, VerifyImpl.class);
+		registerOverrideable(Mocker.class, MockerImpl.class);
 
-			registerInfrastructure(PicoResolver.class, PicoResolverImpl.class);
-			registerFixture(UserPicoResolver.class, new PicoResolverImpl(userContainer));
+		registerInfrastructure(PicoResolver.class, PicoResolverImpl.class);
+		registerFixture(UserPicoResolver.class, new PicoResolverImpl(userContainer));
 
-			registerInfrastructure(Report.class, ReportImpl.class);
-			registerInfrastructure(MethodInvoker.class, MethodInvokerImpl.class);
-			registerInfrastructure(MethodRunner.class, MethodRunnerImpl.class);
-	
-			// Around
-			registerInfrastructure(AroundMatcher.class, AroundMatcherImpl.class);
-			registerInfrastructure(AroundRunnerImpl.class);
+		registerInfrastructure(MethodRunner.class, MethodRunnerImpl.class);
 
-			// Suite Runner
-			registerInfrastructure(SuiteScopeFactory.class, SuiteScopeFactoryImpl.class);
-			registerInfrastructure(SuiteMatcher.class, SuiteMatcherImpl.class);
-			registerInfrastructure(SuiteOperator.class, SuiteOperatorImpl.class);
-			registerInfrastructure(SuiteRunner.class);
+		// Around
+		registerInfrastructure(AroundMatcher.class, AroundMatcherImpl.class);
+		registerInfrastructure(AroundRunnerImpl.class);
 
-			// Test Runner
-			registerInfrastructure(TestScopeFactory.class, TestScopeFactoryImpl.class);
-			registerInfrastructure(TestMatcher.class, TestMatcherImpl.class);
-			registerInfrastructure(TestOperator.class, TestOperatorImpl.class);
-			registerInfrastructure(TestRunner.class);
+		// Suite Runner
+		registerInfrastructure(SuiteScopeFactory.class, SuiteScopeFactoryImpl.class);
+		registerInfrastructure(SuiteMatcher.class, SuiteMatcherImpl.class);
+		registerInfrastructure(SuiteRunner.class);
 
-			// ContextAround
-			registerInfrastructure(ContextAround.class, ContextAroundImpl.class);
+		// Test Runner
+		registerInfrastructure(TestScopeFactory.class, TestScopeFactoryImpl.class);
+		registerInfrastructure(TestMatcher.class, TestMatcherImpl.class);
+		registerInfrastructure(TestRunner.class);
 
-			// SetUp Around
-			registerInfrastructure(SetUpAround.class, SetUpAroundImpl.class);
-	
-			// Mock Around
-			registerInfrastructure(MockAround.class, MockAroundImpl.class);
-			registerInfrastructure(MockResolver.class, MockResolverImpl.class);
-	
-			infrastructureRegistered = true;
-		}
+		// ContextAround
+		registerInfrastructure(ContextAround.class, ContextAroundImpl.class);
+
+		// SetUp Around
+		registerInfrastructure(SetUpAround.class, SetUpAroundImpl.class);
+
+		// Mock Around
+		registerInfrastructure(MockAround.class, MockAroundImpl.class);
+		registerInfrastructure(MockResolver.class, MockResolverImpl.class);
 	}
 
 	private void registerOverrideable(Class interfaceClass, Class implementationClass) {
 		registry.registerOverrideable(interfaceClass, implementationClass);
-	}
-
-	public Object get(Class interfaceClass) {
-		return infrastructureContainer.getComponentInstance(interfaceClass);
 	}
 }
