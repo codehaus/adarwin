@@ -1,6 +1,6 @@
 package picounit.around;
 
-import picounit.impl.Empty;
+import picounit.util.Empty;
 
 public class AroundMatcherImpl extends Empty implements AroundMatcher {
 	public boolean matches(Class testClass) {

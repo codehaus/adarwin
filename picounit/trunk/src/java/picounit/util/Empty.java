@@ -1,4 +1,4 @@
-package picounit.impl;
+package picounit.util;
 
 public class Empty {
 	public int hashCode() {

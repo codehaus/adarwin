@@ -2,10 +2,10 @@ package picounit.pico;
 
 import org.picocontainer.PicoContainer;
 
-import picounit.impl.Equals;
 import picounit.impl.PicoResolver;
 import picounit.impl.PicoUnitException;
 import picounit.impl.UserPicoResolver;
+import picounit.util.Equals;
 
 public class PicoResolverImpl implements PicoResolver, UserPicoResolver {
 	private final PicoContainer picoContainer;

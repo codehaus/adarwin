@@ -1,6 +1,6 @@
 package picounit;
 
-import picounit.impl.Empty;
+import picounit.util.Empty;
 
 public class EmptyTest implements Test {
 	// Unit

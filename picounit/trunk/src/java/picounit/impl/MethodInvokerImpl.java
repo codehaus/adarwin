@@ -1,5 +1,7 @@
 package picounit.impl;
 
+import picounit.util.Empty;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
