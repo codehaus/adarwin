@@ -2,8 +2,8 @@ package org.ajester;
 
 import org.objectweb.asm.Constants;
 
-public class BooleanReturnCodeAdapter extends MutatingCodeAdapter {
-	public BooleanReturnCodeAdapter(String classToMutate) {
+public class BooleanReturnClassAdapter extends MutatingClassAdapter {
+	public BooleanReturnClassAdapter(String classToMutate) {
 		super(classToMutate);
 	}
 	
@@ -15,4 +15,5 @@ public class BooleanReturnCodeAdapter extends MutatingCodeAdapter {
 
 		super.visitInsn(opcode);
 	}
+
 }

@@ -1,17 +1,17 @@
 package org.ajester;
 
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
+
+import java.io.FileOutputStream;
 
 import junit.runner.TestCaseClassLoader;
 import junit.runner.TestSuiteLoader;
 
 public class MutatingClassLoader extends TestCaseClassLoader implements TestSuiteLoader {
-	private MutatingCodeAdapter mutatingCodeAdapter;
+	private MutatingClassAdapter mutatingClassAdapter;
 
-	public MutatingClassLoader(MutatingCodeAdapter mutatingCodeAdapter) {
-		this.mutatingCodeAdapter = mutatingCodeAdapter;
+	public MutatingClassLoader(MutatingClassAdapter mutatingClassAdapter) {
+		this.mutatingClassAdapter = mutatingClassAdapter;
 	}
 	
 	public Class load(String suiteClassName) throws ClassNotFoundException {
@@ -24,9 +24,12 @@ public class MutatingClassLoader extends TestCaseClassLoader implements TestSuit
 
 	public synchronized Class loadClass(String name, boolean resolve)
 		throws ClassNotFoundException {
-			
-		if (mutatingCodeAdapter.shouldMutate(name)) {
+
+		if (mutatingClassAdapter.shouldMutate(name)) {
 			return loadAndMutateClass(name);
+		}
+		else if (name.equals(Coverage.class.getName())) {
+			return Coverage.class;
 		}
 		else {
 			return super.loadClass(name, resolve);
@@ -39,12 +42,9 @@ public class MutatingClassLoader extends TestCaseClassLoader implements TestSuit
 		String classResourceName = name.replace('.', '/') + ".class";
 
 		try {
-			ClassReader classReader = new ClassReader(getResourceAsStream(classResourceName));
-			ClassWriter classWriter = new ClassWriter(false);
-			ClassVisitor classVisitor = new MutatingClassAdapter(classWriter, mutatingCodeAdapter);
-			classReader.accept(classVisitor, false);
-			byte[] b = classWriter.toByteArray();
-			System.out.println("Had no trouble loading: " + classResourceName);
+			new ClassReader(getResourceAsStream(classResourceName)).accept(mutatingClassAdapter, false);
+			byte[] b = mutatingClassAdapter.getClassWriter().toByteArray();
+			
 			return defineClass(name, b, 0, b.length);
 		} catch (Exception e) {
 			System.out.println("For some reason could not load: " + classResourceName);
