@@ -57,7 +57,7 @@ public class GrammarTestCase extends TestCase {
 
 		Rule rule = new RuleBuilder(ruleClassBindings).buildRule("not(true)");
 
-		assertEquals("not(true)", rule.getExpression(ruleClassBindings));
+		assertEquals("not(true)", rule.toString(ruleClassBindings));
 	}
 
 	public void testAddSynonymFromPropertiesFile() throws IOException, ClassNotFoundException, BuilderException {
@@ -66,7 +66,7 @@ public class GrammarTestCase extends TestCase {
 		RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
 		Rule rule = ruleBuilder.buildRule(expression);
 
-		assertEquals(expression, rule.getExpression(ruleClassBindings));
+		assertEquals(expression, rule.toString(ruleClassBindings));
 	}
 
 	private String createPropertiesFile() throws IOException {

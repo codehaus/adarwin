@@ -41,7 +41,7 @@ public class PackageRule implements Rule {
 		return false;
 	}
 
-	public String getExpression(RuleClassBindings ruleClassBindings) {
+	public String toString(RuleClassBindings ruleClassBindings) {
 		return ruleClassBindings.getRule(getClass()) + '(' + pattern + ')';
 	}
 }

@@ -33,7 +33,7 @@ public class ParentRule implements Rule {
 			ElementType.EXTENDS_OR_IMPLEMENTS));
 	}
 
-	public String getExpression(RuleClassBindings ruleClassBindings) {
+	public String toString(RuleClassBindings ruleClassBindings) {
 		return ruleClassBindings.getRule(getClass()) + '(' + packageName + ", " + className + ')';
 	}
 }

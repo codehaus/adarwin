@@ -30,14 +30,14 @@ public class OrRule implements Rule {
 		return result;
 	}
 
-	public String getExpression(RuleClassBindings ruleClassBindings) {
+	public String toString(RuleClassBindings ruleClassBindings) {
 		StringBuffer buffer = new StringBuffer(ruleClassBindings.getRule(getClass()) + '(');
 		
 		for (int rLoop = 0; rLoop < rules.length; ++rLoop) {
 			if (rLoop != 0) {
 				buffer.append(", ");
 			}
-			buffer.append(rules[rLoop].getExpression(ruleClassBindings));
+			buffer.append(rules[rLoop].toString(ruleClassBindings));
 		}
 		buffer.append(')');
             

@@ -36,7 +36,7 @@ public class RuleBuilderTestCase extends TestCase {
 
         Rule rule = ruleBuilder.buildRule(expression);
         
-        assertEquals(expression, rule.getExpression(ruleClassBindings));
+        assertEquals(expression, rule.toString(ruleClassBindings));
     }
 
     private RuleClassBindings createRuleClassBindings(String name, Class clazz) {
@@ -55,7 +55,7 @@ public class RuleBuilderTestCase extends TestCase {
 
         Rule rule = ruleBuilder.buildRule(expression);
 
-        assertEquals(expression, rule.getExpression(ruleClassBindings));
+        assertEquals(expression, rule.toString(ruleClassBindings));
     }
 
     public void testInPackageAndUsesPackage() throws BuilderException, ClassNotFoundException {
@@ -69,7 +69,7 @@ public class RuleBuilderTestCase extends TestCase {
 
         Rule rule = ruleBuilder.buildRule(expression);
 
-        assertEquals(expression, rule.getExpression(ruleClassBindings));
+        assertEquals(expression, rule.toString(ruleClassBindings));
     }
 
     public void testTwoLevelsOfNesting() throws BuilderException, ClassNotFoundException {
@@ -82,7 +82,7 @@ public class RuleBuilderTestCase extends TestCase {
 
         Rule rule = ruleBuilder.buildRule(expression);
 
-        assertEquals(expression, rule.getExpression(ruleClassBindings));
+        assertEquals(expression, rule.toString(ruleClassBindings));
     }
 
     public void testInPackageRule() throws BuilderException, IOException, ClassNotFoundException {
@@ -107,7 +107,7 @@ public class RuleBuilderTestCase extends TestCase {
 
         Rule rule = ruleBuilder.buildRule(expression);
 
-        assertEquals(INCORRECT_RULE_BUILT, expression, rule.getExpression(ruleClassBindings));
+        assertEquals(INCORRECT_RULE_BUILT, expression, rule.toString(ruleClassBindings));
 
         assertTrue(INCORRECT_NUMBER_OF_RULE_MATCHES, new ClassFile(InPackageA.class).evaluate(rule).getCount() > 0);
     }
@@ -150,7 +150,7 @@ public class RuleBuilderTestCase extends TestCase {
         for (int rLoop = 0; rLoop < rules.length; ++rLoop) {
 			Rule rule = rules[rLoop];
 
-			assertEquals("true", rule.getExpression(ruleClassBindings));
+			assertEquals("true", rule.toString(ruleClassBindings));
         }
 	}
 	
@@ -165,7 +165,7 @@ public class RuleBuilderTestCase extends TestCase {
 
 		Rule rule = ruleBuilder.buildRule(expression);
 
-		assertEquals(INCORRECT_RULE_BUILT, SimplyfiedExpression, rule.getExpression(ruleClassBindings));
+		assertEquals(INCORRECT_RULE_BUILT, SimplyfiedExpression, rule.toString(ruleClassBindings));
 	}
 	
 	public void testWhiteSpaceBetweenRulesIsIrrelevant() throws BuilderException {
@@ -180,8 +180,8 @@ public class RuleBuilderTestCase extends TestCase {
 		Rule[] rules = ruleBuilder.buildRules(expression);
 		
 		assertEquals(2, rules.length);
-		assertEquals(subExpression, rules[0].getExpression(ruleClassBindings));
-		assertEquals(subExpression, rules[1].getExpression(ruleClassBindings));
+		assertEquals(subExpression, rules[0].toString(ruleClassBindings));
+		assertEquals(subExpression, rules[1].toString(ruleClassBindings));
 	}
 	
 	public void testWhiteSpaceBetweenVariableAssignmentIsIrrelevant() throws BuilderException {
@@ -199,7 +199,7 @@ public class RuleBuilderTestCase extends TestCase {
 		
 		Rule var = ruleBuilder.getVariable("var");
 		
-		assertEquals(variable, var.getExpression(ruleClassBindings));
+		assertEquals(variable, var.toString(ruleClassBindings));
 	}
 	
 	public void testVariableAssignment() {

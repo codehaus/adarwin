@@ -24,12 +24,12 @@ public class NameRuleTestCase extends TestCase {
 	public void testExpression() {
 		Rule rule = new NameRule(SOME_NAME, new AndRule(new Rule[] {new TrueRule(), new TrueRule()}));
 		
-		assertEquals(SOME_NAME, rule.getExpression(ruleClassBindings));
+		assertEquals(SOME_NAME, rule.toString(ruleClassBindings));
 	}
 	
 	public void testBuild() throws BuilderException {
 		Rule rule = new RuleBuilder(ruleClassBindings).buildRule("name(" + SOME_NAME + ", and(true, true))");
 		
-		assertEquals(SOME_NAME, rule.getExpression(ruleClassBindings));
+		assertEquals(SOME_NAME, rule.toString(ruleClassBindings));
 	}
 }
