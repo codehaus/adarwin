@@ -115,7 +115,7 @@ public class Runner {
 	}
 
 	private boolean executeRule(RuleClassBindings ruleClassBindings, Rule rule) throws IOException, FileNotFoundException {
-		String ruleExpression = rule.getExpression(ruleClassBindings);
+		String ruleExpression = rule.toString(ruleClassBindings);
 		
 		Result result = createCodeFactory().create(getClassPath()).evaluate(rule);
 		if (result.getCount() > 0) {

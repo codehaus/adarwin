@@ -25,7 +25,7 @@ public class NotRule implements Rule {
 		return !ruleToNegate.inspect(classSummary);
 	}
 
-	public String getExpression(RuleClassBindings ruleClassBindings) {
-		return ruleClassBindings.getRule(getClass()) + '(' + ruleToNegate.getExpression(ruleClassBindings) + ')';
+	public String toString(RuleClassBindings ruleClassBindings) {
+		return ruleClassBindings.getRule(getClass()) + '(' + ruleToNegate.toString(ruleClassBindings) + ')';
 	}
 }

@@ -38,7 +38,7 @@ public class OrRuleTestCase extends TestCase {
 
         Rule rule = new RuleBuilder(ruleClassBindings).buildRule(expression);
 
-        assertEquals(expression, rule.getExpression(ruleClassBindings));
+        assertEquals(expression, rule.toString(ruleClassBindings));
 
         assertEquals(0, code.evaluate(rule).getCount());
     }
@@ -48,7 +48,7 @@ public class OrRuleTestCase extends TestCase {
 
         Rule rule = new RuleBuilder(ruleClassBindings).buildRule(expression);
 
-        assertEquals(expression, rule.getExpression(ruleClassBindings));
+        assertEquals(expression, rule.toString(ruleClassBindings));
 
         assertTrue(code.evaluate(rule).getCount() > 0);
     }
@@ -58,7 +58,7 @@ public class OrRuleTestCase extends TestCase {
 
         Rule rule = new RuleBuilder(ruleClassBindings).buildRule(expression);
 
-        assertEquals(expression, rule.getExpression(ruleClassBindings));
+        assertEquals(expression, rule.toString(ruleClassBindings));
 
         assertTrue(code.evaluate(rule).getCount() > 0);
     }

@@ -36,7 +36,7 @@ public class SourceRule implements Rule {
 		return wrappedRule.inspect(new ClassSummary(sourceSet));
 	}
 
-	public String getExpression(RuleClassBindings ruleClassBindings) {
-        return ruleClassBindings.getRule(getClass()) + '(' + wrappedRule.getExpression(ruleClassBindings) + ')';
+	public String toString(RuleClassBindings ruleClassBindings) {
+        return ruleClassBindings.getRule(getClass()) + '(' + wrappedRule.toString(ruleClassBindings) + ')';
     }
 }

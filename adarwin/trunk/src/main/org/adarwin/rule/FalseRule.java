@@ -15,7 +15,7 @@ import org.adarwin.RuleClassBindings;
 
 
 public class FalseRule implements Rule {
-	public String getExpression(RuleClassBindings ruleClassBindings) {
+	public String toString(RuleClassBindings ruleClassBindings) {
         return ruleClassBindings.getRule(getClass());
     }
 

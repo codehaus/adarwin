@@ -16,7 +16,7 @@ public class NameRule implements Rule {
 		return rule.inspect(classSummary);
 	}
 
-	public String getExpression(RuleClassBindings ruleClassBindings) {
+	public String toString(RuleClassBindings ruleClassBindings) {
 		return name;
 	}
 	
