@@ -1,0 +1,13 @@
+name(package a using package b,
+	and(
+		src(package(org.adarwin.testmodel.a)),
+		uses(package(org.adarwin.testmodel.b))
+	)
+),
+
+name(package a using package c,
+	and(
+		src(package(org.adarwin.testmodel.a)),
+		uses(package(org.adarwin.testmodel.c))
+	)
+)
