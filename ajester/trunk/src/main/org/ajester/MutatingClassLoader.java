@@ -6,6 +6,9 @@ import junit.runner.TestCaseClassLoader;
 import junit.runner.TestSuiteLoader;
 
 public class MutatingClassLoader extends TestCaseClassLoader implements TestSuiteLoader {
+	private static final String[] PROHIBITED_CLASSES = new String[] {
+		"java", "junit", "org.ajester.CodeMatcher", "org.ajester.testmodel.test" };
+
 	private final Mutator mutator;
 
 	public MutatingClassLoader(Mutator mutator) {
@@ -23,25 +26,27 @@ public class MutatingClassLoader extends TestCaseClassLoader implements TestSuit
 	public synchronized Class loadClass(String className, boolean resolve)
 		throws ClassNotFoundException {
 
-		boolean newBoolean = !className.startsWith("java") && !className.startsWith("junit");
-		boolean oldBoolean = mutator != null && mutator.getCodeMatcher().matches(className);
-		
-		if (newBoolean != oldBoolean) {
-			System.out.println("new ain't gonna work with: " + className);
-		}
-		
 		if (className.equals(Coverage.class.getName())) {
 			//System.out.println("Not mutating Coverage");
 			return Coverage.class;
 		}
-		//else if (newBoolean && !className.equals("org.ajester.CodeMatcher")) {
-		else if (oldBoolean) {
+		else if (!startsWith(className, PROHIBITED_CLASSES)) {
 //			System.out.println("mutating: " + className + ", with: " + mutator);
 			return loadAndMutateClass(mutator, className);
 		}
 		else {
 			return super.loadClass(className, resolve);
 		}
+	}
+
+	private boolean startsWith(String searchIn, String[] searchFor) {
+		for (int sLoop = 0; sLoop < searchFor.length; sLoop++) {
+			if (searchIn.startsWith(searchFor[sLoop])) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	private synchronized Class loadAndMutateClass(Mutator mutator, final String className)

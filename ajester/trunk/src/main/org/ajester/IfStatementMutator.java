@@ -4,8 +4,10 @@ import org.objectweb.asm.Constants;
 
 
 public class IfStatementMutator extends BaseMutator {
+	private final CodeMatcher codeMatcher;
+
 	public IfStatementMutator(CodeMatcher codeMatcher) {
-		super(codeMatcher);
+		this.codeMatcher = codeMatcher;
 	}
 
 	public boolean matches(Instruction instructionType) {
@@ -26,12 +28,16 @@ public class IfStatementMutator extends BaseMutator {
 		switch (jumpInstruction.getOpcode()) {
 			case Constants.IFEQ:
 				print("IFEQ");
-				return new JumpInstruction(Constants.IFNE, jumpInstruction.getLabel());
+				return jumpInstruction.clone(Constants.IFNE);
 			case Constants.IFNE:
 				print("IFNE");
-				return new JumpInstruction(Constants.IFEQ, jumpInstruction.getLabel());
+				return jumpInstruction.clone(Constants.IFEQ);
 			default:
 				return instruction;
 		}
+	}
+
+	public CodeMatcher getCodeMatcher() {
+		return codeMatcher;
 	}
 }

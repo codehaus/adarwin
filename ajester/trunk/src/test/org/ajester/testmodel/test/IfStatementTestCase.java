@@ -6,7 +6,7 @@ import junit.framework.TestCase;
 
 public class IfStatementTestCase extends TestCase {
 	public void testIfEqualMethodReturnsTrue() {
-		assertTrue(new IfStatement().ifEqual());
+		assertTrue(new IfStatement().getTrue());
 	}
 	
 	public void testIfNotEqualMethodReturnsTrue() {

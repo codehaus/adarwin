@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 abstract class BaseMutator extends ClassAdapter implements Mutator {
-	private final CodeMatcher codeMatcher;
 	private final Set mutations;
 	private CodeVisitor codeVisitor;
 	private String currentClassName;
@@ -19,19 +18,15 @@ abstract class BaseMutator extends ClassAdapter implements Mutator {
 	private final InstructionMatcher instructionMatcher;
 	private final InstructionMutator instructionMutator;
 	
-	public BaseMutator(CodeMatcher codeMatcher) {
+	public BaseMutator() {
 		super(new ReuseableClassWriter());
-		this.codeMatcher = codeMatcher;
 		this.mutations = new HashSet();
 
 		this.instructionMatcher = this;
 		this.instructionMutator = this;
+		currentClassName = "";
 	}
 
-	public CodeMatcher getCodeMatcher() {
-		return codeMatcher;
-	}
-	
 	public Set getMutations() {
 		return mutations;
 	}
@@ -48,27 +43,27 @@ abstract class BaseMutator extends ClassAdapter implements Mutator {
 		setCodeVisitor(cv.visitMethod(access, methodName, desc, exceptions));
 
 		CodeVisitor codeVisitor = this.codeVisitor;
-		Instruction instruction = new MethodInstruction(getCurrentClassName(), access,
-			methodName, desc, exceptions);
+		Instruction instruction = new MethodInstruction(getCurrentCodeLocation(), access,
+			desc, exceptions);
 		
-		if (getCodeMatcher().matches(
-			new CodeLocation(getCurrentClassNameWithDots(), getMethodName()))) {
-
+		Access methodAccess = new Access(access);
+		boolean abstractOrNative = methodAccess.isAbstract || methodAccess.isNative; 
+		if (!abstractOrNative && getCodeMatcher().matches(getCurrentCodeLocation())) {
 			MethodCoverageMutator mutator = new MethodCoverageMutator(null);
 			
 			if (mutator.matches(instruction)) {
-				mutator.mutate(instruction).visit(getClassVisitor(), getCodeVisitor());
+				mutator.mutate(instruction).visit(getClassVisitor(), codeVisitor);
 			}
-			
+
 			codeVisitor = this;
-		}
-		
-		if (instructionMatcher.matches(instruction)) {
-			addCovered();
 			
-			instructionMutator.mutate(instruction).visit(getClassVisitor(), getCodeVisitor());
+			if (instructionMatcher.matches(instruction)) {
+				addCovered();
+			
+				instructionMutator.mutate(instruction).visit(getClassVisitor(), codeVisitor);
+			}
 		}
-		
+
 		return codeVisitor;
 	}
 
@@ -76,7 +71,7 @@ abstract class BaseMutator extends ClassAdapter implements Mutator {
 		String sourceFile) {
 
 		setCurrentClassName(className);
-		print("visit(" + className +")");
+		print("visit(" + access + ", " + className + ")");
 
 		super.visit(access, className, superName, interfaces, sourceFile);
 	}
@@ -119,8 +114,12 @@ abstract class BaseMutator extends ClassAdapter implements Mutator {
 
 	public final void visitJumpInsn(final int opcode, final Label label) {
 		print("visitJumpInsn(" + lookup(opcode) + ")");
-		mutateIfMatches(new JumpInstruction(opcode, label));
+		mutateIfMatches(new JumpInstruction(getCurrentCodeLocation(), opcode, label));
 		//codeVisitor.visitJumpInsn(opcode, label);
+	}
+
+	private CodeLocation getCurrentCodeLocation() {
+		return new CodeLocation(getCurrentClassNameWithDots(), getMethodName());
 	}
 
 	public final void visitLabel(final Label label) {
@@ -200,19 +199,21 @@ abstract class BaseMutator extends ClassAdapter implements Mutator {
 	}
 	
 	protected void print(final String toPrint) {
-//		System.out.println(this + "[" + getCurrentClassName() + "]." +
+//		System.out.println(this + "[" + getCurrentCodeLocation() + "]." +
 //			toPrint);
 	}
 	
 	private String lookup(int opcode) {
 		return new ConstantLookup().getOpcodeName(opcode);
 	}
-
+	
 	public byte[] visit(ClassReader reader) {
 		getClassWriter().reset();
 		reader.accept(this, false);
 		return getClassWriter().toByteArray();
 	}
+	
+	abstract protected CodeMatcher getCodeMatcher();
 
 	protected ClassVisitor getClassVisitor() {
 		return this.cv;
