@@ -11,7 +11,6 @@
 package org.adarwin;
 
 import java.io.IOException;
-import java.util.Calendar;
 
 import junit.framework.TestCase;
 
@@ -86,13 +85,6 @@ public class UsesPackageTestCase extends TestCase {
 		assertEquals(1, new ClassFile(UsesClassForBaseInterface.class).evaluate(rule).getCount());
 	}
 	
-	public void testUsesAsUnusedImport() throws IOException {
-		if (Calendar.getInstance().get(Calendar.DAY_OF_YEAR) > 288) {
-			throw new RuntimeException("Feature not implemented in time");
-		}
-		//assertEquals(1, new ClassFile(UsesClassInPackageBAsUnusedImport.class).evaluate(rule).getCount());
-	}
-
 	public void testUsesInMethodReturn() throws IOException {
 		assertEquals(1, new ClassFile(UsesClassInPackageBInMethodReturn.class).evaluate(rule).getCount());
 	}

@@ -10,8 +10,6 @@
 
 package org.adarwin;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 public class ClassSummary {
@@ -20,38 +18,12 @@ public class ClassSummary {
 	private final Set methods;
 	private final Set dependancies;
 
-	public ClassSummary(String className, Constructor constructor, Method method,
-		CodeElement dependancy) {
-		this(className, createSet(constructor), createSet(method), createSet(dependancy));		
-	}
-	
     public ClassSummary(String className, Set constructors, Set methods, Set dependancies) {
 		this.className = className;
     	this.constructors = constructors;
 		this.methods = methods;
 		this.dependancies = dependancies;
     }
-
-	public boolean equals(Object object) {
-		if (object == null || !object.getClass().equals(getClass())) {
-			return false;
-		}
-
-		ClassSummary other = (ClassSummary) object;
-
-		return getConstructors().equals(other.getConstructors()) && 
-			getMethods().equals(other.getMethods()) &&
-			getDependancies().equals(other.getDependancies());
-	}
-
-	public int hashCode() {
-		return toString().hashCode();
-	}
-
-	public String toString() {
-		return "ClassSummary(" + getConstructors() + ", " + getMethods() + ", " +
-			getDependancies() + ")";
-	}
 
 	public String getClassName() {
 		return className;
@@ -76,16 +48,4 @@ public class ClassSummary {
 		
 		return new ClassSummary(getClassName(), getConstructors(), getMethods(), dependancies);
 	}
-		
-	public static Set createSet(Object object) {
-		Set set = Collections.EMPTY_SET;
-		
-		if (object != null) {
-			set = new HashSet();
-			
-			set.add(object);
-		}
-		
-		return set;
-	}	
 }

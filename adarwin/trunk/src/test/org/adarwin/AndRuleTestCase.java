@@ -25,14 +25,12 @@ import org.adarwin.rule.UsesRule;
 import org.adarwin.testmodel.a.InPackageA;
 import org.adarwin.testmodel.a.InPackageAUsesClassFromPackageB;
 import org.adarwin.testmodel.b.InPackageB;
-import org.adarwin.testmodel.c.InPackagaeCUsesClassFromPackageB;
-import org.adarwin.testmodel.c.InPackageC;
 
 public class AndRuleTestCase extends TestCase {
     public void testFalseAndFalse() throws IOException {
         Rule rule = new AndRule(new Rule[] {new FalseRule(), new FalseRule()});
 
-        Assert.assertEquals(0, new ClassFile(InPackageC.class).evaluate(rule).getCount());
+        Assert.assertEquals(0, new ClassFile(InPackageA.class).evaluate(rule).getCount());
     }
 
     public void testFalseAndTrue() throws IOException {
@@ -44,7 +42,7 @@ public class AndRuleTestCase extends TestCase {
     public void testTrueAndFalse() throws IOException {
         Rule rule = new AndRule(new Rule[] {new TrueRule(), new FalseRule()});
 
-        assertEquals(0, new ClassFile(InPackagaeCUsesClassFromPackageB.class).evaluate(rule).getCount());
+        assertEquals(0, new ClassFile(InPackageA.class).evaluate(rule).getCount());
     }
 
     public void testTrueAndTrue() throws IOException {

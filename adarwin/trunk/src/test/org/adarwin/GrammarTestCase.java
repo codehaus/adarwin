@@ -22,10 +22,9 @@ import org.adarwin.rule.Rule;
 import org.adarwin.rule.TrueRule;
 
 public class GrammarTestCase extends TestCase {
-    public void testAddMapping() {
+    public void testSingleMapping() {
         String rule = "rule";
-		RuleClassBindings ruleClassBindings = new RuleClassBindings();
-		ruleClassBindings.addMapping(rule, TrueRule.class);
+		RuleClassBindings ruleClassBindings = new RuleClassBindings(rule, TrueRule.class);
 
         assertEquals(TrueRule.class, ruleClassBindings.getClass(rule));
     }
@@ -34,9 +33,9 @@ public class GrammarTestCase extends TestCase {
         String firstRule = "firstRule";
         String secondRule = "secondRule";
 
-		RuleClassBindings ruleClassBindings = new RuleClassBindings();
-		ruleClassBindings.addMapping(firstRule, TrueRule.class);
-		ruleClassBindings.addMapping(secondRule, FalseRule.class);
+		RuleClassBindings ruleClassBindings = new RuleClassBindings(
+			new String[] {firstRule, secondRule},
+			new Class[] {TrueRule.class, FalseRule.class});
 
         assertEquals(TrueRule.class, ruleClassBindings.getClass(firstRule));
         assertEquals(FalseRule.class, ruleClassBindings.getClass(secondRule));
@@ -44,16 +43,15 @@ public class GrammarTestCase extends TestCase {
 
     public void testReverseMapping() {
         String rule = "rule";
-		RuleClassBindings ruleClassBindings = new RuleClassBindings();
-		ruleClassBindings.addMapping(rule, TrueRule.class);
+		RuleClassBindings ruleClassBindings = new RuleClassBindings(rule, TrueRule.class);
 
         assertEquals(rule, ruleClassBindings.getRule(TrueRule.class));
     }
 
 	public void testAddSynonymForNegate() throws BuilderException, ClassNotFoundException {
-		RuleClassBindings ruleClassBindings = new RuleClassBindings();
-		ruleClassBindings.addMapping("not", NotRule.class);
-		ruleClassBindings.addMapping("true", TrueRule.class);
+		RuleClassBindings ruleClassBindings = new RuleClassBindings(
+			new String[] {"not", "true"},
+			new Class[] {NotRule.class, TrueRule.class});
 
 		Rule rule = new RuleBuilder(ruleClassBindings).buildRule("not(true)");
 

@@ -21,7 +21,7 @@ import junit.framework.TestCase;
 
 import com.mockobjects.dynamic.OrderedMock;
 
-public class RunnerTest extends TestCase {
+public class RunnerTestCase extends TestCase {
 	private static final String CLASSPATH = "target/test-classes";
 	private static final String RULE = "package(org.adarwin.testmodel.a)";
 	private static final String SECOND_RULE = "package(org.adarwin.testmodel.x)";
@@ -112,11 +112,31 @@ public class RunnerTest extends TestCase {
 		}
 	}
 	
+ 	public void testMainNotEnoughArgs() {
+		try {
+			new Runner.Main(new String[Runner.Main.MIN_ARGS - 1]);
+			fail("UsageException expected");
+		} catch (UsageException e) {
+			assertEquals(Runner.Main.USAGE, e.getMessage());
+		}
+ 	} 
+
+	public void testMainTooManyArgs() {
+		try {
+			new Runner.Main(new String[Runner.Main.MAX_ARGS + 1]);
+			fail("UsageException expected");
+		} catch (UsageException e) {
+			assertEquals(Runner.Main.USAGE, e.getMessage());
+		}
+	} 
+	
 	public void testMainMissingBinding() throws UsageException {
 		try {
 			new Runner.Main(new String[] {
 				"-c", "target/test-classes",
-				"-r", "false"
+				"-r", "false",
+				// Repeating these so that the number of args is correct
+				"-r", "false", 
 			}).getRunner().run();
 			fail("RuleException expected");
 		} catch (RuleException e) {
@@ -128,7 +148,9 @@ public class RunnerTest extends TestCase {
 		try {
 			new Runner.Main(new String[] {
 				"-b", "rules.properties",
-				"-r", "false"
+				"-r", "false",
+				// Repeating these so that the number of args is correct
+				"-r", "false", 
 			}).getRunner().run();
 			fail("RuleException expected");
 		} catch (RuleException e) {
@@ -140,6 +162,8 @@ public class RunnerTest extends TestCase {
 		try {
 			new Runner.Main(new String[] {
 				"-b", "rules.properties",
+				"-c", "target/test-classes",
+				// Repeating these so that the number of args is correct
 				"-c", "target/test-classes"
 			}).getRunner().run();
 			fail("RuleException expected");

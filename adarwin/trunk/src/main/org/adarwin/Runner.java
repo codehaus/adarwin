@@ -189,6 +189,9 @@ public class Runner {
 	}
 	
 	public static class Main {
+		public static final int MIN_ARGS = 6;
+		public static final int MAX_ARGS = 7;
+
 		public static final String USAGE = "Usage: " + Runner.class.getName() +
 			" -b <binding-file> -c <class-path> {-r <rule> | -f <rule-file>} -p";
 			
@@ -196,7 +199,7 @@ public class Runner {
 
 		public Main(String[] args) throws UsageException {
 			runner = new Runner();
-			if (args.length < 3 || args.length > 5) {
+			if (args.length < MIN_ARGS || args.length > MAX_ARGS) {
 				usage();
 				return;
 			}

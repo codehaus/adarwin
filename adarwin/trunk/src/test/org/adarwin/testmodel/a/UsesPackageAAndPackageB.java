@@ -8,7 +8,14 @@
  * Idea and Original Code by Stacy Curl                                      *
  *****************************************************************************/
 
-package org.adarwin.testmodel.c;
+package org.adarwin.testmodel.a;
 
-public class InPackageC {
+import org.adarwin.testmodel.a.InPackageA;
+import org.adarwin.testmodel.b.InPackageB;
+
+public class UsesPackageAAndPackageB {
+	public void uses() {
+		new InPackageA();
+		new InPackageB();
+	}
 }

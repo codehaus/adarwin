@@ -43,6 +43,17 @@ class RuleClassVisitor implements ClassVisitor {
     }
 
 	public void visit(int access, String sourceClassPath, String baseClassPath, String[] interfaces, String fileName) {
+		log("visit: ");
+		log("access: " + access);
+		log(", sourceClassPath: " + sourceClassPath);
+		log(", baseClassPath: " + baseClassPath);
+		if (interfaces != null) {
+			for (int iLoop = 0; iLoop < interfaces.length; ++iLoop) {
+				log(", interfaces[" + iLoop + "] = " + interfaces[iLoop]);
+			}
+		}
+		logln(", filename: " + fileName);
+		
 		fullyQualifiedClassName = getFullyQualifiedClassName(sourceClassPath);
 
 		inspect(new CodeElement(getFullyQualifiedClassName(sourceClassPath), ElementType.SOURCE));
@@ -63,8 +74,8 @@ class RuleClassVisitor implements ClassVisitor {
 		}
 	}
 
-	public void visitInnerClass(String string, String string1, String string2, int i) {
-		logln("visitInnerClass: " + string + ", " + string1 + ", " + string2);
+	public void visitInnerClass(String name, String outerName, String innerName, int access) {
+		logln("visitInnerClass: " + name + ", " + outerName + ", " + innerName);
     }
 
     public void visitField(int access, String name, String desc, Object value) {
@@ -126,17 +137,23 @@ class RuleClassVisitor implements ClassVisitor {
         public static final char STATIC_CLASS_SEPARATOR = '$';
         public static final String STATIC_CLASS_PREFIX = "class" + STATIC_CLASS_SEPARATOR;
 
-        public void visitInsn(int i) {
+        public void visitInsn(int opcode) {
+        	logln("visitInsn: opcode = " + opcode);
         }
 
-        public void visitIntInsn(int i, int i1) {
+        public void visitIntInsn(int opcode, int operand) {
+        	log("visitIntInsn: opcode = " + opcode);
+        	logln(", operand = " + operand);
         }
 
-        public void visitVarInsn(int i, int i1) {
+        public void visitVarInsn(int opcode, int var) {
+        	log("visitVarInsn: opcode = " + opcode);
+        	logln(", var = " + var);
         }
 
         public void visitTypeInsn(int opcode, String desc) {
-        	logln("visitTypeInsn: desc = " + desc);
+        	log("visitTypeInsn: opcode = " + opcode);
+        	logln(", desc = " + desc);
             String fullyQualifiedClassName = getFullyQualifiedClassName(desc);
 			inspect(new CodeElement(fullyQualifiedClassName, ElementType.USES));
         }
@@ -166,37 +183,45 @@ class RuleClassVisitor implements ClassVisitor {
         }
 
 		public void visitJumpInsn(int i, Label label) {
-            logln("visitJumpInsn: " + label);
         }
 
         public void visitLabel(Label label) {
-        	logln("visitLabel: " + label);
         }
 
         public void visitLdcInsn(Object object) {
             logln("visitLdcInsn:  " + object);
         }
 
-        public void visitIincInsn(int i, int i1) {
+        public void visitIincInsn(int var, int increment) {
+        	log("visitIincInsn: var = " + var);
+        	logln(", increment = " + increment);
         }
 
-        public void visitTableSwitchInsn(int i, int i1, Label label, Label[] labels) {
-        }
+        public void visitTableSwitchInsn(int min, int max, Label defaultLabel, Label[] labels) {
+        	log("visitTableSwitchInsn: min = " + min);			logln(", max = " + max);        }
 
         public void visitLookupSwitchInsn(Label label, int[] ints, Label[] labels) {
         }
 
-        public void visitMultiANewArrayInsn(String string, int i) {
-        	logln("visitMultiANewArrayInsn: " + string);
+        public void visitMultiANewArrayInsn(String desc, int dims) {
+        	log("visitMultiANewArrayInsn: desc = " + desc);
+        	logln(", dims = " + dims);
         }
 
-        public void visitTryCatchBlock(Label label, Label label1, Label label2, String string) {
+        public void visitTryCatchBlock(Label start, Label end, Label handler, String type) {
+        	logln("visitTryCatchBlock: type = " + type);
         }
 
-        public void visitMaxs(int i, int i1) {
+        public void visitMaxs(int maxStack, int maxLocals) {
+        	log("visitMaxs: maxStack = " + maxStack);
+        	logln(", maxLocals = " + maxLocals);
         }
 
         public void visitLocalVariable(String name, String desc, Label start, Label end, int index) {
+        	log("visitLocalVariable: name = " + name);
+        	log(", desc = " + desc);
+        	logln(", index = " + index);
+        	
 			if (!"this".equals(name)) {
 				IType type = typeParser.parse(desc);
 				if (!type.isPrimative()) {
@@ -205,7 +230,8 @@ class RuleClassVisitor implements ClassVisitor {
 			}
         }
 
-        public void visitLineNumber(int i, Label label) {
+        public void visitLineNumber(int line, Label start) {
+        	logln("visitLineNumber: line = " + line);
         }
     }
 

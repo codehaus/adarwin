@@ -49,8 +49,4 @@ public class ElementType {
 	public String toString() {
 		return "ElementType(" + getType() + ", " + getSubType() + ")";
 	}
-
-	public boolean sameType(ElementType type) {
-		return getType().equals(type.getType());
-	}
 }

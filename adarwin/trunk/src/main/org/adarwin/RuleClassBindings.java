@@ -18,17 +18,10 @@ import java.util.Map;
 import java.util.Properties;
 
 public class RuleClassBindings {
-    private Map ruleToClass;
-    private Map classToRule;
-
-    public RuleClassBindings() {
-        ruleToClass = new HashMap();
-        classToRule = new HashMap();
-    }
+    private final Map ruleToClass = new HashMap();
+    private final Map classToRule = new HashMap();
 
     public RuleClassBindings(String propertiesFileName) throws IOException, ClassNotFoundException {
-        this();
-
         Properties properties = new Properties();
         properties.load(new FileInputStream(propertiesFileName));
         for (Iterator iterator = properties.entrySet().iterator(); iterator.hasNext();) {
@@ -38,8 +31,6 @@ public class RuleClassBindings {
     }
 
     public RuleClassBindings(String[] names, Class[] classes) {
-        this();
-
         for (int mLoop = 0; mLoop < names.length; ++mLoop) {
             addMapping(names[mLoop], classes[mLoop]);
         }
@@ -49,11 +40,6 @@ public class RuleClassBindings {
         this(new String[] {name}, new Class[] {classes});
     }
 
-    public void addMapping(String rule, Class clazz) {
-        ruleToClass.put(rule, clazz);
-        classToRule.put(clazz, rule);
-    }
-
     public Class getClass(String rule) {
         return (Class) ruleToClass.get(rule);
     }
@@ -61,4 +47,9 @@ public class RuleClassBindings {
     public String getRule(Class clazz) {
         return (String) classToRule.get(clazz);
     }
+
+	private void addMapping(String rule, Class clazz) {
+		ruleToClass.put(rule, clazz);
+		classToRule.put(clazz, rule);
+	}
 }

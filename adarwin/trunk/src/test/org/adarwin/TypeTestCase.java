@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 import junit.framework.TestCase;
 
-public class TypeTest extends TestCase {
+public class TypeTestCase extends TestCase {
 	private TypeParser typeParser;
 	protected void setUp() throws Exception {
 		super.setUp();

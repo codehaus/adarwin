@@ -15,8 +15,10 @@ import java.io.IOException;
 import junit.framework.TestCase;
 
 import org.adarwin.rule.AndRule;
+import org.adarwin.rule.ConstructorRule;
 import org.adarwin.rule.NotRule;
 import org.adarwin.rule.PackageRule;
+import org.adarwin.rule.ParentRule;
 import org.adarwin.rule.Rule;
 import org.adarwin.rule.SourceRule;
 import org.adarwin.rule.TrueRule;
@@ -28,7 +30,7 @@ public class RuleBuilderTestCase extends TestCase {
     private final String INCORRECT_NUMBER_OF_RULE_MATCHES = "Incorrect number of rule matches";
 
     public void testTrueRuleGrammer() throws BuilderException, ClassNotFoundException {
-		RuleClassBindings ruleClassBindings = createRuleClassBindings("true", TrueRule.class);
+		RuleClassBindings ruleClassBindings = new RuleClassBindings("true", TrueRule.class);
 
         RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
 
@@ -37,12 +39,6 @@ public class RuleBuilderTestCase extends TestCase {
         Rule rule = ruleBuilder.buildRule(expression);
         
         assertEquals(expression, rule.toString(ruleClassBindings));
-    }
-
-    private RuleClassBindings createRuleClassBindings(String name, Class clazz) {
-		RuleClassBindings ruleClassBindings = new RuleClassBindings();
-		ruleClassBindings.addMapping(name, clazz);
-        return ruleClassBindings;
     }
 
     public void testInPackageRuleGrammer() throws BuilderException, ClassNotFoundException {
@@ -112,8 +108,28 @@ public class RuleBuilderTestCase extends TestCase {
         assertTrue(INCORRECT_NUMBER_OF_RULE_MATCHES, new ClassFile(InPackageA.class).evaluate(rule).getCount() > 0);
     }
 
+    public void testConstructorRule() throws BuilderException {
+    	RuleClassBindings bindings = new RuleClassBindings("constructor", ConstructorRule.class);
+		RuleBuilder ruleBuilder = new RuleBuilder(bindings);
+		
+		String expression = "constructor(java.lang.Integer, myClass)";
+		Rule rule = ruleBuilder.buildRule(expression);
+		
+		assertEquals(expression, rule.toString(bindings));
+	}
+	
+	public void testParentRule() throws BuilderException {
+		RuleClassBindings bindings = new RuleClassBindings("parent", ParentRule.class);
+		RuleBuilder ruleBuilder = new RuleBuilder(bindings);
+		
+		String expression = "parent(someClass)";
+		Rule rule = ruleBuilder.buildRule(expression);
+		
+		assertEquals(expression, rule.toString(bindings));
+	}
+
     public void testUnknownRule() throws BuilderException, ClassNotFoundException {
-        RuleBuilder ruleBuilder = new RuleBuilder(new RuleClassBindings());
+        RuleBuilder ruleBuilder = new RuleBuilder(new RuleClassBindings("true", TrueRule.class));
 
 		try {
         	ruleBuilder.buildRule("gobbledygook");
@@ -127,7 +143,7 @@ public class RuleBuilderTestCase extends TestCase {
 	public void testUnbalancedBrackets() {
 		String expression = "(";
 		try {
-			new RuleBuilder(new RuleClassBindings()).buildRule(expression);
+			new RuleBuilder(null).buildRule(expression);
 			fail();
 		}
 		catch (BuilderException be) {
@@ -136,7 +152,7 @@ public class RuleBuilderTestCase extends TestCase {
 	}
 
 	public void testMultipleRules() throws BuilderException, ClassNotFoundException {
-		RuleClassBindings ruleClassBindings = createRuleClassBindings("true", TrueRule.class);
+		RuleClassBindings ruleClassBindings = new RuleClassBindings("true", TrueRule.class);
 
 		RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
 
@@ -232,6 +248,5 @@ public class RuleBuilderTestCase extends TestCase {
 		assertEquals(2, parsed.length);
 		assertEquals(first, parsed[0]);
 		assertEquals(second, parsed[1]);
-	}
-	
+	}	
 }
