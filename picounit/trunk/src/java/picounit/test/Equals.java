@@ -1,23 +1,17 @@
 package picounit.test;
 
 abstract public class Equals {
-	private final Object thisObject;
-
-	public Equals(Object thisObject) {
-		this.thisObject = thisObject;
-	}
-
-	public final boolean equals(Object object) {
-		if (object == null || !object.getClass().equals(thisObject.getClass())) {
+	public final boolean equals(Object lhs, Object rhs) {
+		if (lhs == null || rhs == null || !lhs.getClass().equals(rhs.getClass())) {
 			return false;
 		}
-		
-		if (thisObject == object) {
+
+		if (lhs == rhs) {
 			return true;
 		}
-		
-		return equalsImpl(object);
+
+		return equalsImpl(lhs, rhs);
 	}
-	
-	abstract protected boolean equalsImpl(Object object);
+
+	abstract protected boolean equalsImpl(Object lhs, Object rhs);
 }
