@@ -23,7 +23,7 @@ public class UsesTestCase extends TestCase {
     public void testMinimal() throws IOException, BuilderException {
         String expression = "uses(true)";
 
-        Rule rule = new RuleBuilder(new Grammar(new String[] {"uses", "true"},
+        Rule rule = new RuleBuilder(new RuleClassBindings(new String[] {"uses", "true"},
             new Class[] {UsesRule.class, TrueRule.class})).buildRule(expression);
 
         assertTrue(new ClassFile(InPackageAUsesClassFromPackageB.class).evaluate(rule).getCount() > 0);

@@ -11,7 +11,7 @@
 package org.adarwin.rule;
 
 import org.adarwin.ClassSummary;
-import org.adarwin.Grammar;
+import org.adarwin.RuleClassBindings;
 
 
 public class AndRule implements Rule {
@@ -33,14 +33,14 @@ public class AndRule implements Rule {
 		//return leftRule.inspect(classSummary) && rightRule.inspect(classSummary);
 	}
 
-	public String getExpression(Grammar grammar) {
-		StringBuffer buffer = new StringBuffer(grammar.getRule(getClass()) + '(');
+	public String getExpression(RuleClassBindings ruleClassBindings) {
+		StringBuffer buffer = new StringBuffer(ruleClassBindings.getRule(getClass()) + '(');
 		
 		for (int rLoop = 0; rLoop < rules.length; ++rLoop) {
 			if (rLoop != 0) {
 				buffer.append(", ");
 			}
-			buffer.append(rules[rLoop].getExpression(grammar));
+			buffer.append(rules[rLoop].getExpression(ruleClassBindings));
 		}
 		buffer.append(')');
 		

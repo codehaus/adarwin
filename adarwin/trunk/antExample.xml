@@ -34,6 +34,13 @@
              ruleExpression="${ruleUsingB}, ${ruleUsingC}"/>
   </target>
 
+  <target name="file">
+    <adarwin binding="rules.properties"
+             classPath="${basedir}/target/classes"
+             print="true"
+             ruleFileName="rules.txt"/>
+  </target>
+
   <target name="good">
     <adarwin binding="rules.properties"
              classPath="target/idea"

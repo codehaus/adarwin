@@ -11,9 +11,9 @@
 package org.adarwin.rule;
 
 import org.adarwin.ClassSummary;
-import org.adarwin.Grammar;
+import org.adarwin.RuleClassBindings;
 
 public interface Rule {
 	boolean inspect(ClassSummary classSummary);
-	String getExpression(Grammar grammar);
+	String getExpression(RuleClassBindings ruleClassBindings);
 }

@@ -5,20 +5,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import junit.framework.TestCase;
+
 import org.adarwin.ant.ADarwinTask;
 import org.adarwin.ant.ADarwinTask.ILogger;
 import org.apache.tools.ant.BuildException;
 
 import com.mockobjects.dynamic.OrderedMock;
 
-import junit.framework.TestCase;
-
 public class ADarwinTaskTest extends TestCase {
+	private static final String CLASSPATH = "target/classes";
 	private static final String RULE = "package(org.adarwin.testmodel.a)";
 	private static final String SECOND_RULE = "package(org.adarwin.testmodel.x)";
 	private static final String COMPOSITE_RULE = RULE + ", " + SECOND_RULE;
-	private static final String TARGET_SUMMARY =
-		"aDarwin checking classpath: target/classes, against the rule: package(org.adarwin.testmodel.a)";
 	private OrderedMock mockLogger;
 	private ADarwinTask task;
 
@@ -28,13 +27,13 @@ public class ADarwinTaskTest extends TestCase {
 		task = new ADarwinTask();
 		task.setLogger((ILogger) mockLogger.proxy());
 		task.setBinding("rules.properties");
-		task.setClassPath("target/classes");
+		task.setClassPath(CLASSPATH);
+		mockLogger.expect("log", "Evaluating rules against: " + CLASSPATH);
 	}
 
 	public void testRuleInAntFile() {
-		mockLogger.expect("log", TARGET_SUMMARY);
-		mockLogger.expect("log", "3 classes matched: " + RULE);
-				
+		mockLogger.expect("log", "3 classes violated: " + RULE);
+
 		task.setRuleExpression(RULE);
 		
 		executeTask();
@@ -43,8 +42,7 @@ public class ADarwinTaskTest extends TestCase {
 	}
 	
 	public void testRuleInFile() throws IOException {
-		mockLogger.expect("log", TARGET_SUMMARY);
-		mockLogger.expect("log", "3 classes matched: " + RULE);
+		mockLogger.expect("log", "3 classes violated: " + RULE);
 		
 		task.setRuleFileName(createTempRuleFile(RULE));
 		
@@ -54,14 +52,50 @@ public class ADarwinTaskTest extends TestCase {
 	}
 
 	public void testMultipleRulesOneRuleMatches() {
-		mockLogger.expect("log", TARGET_SUMMARY);
-		mockLogger.expect("log", "3 classes matched: " + RULE);
+		mockLogger.expect("log", "3 classes violated: " + RULE);
 				
 		task.setRuleExpression(COMPOSITE_RULE);
 		
 		executeTask();
 		
 		mockLogger.verify();
+	}
+	
+	public void testMissingBinding() {
+		task.setBinding("");
+		
+		try {
+			task.execute();
+			fail("BuildException expected");
+		}
+		catch (BuildException be) {
+			assertEquals(ADarwinTask.BINDING + ADarwinTask.MISSING_OR_EMPTY, be.getMessage());
+		}
+	}
+	
+	public void testMissingClassPath() {
+		task.setClassPath("");
+		
+		try {
+			task.execute();
+			fail("BuildException expected");
+		}
+		catch (BuildException be) {
+			assertEquals(ADarwinTask.CLASSPATH + ADarwinTask.MISSING_OR_EMPTY, be.getMessage());
+		}
+	}
+
+	public void testMissingRuleExpressionAndRuleFileName() {
+		task.setRuleExpression("");
+		task.setRuleFileName("");
+		
+		try {
+			task.execute();
+			fail("BuildException expected");
+		}
+		catch (BuildException be) {
+			assertEquals("both ruleExpression and ruleFileName parameters are missing or empty", be.getMessage());
+		}
 	}
 
 	private void executeTask() {
@@ -70,7 +104,7 @@ public class ADarwinTaskTest extends TestCase {
 			fail("BuildException expected");
 		}		
 		catch (BuildException be) {
-			assertEquals("aDarwin Rule Violated", be.getMessage());
+			assertEquals(ADarwinTask.RULE_VIOLATED, be.getMessage());
 		}
 	}
 

@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
-import org.adarwin.Grammar;
+import org.adarwin.RuleClassBindings;
 import org.adarwin.Util;
 
 public class PackageRule implements Rule {
@@ -41,7 +41,7 @@ public class PackageRule implements Rule {
 		return false;
 	}
 
-	public String getExpression(Grammar grammar) {
-		return grammar.getRule(getClass()) + '(' + pattern + ')';
+	public String getExpression(RuleClassBindings ruleClassBindings) {
+		return ruleClassBindings.getRule(getClass()) + '(' + pattern + ')';
 	}
 }

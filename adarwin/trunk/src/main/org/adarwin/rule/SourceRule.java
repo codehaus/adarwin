@@ -16,7 +16,7 @@ import java.util.Set;
 
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
-import org.adarwin.Grammar;
+import org.adarwin.RuleClassBindings;
 
 public class SourceRule implements Rule {
 	private Rule wrappedRule;
@@ -36,7 +36,7 @@ public class SourceRule implements Rule {
 		return wrappedRule.inspect(new ClassSummary(sourceSet));
 	}
 
-	public String getExpression(Grammar grammar) {
-        return grammar.getRule(getClass()) + '(' + wrappedRule.getExpression(grammar) + ')';
+	public String getExpression(RuleClassBindings ruleClassBindings) {
+        return ruleClassBindings.getRule(getClass()) + '(' + wrappedRule.getExpression(ruleClassBindings) + ')';
     }
 }

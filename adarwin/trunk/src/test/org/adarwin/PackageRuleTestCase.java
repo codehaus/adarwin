@@ -25,7 +25,7 @@ public class PackageRuleTestCase extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		ruleBuilder = new RuleBuilder(new Grammar("package", PackageRule.class));
+		ruleBuilder = new RuleBuilder(new RuleClassBindings("package", PackageRule.class));
 	}
 
 	public void testMatchingUsingClass() throws BuilderException, IOException {

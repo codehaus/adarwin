@@ -11,12 +11,12 @@
 package org.adarwin.rule;
 
 import org.adarwin.ClassSummary;
-import org.adarwin.Grammar;
+import org.adarwin.RuleClassBindings;
 
 
 public class FalseRule implements Rule {
-	public String getExpression(Grammar grammar) {
-        return grammar.getRule(getClass());
+	public String getExpression(RuleClassBindings ruleClassBindings) {
+        return ruleClassBindings.getRule(getClass());
     }
 
 	public boolean inspect(ClassSummary classSummary) {

@@ -12,41 +12,70 @@ package org.adarwin;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.adarwin.rule.Rule;
 
 public class RuleBuilder {
-    private Grammar grammar;
+    private RuleClassBindings ruleClassBindings;
+    private Map variables;
 
-    public RuleBuilder(Grammar grammar) {
-        this.grammar = grammar;
+    public RuleBuilder(RuleClassBindings ruleClassBindings) {
+        this.ruleClassBindings = ruleClassBindings;
+        variables = new HashMap();
     }
     
 	public Rule[] buildRules(String expression) throws BuilderException {
 		String[] subExpression = parse(expression);
 		
-		Rule[] rules = new Rule[subExpression.length];
+		List rules = new ArrayList(subExpression.length);
 		
-		for (int rLoop = 0; rLoop < rules.length; rLoop++) {
-			rules[rLoop] = buildRule(subExpression[rLoop]);
+		for (int rLoop = 0; rLoop < subExpression.length; rLoop++) {
+			Rule rule = buildRule(subExpression[rLoop]);
+			if (rule != null) {
+				rules.add(rule);
+			}
 		}
 		
-		return rules;
+		return (Rule[]) rules.toArray(new Rule[0]);
 	}
 
     public Rule buildRule(String expression) throws BuilderException {
 		checkBalancedParathesis(expression);
         try {
-            return buildRule(getName(expression), getParameters(expression));
+        	String variable = getVariable(expression);
+			String name = getName(expression);
+			
+			if (variables.get(name) != null) {
+				return (Rule) variables.get(name);
+			}
+			
+            Rule rule = buildRule(name, getParameters(expression));
+            if (variable != null && variable.length() > 0) {
+            	variables.put(variable, rule);
+            	return null;
+            }
+            return rule;
         } catch (BuilderException e) {
             throw e;
         } catch (Exception e) {
             throw new BuilderException(e);
         }
     }
+
+	private String getVariable(String expression) {
+		expression = expression.replaceAll("\\s++", "");
+		
+		if (expression.indexOf('=') != -1) {
+			return expression.substring(0, expression.indexOf('='));
+		}
+		return "";
+	}
 
 	private void checkBalancedParathesis(String expression) throws BuilderException {
 		if (countNumberOf(expression, "(") != countNumberOf(expression, ")")) {
@@ -67,12 +96,25 @@ public class RuleBuilder {
 	}
 
 	private String getName(String expression) {
+		expression = expression.replaceAll("\\s++", "");
+		
+		int startOfName = 0;
+		
+		if (expression.indexOf('=') != -1) {
+			startOfName = expression.indexOf('=') + 1;
+		}
+		
+		int endOfName = expression.length();
+		
         if (expression.indexOf('(') != -1) {
-            return expression.substring(0, expression.indexOf('('));
+			endOfName = expression.indexOf('(');
+            //return expression.substring(0, expression.indexOf('('));
         }
-        else {
-            return expression;
-        }
+
+		return expression.substring(startOfName, endOfName);        
+//        else {
+//            return expression;
+//        }
     }
 
     private String[] getParameters(String expression) {
@@ -206,7 +248,7 @@ public class RuleBuilder {
 	}
 
 	private Class getRuleClass(String name) {
-        return grammar.getClass(name);
+        return ruleClassBindings.getClass(name);
     }
     
 	public static String[] parse(String expression) {
