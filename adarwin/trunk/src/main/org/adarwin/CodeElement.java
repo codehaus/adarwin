@@ -32,14 +32,14 @@ public class CodeElement {
 	protected CodeElement(String className) {
 		this(className, SOURCE);
 	}
-	
+
 	protected CodeElement(String className, int codeType) {
 		this.className = className;
 		this.type = codeType;
 	}
 
 	public boolean isUses() {
-		return USES == type || EXTENDS_OR_IMPLEMENTS == type;
+		return SOURCE != type;
 	}
 
 	public boolean isSource() {

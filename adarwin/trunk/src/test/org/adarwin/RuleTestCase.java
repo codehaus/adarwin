@@ -34,12 +34,12 @@ public abstract class RuleTestCase extends TestCase {
 	}
 
 	public CodeElement createMethodDeclaration(String methodName, Class returnType, Class[] parameterTypes) {
-		return MethodDeclaration.createDeclaration(Integer.class.getName(), returnType.getName(),
+		return Method.createDeclaration(Integer.class.getName(), returnType.getName(),
 			methodName, RuleTestCase.convertClassArrayToStringArray(parameterTypes));
 	}
 
 	public CodeElement createMethodDeclaration(String methodName, Class returnType) {
-		return MethodDeclaration.createDeclaration(Integer.class.getName(), returnType.getName(),
+		return Method.createDeclaration(Integer.class.getName(), returnType.getName(),
 			methodName, new String[0]);
 	}
 

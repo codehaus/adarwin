@@ -27,11 +27,7 @@ public class Constructor extends CodeElement {
 		this.parameterTypes = parameterTypes;
 	}
 
-	public String[] getParameterTypes() {
-		return parameterTypes;
-	}
-
 	public boolean matches(String className, String[] parameterTypes) {
-		return matches(className) && Util.matchesPatterns(getParameterTypes(), parameterTypes);
+		return matches(className) && Util.matchesPatterns(this.parameterTypes, parameterTypes);
 	}
 }

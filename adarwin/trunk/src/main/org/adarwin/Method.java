@@ -12,26 +12,27 @@ package org.adarwin;
 
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
-public class MethodDeclaration extends CodeElement {
+public class Method extends CodeElement {
 	private final String methodName;
 	private final String returnType;
 	private final String[] parameterTypes;
-	
+
 	public static CodeElement createDeclaration(String className, String returnType, 
 		String methodName, String[] parameterTypes) {
-		
-		return new MethodDeclaration(className, methodName, returnType, parameterTypes, SOURCE);
-	}
-	
-	public static CodeElement createInvocation(String className, String returnType, 
-		String methodName, String[] parameterTypes) {
-		
-		return new MethodDeclaration(className, methodName, returnType, parameterTypes, USES);
+
+		return new Method(className, methodName, returnType, parameterTypes, SOURCE);
 	}
 
-	private MethodDeclaration(String className, String methodName, String returnType,
-		String[] parameterTypes, int codeType)  {
+	public static CodeElement createInvocation(String className, String returnType, 
+		String methodName, String[] parameterTypes) {
+
+		return new Method(className, methodName, returnType, parameterTypes, USES);
+	}
+
+	private Method(String className, String methodName, String returnType, String[] parameterTypes,
+		int codeType)  {
 
 		super(className, codeType);
 		this.methodName = methodName;
@@ -39,20 +40,8 @@ public class MethodDeclaration extends CodeElement {
 		this.returnType = returnType;
 	}
 
-	public String getMethodName() {
-		return methodName;
-	}
-
-	public String getReturnType() {
-		return returnType;
-	}
-
-	public String[] getParameterTypes() {
-		return parameterTypes;
-	}
-
 	public int hashCode() {
-		return toString().hashCode();
+		return getClass().hashCode();
 	}
 
 	public boolean equals(Object object) {
@@ -64,24 +53,17 @@ public class MethodDeclaration extends CodeElement {
 		if (object == this) {
 			return true;
 		}
+		
+		Method other = (Method) object;
 
-		return equalsMethod((MethodDeclaration) object);
+		return returnType.equals(other.returnType) &&
+			methodName.equals(other.methodName) &&
+			Arrays.equals(parameterTypes, other.parameterTypes);
 	}
 
-	public String toString() {
-		StringBuffer buffer =
-			new StringBuffer(getReturnType() + " " + getMethodName() + '(');
-
-		Util.appendArray(buffer, parameterTypes);
-
-		buffer.append(')');
-
-		return buffer.toString();
-	}
-
-	public boolean equalsMethod(MethodDeclaration other) {
-		return getReturnType().equals(other.getReturnType()) &&
-			getMethodName().equals(other.getMethodName()) &&
-			Arrays.equals(getParameterTypes(), other.getParameterTypes());
+	public boolean matches(String returnType, String methodName, String[] parameterTypes) {
+		return Pattern.matches(this.returnType, returnType) &&
+			Pattern.matches(this.methodName, methodName) &&
+			Util.matchesPatterns(this.parameterTypes, parameterTypes);
 	}
 }
