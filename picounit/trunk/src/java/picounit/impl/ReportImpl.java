@@ -17,10 +17,7 @@ public class ReportImpl implements ResultListener {
 
 	private List stack = new LinkedList();
 
-	private final MethodInvoker methodInvoker;
-
-	public ReportImpl(MethodInvoker methodInvoker) {
-		this.methodInvoker = methodInvoker;
+	public ReportImpl() {
 		this.start = new Date();
 	}
 
@@ -69,11 +66,6 @@ public class ReportImpl implements ResultListener {
 		visited.add(scope);
 
 		stack.add(0, scope);
-
-		if (Method.class.equals(scope.getType())) {
-			System.out.print(".");
-			methodInvoker.invokeMethod((Method) scope.value());
-		}
 	}
 
 	public void exit() {
