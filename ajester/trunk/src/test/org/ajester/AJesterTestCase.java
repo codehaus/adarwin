@@ -2,14 +2,11 @@ package org.ajester;
 
 
 import org.ajester.testmodel.code.BooleanReturn;
-import org.ajester.testmodel.code.IfStatement;
+import org.ajester.testmodel.code.IfEqualsStatement;
 import org.ajester.testmodel.code.ProblematicIfStatement;
 import org.ajester.testmodel.test.BooleanReturnTestCase;
 import org.ajester.testmodel.test.IfStatementTestCase;
 import org.ajester.testmodel.test.ProblematicIfStatementTestCase;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -18,7 +15,7 @@ public class AJesterTestCase extends TestCase {
 	
 	public void testGetMutatorsReturnsOneMutatorPerMethod() throws Exception {
 		Mutator[] mutators = AJester.getMutators(IfStatementTestCase.class,
-			IfStatement.class, new MutatorFactory(IfStatementMutator.class));
+			IfEqualsStatement.class, new MutatorFactory(IfStatementMutator.class));
 
 		assertNotNull(mutators);
 		
@@ -44,7 +41,7 @@ public class AJesterTestCase extends TestCase {
 			new MutatorFactory(BooleanReturnMutator.class)
 		};
 		
-		Mutator[] mutators = AJester.getMutators(IfStatementTestCase.class, IfStatement.class,
+		Mutator[] mutators = AJester.getMutators(IfStatementTestCase.class, IfEqualsStatement.class,
 			factories);
 		
 		assertNotNull(mutators);
@@ -71,14 +68,14 @@ public class AJesterTestCase extends TestCase {
 	
 	public void testReport() throws Exception {
 		AJester ajester = new AJester(BooleanReturnTestCase.class,
-			new BooleanReturnMutator(BooleanReturn.GET_TRUE_LOCATION));
+			new BooleanReturnMutator(BooleanReturn.LOCATION));
 
 		assertEquals(Report.NO_PROBLEMS, ajester.run().getReport());
 	}
 	
 	public void testReportWithAnotherClass() throws Exception {
 		AJester ajester = new AJester(IfStatementTestCase.class,
-			new BooleanReturnMutator(IfStatement.IF_EQUAL_LOCATION));
+			new BooleanReturnMutator(IfEqualsStatement.IF_EQUAL_LOCATION));
 
 		assertEquals(Report.NO_PROBLEMS, ajester.run().getReport());
 	}
@@ -96,9 +93,9 @@ public class AJesterTestCase extends TestCase {
 	
 	public void testGetCoverage() throws Exception {
 		Report report = new AJester(BooleanReturnTestCase.class,
-			new BooleanReturnMutator(BooleanReturn.GET_TRUE_LOCATION)).run();
+			new BooleanReturnMutator(BooleanReturn.LOCATION)).run();
 
-		assertTrue(report.getCoverage().contains(BooleanReturn.GET_TRUE_LOCATION));
+		assertTrue(report.getCoverage().contains(BooleanReturn.LOCATION));
 	}
 
 	public void testReportWithProblematicIfStatementWhenModifyingDifferentMethod()

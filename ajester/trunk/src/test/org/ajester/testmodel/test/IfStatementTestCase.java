@@ -1,15 +1,16 @@
 package org.ajester.testmodel.test;
 
-import org.ajester.testmodel.code.IfStatement;
+import org.ajester.testmodel.code.IfEqualsStatement;
+import org.ajester.testmodel.code.IfNotEqualsStatement;
 
 import junit.framework.TestCase;
 
 public class IfStatementTestCase extends TestCase {
 	public void testIfEqualMethodReturnsTrue() {
-		assertTrue(new IfStatement().getTrue());
+		assertTrue(new IfEqualsStatement().getTrue());
 	}
 	
 	public void testIfNotEqualMethodReturnsTrue() {
-		assertTrue(new IfStatement().ifNotEqual());
+		assertTrue(new IfNotEqualsStatement().getTrue());
 	}
 }
