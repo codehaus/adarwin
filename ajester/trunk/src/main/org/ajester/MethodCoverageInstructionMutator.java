@@ -4,12 +4,26 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Constants;
 
-public class MethodCoverageInstructionMutator extends MethodCoverageMatcher implements InstructionMutator {
+public class MethodCoverageInstructionMutator implements InstructionMatcher, InstructionMutator {
+	private CodeMatcher codeMatcher;
+
 	public MethodCoverageInstructionMutator(CodeMatcher codeMatcher) {
-		super(codeMatcher);
+		this.codeMatcher = codeMatcher;
 	}
 
 	private static final String COVERAGE_CLASS = Coverage.class.getName().replace('.', '/');
+
+	public boolean matches(Instruction instructionType) {
+		if (instructionType instanceof MethodInstruction) {
+			MethodInstruction methodInstruction =
+			(MethodInstruction) instructionType;
+
+			return !methodInstruction.getCodeLocation().getMethodName().equals("<init>") &&
+			!methodInstruction.getCodeLocation().getMethodName().equals("<clinit>");
+		}
+
+		return false;
+	}
 
 	public Instruction mutate(Instruction instruction) {
 		final MethodInstruction methodInstruction = (MethodInstruction) instruction;
@@ -23,5 +37,9 @@ public class MethodCoverageInstructionMutator extends MethodCoverageMatcher impl
 					"(Ljava/lang/String;Ljava/lang/String;)V");
 			}
 		};
+	}
+	
+	public CodeMatcher getCodeMatcher() {
+		return codeMatcher;
 	}
 }

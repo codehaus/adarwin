@@ -2,11 +2,25 @@ package org.ajester;
 
 import org.objectweb.asm.Constants;
 
-public class IfStatementInstructionMutator extends IfStatementMatcher implements InstructionMutator {
+public class IfStatementInstructionMutator implements InstructionMatcher, InstructionMutator {
+	private CodeMatcher codeMatcher;
+
 	public IfStatementInstructionMutator(CodeMatcher codeMatcher) {
-		super(codeMatcher);
+		this.codeMatcher = codeMatcher;
 	}
 
+	public boolean matches(Instruction instructionType) {
+		if (instructionType instanceof JumpInstruction) {
+			JumpInstruction jumpInstruction =
+			(JumpInstruction) instructionType;
+			
+			return jumpInstruction.getOpcode() == Constants.IFEQ ||
+			jumpInstruction.getOpcode() == Constants.IFNE;			
+		}
+		
+		return false;
+	}
+	
 	public Instruction mutate(Instruction instruction) {
 		JumpInstruction jumpInstruction = (JumpInstruction) instruction;
 
@@ -18,5 +32,9 @@ public class IfStatementInstructionMutator extends IfStatementMatcher implements
 			default:
 				return instruction;
 		}
+	}
+	
+	public CodeMatcher getCodeMatcher() {
+		return codeMatcher;
 	}
 }
