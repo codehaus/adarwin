@@ -1,4 +1,4 @@
-package picounit;
+package picounit.junit;
 
 import picounit.util.MethodUtil;
 import picounit.util.ProxyFactory;

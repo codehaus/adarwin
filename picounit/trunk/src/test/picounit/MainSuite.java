@@ -1,13 +1,13 @@
 package picounit;
 
-import picounit.around.AroundTests;
+import picounit.around.AroundSuite;
 import picounit.junit.JUnitSuite;
-import picounit.runner.RunnerTests;
-import picounit.test.TestTests;
+import picounit.runner.RunnerSuite;
+import junit.framework.TestSuite;
 
-public class AllTests implements Suite {
+public class MainSuite implements Suite {
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException {
-		new MainRunner().run(AllTests.class);
+		new MainRunner().run(MainSuite.class);
 	}
 
 	public void suite(Runner runner) {
@@ -15,9 +15,9 @@ public class AllTests implements Suite {
 		runner.run(MethodInvokerTest.class);
 		runner.run(VerifyTest.class);
 		
-		runner.run(AroundTests.class);
-		runner.run(RunnerTests.class);
-		runner.run(TestTests.class);
+		runner.run(AroundSuite.class);
+		runner.run(RunnerSuite.class);
+		runner.run(TestSuite.class);
 		runner.run(JUnitSuite.class);
 	}
 }

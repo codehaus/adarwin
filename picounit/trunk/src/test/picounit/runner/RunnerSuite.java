@@ -2,15 +2,15 @@ package picounit.runner;
 
 import picounit.Runner;
 import picounit.Suite;
-import picounit.suite.SuiteRunnerTests;
+import picounit.suite.SuiteSuite;
 
-public class RunnerTests implements Suite {
+public class RunnerSuite implements Suite {
 	public void suite(Runner runner) {
 		runner.run(RegistryTest.class);
 		runner.run(ReportTest.class);
 		runner.run(ReportingTest.class);
 		runner.run(MainRunnerTest.class);
 
-		runner.run(SuiteRunnerTests.class);
+		runner.run(SuiteSuite.class);
 	}
 }
