@@ -14,23 +14,19 @@ import org.adarwin.rule.OrRule;
 import org.adarwin.rule.Rule;
 
 public class OrRuleTestCase extends RuleTestCase {
-    public void testFalseOrFalse() throws ADarwinException {
-        assertNumMatches(0, new OrRule(new Rule[] {new FalseRule(), new FalseRule()}),
-        	String.class);
+    public void testFalseOrFalse() {
+        assertNumMatches(0, new OrRule(new Rule[] {new FalseRule(), new FalseRule()}), Void.class);
     }
 
-    public void testTrueOrFalse() throws ADarwinException {
-        assertNumMatches(1, new OrRule(new Rule[] {new TrueRule(), new FalseRule()}),
-        	String.class);
+    public void testTrueOrFalse() {
+        assertNumMatches(1, new OrRule(new Rule[] {new TrueRule(), new FalseRule()}), Void.class);
     }
 
-    public void testFalseOrTrue() throws ADarwinException {
-        assertNumMatches(1, new OrRule(new Rule[] {new FalseRule(), new TrueRule()}),
-        	String.class);
+    public void testFalseOrTrue() {
+        assertNumMatches(1, new OrRule(new Rule[] {new FalseRule(), new TrueRule()}), Void.class);
     }
 
-    public void testTrueOrTrue() throws ADarwinException {
-    	assertNumMatches(1, new OrRule(new Rule[] {new TrueRule(), new TrueRule()}),
-    		String.class);
+    public void testTrueOrTrue() {
+    	assertNumMatches(1, new OrRule(new Rule[] {new TrueRule(), new TrueRule()}), Void.class);
     }
 }

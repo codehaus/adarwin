@@ -17,19 +17,19 @@ import org.adarwin.testmodel.a.InPackageA;
 import org.adarwin.testmodel.b.InPackageB;
 
 public class NotRuleTestCase extends RuleTestCase {
-    public void testNegatation() throws ADarwinException {
+    public void testNegatation() {
         Rule rule = new NotRule(new TrueRule());
 
         assertNumMatches(0, rule, InPackageA.class);
     }
 
-    public void testDoubleNegation() throws ADarwinException {
+    public void testDoubleNegation() {
         Rule rule = new NotRule(new NotRule(new TrueRule()));
 
         assertNumMatches(1, rule, InPackageA.class);
     }
 
-	public void testComplexNegation() throws ADarwinException {
+	public void testComplexNegation() {
 		class UsesPackageAAndPackageB {
 			public void uses() {
 				new InPackageA();

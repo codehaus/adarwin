@@ -10,7 +10,6 @@
 
 package org.adarwin;
 
-import org.adarwin.rule.ElementType;
 import org.adarwin.testmodel.b.ExceptionInPackageB;
 
 import java.io.IOException;
@@ -84,7 +83,7 @@ public class RuleClassVisitorTestCase extends RuleTestCase {
 	}
 
 	private CodeElement create(Class clazz, ElementType codeType) {
-		return CodeElement.create(new ClassName(clazz.getName()), codeType);
+		return UsesCodeElement.create(new ClassName(clazz.getName()), codeType);
 	}
 }
 

@@ -10,6 +10,7 @@
 
 package org.adarwin;
 
+
 import java.util.Arrays;
 
 public class MethodInvocation extends UsesCodeElement implements Method {
@@ -26,7 +27,7 @@ public class MethodInvocation extends UsesCodeElement implements Method {
 	private MethodInvocation(ClassName usesClassName, String returnType,
 		String methodName, String[] parameterTypes) {
 
-		super(usesClassName);
+		super(usesClassName, ElementType.USES);
 
 		this.returnType = returnType;
 		this.methodName = methodName;

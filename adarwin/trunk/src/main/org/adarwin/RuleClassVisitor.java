@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.adarwin.rule.ElementType;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.CodeVisitor;
@@ -27,7 +26,7 @@ class RuleClassVisitor implements ClassVisitor {
 	private final Set dependancies = new HashSet();
 	private ClassName className;
 
-	public static ClassSummary visit(InputStream inputStream) throws ADarwinException {
+	public static ClassSummary visit(InputStream inputStream) {
 		try {
 			return new RuleClassVisitor().visit(new ClassReader(inputStream));
 		}
@@ -37,7 +36,8 @@ class RuleClassVisitor implements ClassVisitor {
 		finally {
 			try {
 				inputStream.close();
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 			}
 		}
 	}
@@ -51,11 +51,11 @@ class RuleClassVisitor implements ClassVisitor {
 	public void visit(int access, String sourceClassPath, String baseClassPath, String[] interfaces, String fileName) {
 		className = getFullClassName(sourceClassPath);
 
-		inspect(CodeElement.create(getFullClassName(baseClassPath),
+		inspect(UsesCodeElement.create(getFullClassName(baseClassPath),
 			ElementType.EXTENDS_OR_IMPLEMENTS));
 
 		for (int iLoop = 0; iLoop < interfaces.length; ++iLoop) {
-			inspect(CodeElement.create(getFullClassName(interfaces[iLoop]),
+			inspect(UsesCodeElement.create(getFullClassName(interfaces[iLoop]),
 				ElementType.EXTENDS_OR_IMPLEMENTS));
 		}
     }
@@ -76,7 +76,7 @@ class RuleClassVisitor implements ClassVisitor {
     public void visitField(int access, String name, String desc, Object value) {
 		IType type = typeParser.parse(desc);
 		if (!type.isPrimative()) {
-			inspect(CodeElement.create(new ClassName(type.getTypeName()), ElementType.USES));
+			inspect(UsesCodeElement.create(new ClassName(type.getTypeName()), ElementType.USES));
 		}
     }
 
@@ -89,7 +89,7 @@ class RuleClassVisitor implements ClassVisitor {
 			IType returnType = typeParser.parseMethodReturn(desc); 
 			
 			if (!returnType.isPrimative()) {
-				inspect(CodeElement.create(new ClassName(returnType.getTypeName()), ElementType.USES));
+				inspect(UsesCodeElement.create(new ClassName(returnType.getTypeName()), ElementType.USES));
 			}
 			
 			IType[] argumentTypes = typeParser.parseMethodParameters(desc);
@@ -103,7 +103,7 @@ class RuleClassVisitor implements ClassVisitor {
 
 		if (exceptions != null) {
 			for (int eLoop = 0; eLoop < exceptions.length; eLoop++) {
-				inspect(CodeElement.create(getFullClassName(exceptions[eLoop]), ElementType.USES));
+				inspect(UsesCodeElement.create(getFullClassName(exceptions[eLoop]), ElementType.USES));
 			}
 		}
 
@@ -141,7 +141,7 @@ class RuleClassVisitor implements ClassVisitor {
         }
 
         public void visitTypeInsn(int opcode, String desc) {
-			inspect(CodeElement.create(getFullClassName(desc), ElementType.USES));
+			inspect(UsesCodeElement.create(getFullClassName(desc), ElementType.USES));
         }
 
         public void visitFieldInsn(int opcode, String owner, String name, String desc) {
@@ -149,7 +149,7 @@ class RuleClassVisitor implements ClassVisitor {
             	String text = name.substring(STATIC_CLASS_PREFIX.length());
             	
             	ClassName className = new ClassName(text.replace(STATIC_CLASS_SEPARATOR, '.'));
-				inspect(CodeElement.create(className, ElementType.USES));
+				inspect(UsesCodeElement.create(className, ElementType.USES));
             }
         }
 
@@ -205,7 +205,8 @@ class RuleClassVisitor implements ClassVisitor {
 			if (!"this".equals(name)) {
 				IType type = typeParser.parse(desc);
 				if (!type.isPrimative()) {
-					inspect(CodeElement.create(new ClassName(type.getTypeName()), ElementType.USES));
+					inspect(UsesCodeElement.create(
+						new ClassName(type.getTypeName()), ElementType.USES));
 				}
 			}
         }

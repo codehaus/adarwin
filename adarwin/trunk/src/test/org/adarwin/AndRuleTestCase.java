@@ -19,31 +19,31 @@ import org.adarwin.testmodel.a.InPackageAUsesClassFromPackageB;
 import org.adarwin.testmodel.b.InPackageB;
 
 public class AndRuleTestCase extends RuleTestCase {
-    public void testFalseAndFalse() throws ADarwinException {
+    public void testFalseAndFalse() {
         Rule rule = new AndRule(new Rule[] {new FalseRule(), new FalseRule()});
 
         assertNumMatches(0, rule, InPackageA.class);
     }
 
-    public void testFalseAndTrue() throws ADarwinException {
+    public void testFalseAndTrue() {
         Rule rule = new AndRule(new Rule[] {new FalseRule(), new TrueRule()});
 
         assertNumMatches(0, rule, InPackageA.class);
     }
 
-    public void testTrueAndFalse() throws ADarwinException {
+    public void testTrueAndFalse() {
         Rule rule = new AndRule(new Rule[] {new TrueRule(), new FalseRule()});
 
         assertNumMatches(0, rule, InPackageA.class);
     }
 
-    public void testTrueAndTrue() throws ADarwinException {
+    public void testTrueAndTrue() {
         Rule rule = new AndRule(new Rule[] {new TrueRule(), new TrueRule()});
 
         assertNumMatches(1, rule, InPackageAUsesClassFromPackageB.class);
     }
 
-	public void testRealTrueAndTrue() throws ADarwinException {
+	public void testRealTrueAndTrue() {
 		Rule rule = new AndRule(new Rule[] {
 			new SourceRule(createPackageRule(InPackageA.class)),
 			new UsesRule(createPackageRule(InPackageB.class))
@@ -52,7 +52,7 @@ public class AndRuleTestCase extends RuleTestCase {
 		assertNumMatches(1, rule, InPackageAUsesClassFromPackageB.class);
 	}
 
-    public void testSequentialCoincedence() throws ADarwinException {
+    public void testSequentialCoincedence() {
         Rule rule = new AndRule(new Rule[] {
         	createPackageRule(InPackageA.class),
 			createPackageRule(InPackageB.class)

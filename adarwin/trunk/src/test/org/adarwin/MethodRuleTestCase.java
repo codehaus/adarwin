@@ -16,7 +16,7 @@ import org.adarwin.rule.SourceRule;
 import org.adarwin.rule.UsesRule;
 
 public class MethodRuleTestCase extends RuleTestCase {
-	public void testVoidReturnMethod() throws ADarwinException {
+	public void testVoidReturnMethod() {
 		class ClassWithVoidReturnMethod {
 			public void voidReturnMethod() {
 			}
@@ -26,7 +26,7 @@ public class MethodRuleTestCase extends RuleTestCase {
 			ClassWithVoidReturnMethod.class);
 	}
 
-	public void testNoArgMethod() throws ADarwinException {
+	public void testNoArgMethod() {
 		class ClassWithNoArgMethod {
 			public Integer noArgMethod() {
 				return null;
@@ -37,7 +37,7 @@ public class MethodRuleTestCase extends RuleTestCase {
 			ClassWithNoArgMethod.class);
 	}
 
-	public void testSingleArgMethod() throws ADarwinException {
+	public void testSingleArgMethod() {
 		class ClassWithSingleArgMethod {
 			public Integer singleArgMethod(String string) {
 				return null;
@@ -48,7 +48,7 @@ public class MethodRuleTestCase extends RuleTestCase {
 			new Class[] {String.class}), ClassWithSingleArgMethod.class);
 	}
 
-	public void testTwoArgMethod() throws ADarwinException {
+	public void testTwoArgMethod() {
 		class ClassWithTwoArgMethod {
 			public Integer twoArgMethod(Integer integer, String string) {
 				return null;
@@ -59,7 +59,7 @@ public class MethodRuleTestCase extends RuleTestCase {
 			new Class[] {Integer.class, String.class}), ClassWithTwoArgMethod.class);
 	}
 
-	public void testMethodReturningPrimitive() throws ADarwinException {
+	public void testMethodReturningPrimitive() {
 		class ClassWithMethodReturningPrimitive {
 			public int methodReturningPrimitive() {
 				return 0;
@@ -70,7 +70,7 @@ public class MethodRuleTestCase extends RuleTestCase {
 			ClassWithMethodReturningPrimitive.class);
 	}
 
-	public void testMethodDeclaration() throws ADarwinException {
+	public void testMethodDeclaration() {
 		class ClassWithNoArgMethodReturningInteger {
 			public Integer noArgMethod() {
 				return null;
@@ -82,13 +82,13 @@ public class MethodRuleTestCase extends RuleTestCase {
 		assertNumMatches(1, rule, ClassWithNoArgMethodReturningInteger.class);
 	}
 
-	public void testSelf() throws ADarwinException {
+	public void testSelf() {
 		Rule rule = MethodRule.create(Void.TYPE.getName(), "testSelf", new String[0]); 
 
 		assertNumMatches(1, rule, MethodRuleTestCase.class);
 	}
 
-	public void testMethodInvocation() throws ADarwinException {
+	public void testMethodInvocation() {
 		class InvokesMethod {
 			public void method() {
 				new Integer(0).toString();
@@ -100,7 +100,7 @@ public class MethodRuleTestCase extends RuleTestCase {
 		assertNumMatches(1, rule, InvokesMethod.class);
 	}
 
-	public void testUsingAMethodNotRegardedAsHavingSaidMethod() throws ADarwinException {
+	public void testUsingAMethodNotRegardedAsHavingSaidMethod() {
 		class InvokesMethod {
 			public void method() {
 				new Integer(0).toString();

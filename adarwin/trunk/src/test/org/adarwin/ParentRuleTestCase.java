@@ -17,13 +17,13 @@ import org.adarwin.testmodel.b.IInPackageB;
 import org.adarwin.testmodel.b.InPackageB;
 
 public class ParentRuleTestCase extends RuleTestCase {
-	public void testNeitherExtendsNorImplements() throws ADarwinException {
+	public void testNeitherExtendsNorImplements() {
 		Rule rule = new ParentRule(InPackageB.class);
 
 		assertNumMatches(0, rule, InPackageA.class);
 	}
 
-	public void testExtends() throws ADarwinException {
+	public void testExtends() {
 		class UsesClassForBaseClass extends InPackageB {
 		}
 		
@@ -32,7 +32,7 @@ public class ParentRuleTestCase extends RuleTestCase {
 		assertNumMatches(1, rule, UsesClassForBaseClass.class);
 	}
 
-	public void testImplements() throws ADarwinException {
+	public void testImplements() {
 		class UsesClassForBaseInterface implements IInPackageB {
 		}
 		
@@ -44,7 +44,7 @@ public class ParentRuleTestCase extends RuleTestCase {
 	static interface IUsesClassForBaseInterface extends IInPackageB {
 	}
 
-	public void testExtendsInterface() throws ADarwinException {
+	public void testExtendsInterface() {
 		Rule rule = new ParentRule(IInPackageB.class);
 
 		assertNumMatches(1, rule, IUsesClassForBaseInterface.class);

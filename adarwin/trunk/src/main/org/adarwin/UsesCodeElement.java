@@ -10,17 +10,20 @@
 
 package org.adarwin;
 
-import org.adarwin.rule.ElementType;
 
 public class UsesCodeElement extends CodeElement {
 	private final ClassName usesClassName;
 
 	public static CodeElement create(ClassName usesClassName) {
-		return new UsesCodeElement(usesClassName);
+		return new UsesCodeElement(usesClassName, ElementType.USES);
 	}
 
-	protected UsesCodeElement(ClassName usesClassName) {
-		super(usesClassName, ElementType.USES);
+	public static CodeElement create(ClassName usesClassName, ElementType elementType) {
+		return new UsesCodeElement(usesClassName, elementType);
+	}
+
+	protected UsesCodeElement(ClassName usesClassName, ElementType elementType) {
+		super(usesClassName, elementType);
 		this.usesClassName = usesClassName;
 	}
 

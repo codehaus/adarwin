@@ -9,5 +9,5 @@ public interface RuleConsumer {
 		}
 	};
 
-	boolean consume(Rule rule, Logger logger) throws ADarwinException;
+	boolean consume(Rule rule, Logger logger) ;
 }

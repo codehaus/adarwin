@@ -11,7 +11,6 @@
 package org.adarwin.rule;
 
 import org.adarwin.ClassSummary;
-import org.adarwin.RuleClassBindings;
 
 public class OrRule implements Rule {
 	private Rule[] rules;
@@ -28,19 +27,5 @@ public class OrRule implements Rule {
 		}
 		
 		return ClassSummary.or(summaries);
-	}
-
-	public String toString(RuleClassBindings ruleClassBindings) {
-		StringBuffer buffer = new StringBuffer(ruleClassBindings.getRule(getClass()) + '(');
-		
-		for (int rLoop = 0; rLoop < rules.length; ++rLoop) {
-			if (rLoop != 0) {
-				buffer.append(", ");
-			}
-			buffer.append(rules[rLoop].toString(ruleClassBindings));
-		}
-		buffer.append(')');
-            
-        return buffer.toString();
 	}
 }

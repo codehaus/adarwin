@@ -12,7 +12,7 @@ package org.adarwin.rule;
 
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
-import org.adarwin.RuleClassBindings;
+import org.adarwin.Filter;
 import org.adarwin.UsesCodeElement;
 
 public class SourceRule implements Rule, Filter {
@@ -29,10 +29,6 @@ public class SourceRule implements Rule, Filter {
 	public boolean matches(CodeElement codeElement) {
 		return !(codeElement instanceof UsesCodeElement);
 	}
-
-	public String toString(RuleClassBindings ruleClassBindings) {
-        return ruleClassBindings.getRule(getClass()) + '(' + wrappedRule.toString(ruleClassBindings) + ')';
-    }
 
 	public int hashCode() {
 		return getClass().hashCode() ^ wrappedRule.hashCode();

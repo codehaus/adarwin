@@ -10,15 +10,9 @@
 
 package org.adarwin;
 
-import java.io.IOException;
-
-import org.adarwin.rule.PackageRule;
-import org.adarwin.rule.SourceRule;
-import org.adarwin.testmodel.a.InPackageA;
-import org.adarwin.testmodel.a.InPackageAUsesClassFromPackageB;
-import org.adarwin.testmodel.a.UsesPackageAAndPackageB;
 import org.easymock.MockControl;
-import org.easymock.ParameterMatcher;
+
+import java.io.IOException;
 
 import junit.framework.TestCase;
 
@@ -48,20 +42,20 @@ public class RunnerTestCase extends TestCase {
 	private boolean failOnMatch = true;
 	private String ruleExpression = null;
 
-	private IRunner createRunner() throws ADarwinException {
+	private Runner createRunner() {
 		return runner = new Runner(printDetail, failOnMatch, failFast, binding, classPath,
-			logger, ruleBuilder, new CodeProducer(classPath));
+			logger, ruleBuilder, new CodeProducer(classPath, new FileAccessor()));
 	}
 
 	public static void expectRuleViolated(Logger logger, String rule, Class[] classes) {
-		logger.reset(Runner.CLASSES_VIOLATED + rule);
+		logger.reset(RuleBuilder.CLASSES_VIOLATED + rule);
 
 		for (int cLoop = 0; cLoop < classes.length; cLoop++) {
 			logger.log("  " + classes[cLoop].getName());
 		}
 	}
 
-//	public void testRuleExpression() throws ADarwinException {
+//	public void testRuleExpression() {
 //		ruleExpression = RULE;
 //
 //		logger.log("Evaluating rules against: " + CLASSPATH);
@@ -89,7 +83,7 @@ public class RunnerTestCase extends TestCase {
 //		verify();
 //	}
 
-//	public void testMultipleRulesOneRuleMatches() throws ADarwinException {
+//	public void testMultipleRulesOneRuleMatches() {
 //		ruleExpression = COMPOSITE_RULE;
 //
 //		logger.log("Evaluating rules against: " + CLASSPATH);
@@ -108,7 +102,7 @@ public class RunnerTestCase extends TestCase {
 //		verify();
 //	}
 //
-//	public void testFailFast() throws ADarwinException {
+//	public void testFailFast() {
 //		failFast = true;
 //		ruleExpression = RULE;
 //
@@ -132,7 +126,7 @@ public class RunnerTestCase extends TestCase {
 		}
 	}
 
-//	public void testPrintDetail() throws ADarwinException {
+//	public void testPrintDetail() {
 //		ruleExpression = CONSTRUCTOR_RULE;
 //		printDetail = true;
 //		failFast = true;
@@ -155,21 +149,21 @@ public class RunnerTestCase extends TestCase {
 //		verify();
 //	}
 	
-	public void testMainNotEnoughArgs() throws ADarwinException, IOException {
+	public void testMainNotEnoughArgs() throws IOException {
 		try {
 			Runner.main(new String[Runner.MIN_ARGS - 1]);
 			fail("UsageException expected");
 		} catch (UsageException e) {
-			assertEquals(UsageException.USAGE, e.getMessage());
+			assertEquals(Runner.USAGE, e.getMessage());
 		}
  	} 
 
-	public void testMainTooManyArgs() throws ADarwinException, IOException {
+	public void testMainTooManyArgs() throws IOException {
 		try {
 			Runner.main((new String[Runner.MAX_ARGS + 1]));
 			fail("UsageException expected");
 		} catch (UsageException e) {
-			assertEquals(UsageException.USAGE, e.getMessage());
+			assertEquals(Runner.USAGE, e.getMessage());
 		}
 	} 
 
@@ -215,7 +209,7 @@ public class RunnerTestCase extends TestCase {
 		}
 	}
 
-	private void runAndExpectException(String expectedMessage) throws ADarwinException {
+	private void runAndExpectException(String expectedMessage)  {
 		try {
 			runner.run();
 			fail("RuleException expected");

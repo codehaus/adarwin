@@ -12,8 +12,8 @@ package org.adarwin.rule;
 
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
+import org.adarwin.Filter;
 import org.adarwin.Method;
-import org.adarwin.RuleClassBindings;
 import org.adarwin.Util;
 
 import java.util.Arrays;
@@ -45,20 +45,6 @@ public class MethodRule implements Rule, Filter {
 	public boolean matches(CodeElement codeElement) {
 		return codeElement instanceof Method &&
 			matchesMethod((Method) codeElement);
-	}
-
-	public String toString(RuleClassBindings ruleClassBindings) {
-		StringBuffer stringBuffer = new StringBuffer(ruleClassBindings.getRule(getClass()));
-
-		stringBuffer.append('(');
-		stringBuffer.append(returnType);
-		stringBuffer.append(' ');
-		stringBuffer.append(methodName);
-		stringBuffer.append('(');
-		Util.appendArray(stringBuffer, parameterTypes);
-		stringBuffer.append("))");
-
-		return stringBuffer.toString();
 	}
 
 	private static String getReturnType(String signature) {

@@ -13,11 +13,11 @@ package org.adarwin;
 import org.adarwin.rule.ClassRule;
 
 public class ClassRuleTestCase extends RuleTestCase {
-	public void testNonMatchingClass() throws ADarwinException {
+	public void testNonMatchingClass() {
 		assertNumMatches(0, new ClassRule("Fred"), String.class);
     }
 
-    public void testMatchingClass() throws ADarwinException {
+    public void testMatchingClass() {
         assertNumMatches(1, new ClassRule("St.*"), String.class);
     }
 }

@@ -10,7 +10,6 @@
 
 package org.adarwin;
 
-import org.adarwin.rule.ElementType;
 
 import java.util.Arrays;
 

@@ -11,7 +11,6 @@
 package org.adarwin.rule;
 
 import org.adarwin.ClassSummary;
-import org.adarwin.RuleClassBindings;
 
 import java.util.Arrays;
 
@@ -32,20 +31,6 @@ public class AndRule implements Rule {
 
 		return ClassSummary.and(summaries);
 	}
-
-	public String toString(RuleClassBindings ruleClassBindings) {
-		StringBuffer buffer = new StringBuffer(ruleClassBindings.getRule(getClass()) + '(');
-		
-		for (int rLoop = 0; rLoop < rules.length; ++rLoop) {
-			if (rLoop != 0) {
-				buffer.append(", ");
-			}
-			buffer.append(rules[rLoop].toString(ruleClassBindings));
-		}
-		buffer.append(')');
-		
-		return buffer.toString();
-    }
 
 	public int hashCode() {
 		return getClass().hashCode();

@@ -10,6 +10,7 @@
 
 package org.adarwin;
 
-public interface IRunner {
-	void run() throws ADarwinException;
+
+public interface Filter {
+	boolean matches(CodeElement codeElement);
 }

@@ -13,7 +13,7 @@ package org.adarwin.rule;
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
 import org.adarwin.Constructor;
-import org.adarwin.RuleClassBindings;
+import org.adarwin.Filter;
 import org.adarwin.Util;
 
 import java.util.Arrays;
@@ -46,18 +46,6 @@ public class ConstructorRule implements Rule, Filter {
 			matchesConstructor(((Constructor) codeElement));
 	}
 	
-	public String toString(RuleClassBindings ruleClassBindings) {
-		StringBuffer buffer = new StringBuffer(ruleClassBindings.getRule(getClass()));
-		buffer.append('(');
-		buffer.append(className);
-
-		buffer.append('(');
-		Util.appendArray(buffer, parameterTypes);
-		buffer.append("))");
-
-		return buffer.toString();
-	}
-
 	private static String getClassName(String signature) {
 		return Util.getToken(0, signature, " (,)");
 	}

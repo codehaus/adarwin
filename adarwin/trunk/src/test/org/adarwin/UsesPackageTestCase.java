@@ -19,11 +19,11 @@ import org.adarwin.testmodel.b.InPackageB;
 public class UsesPackageTestCase extends RuleTestCase {
     private final Rule rule = new UsesRule(createPackageRule(InPackageB.class));
 
-    public void testNotUsingPackage() throws ADarwinException {
+    public void testNotUsingPackage() {
 		assertNumMatches(0, rule, String.class);
     }    
 
-	public void testUsesAsField() throws ADarwinException {
+	public void testUsesAsField() {
 		class UsesClassInPackageBAsField {
 		    InPackageB empty;
 		}
@@ -31,7 +31,7 @@ public class UsesPackageTestCase extends RuleTestCase {
 		assertNumMatches(1, rule, UsesClassInPackageBAsField.class);
     }
 
-    public void testUsesAsLocalVariable() throws ADarwinException {
+    public void testUsesAsLocalVariable() {
     	class UsesClassInPackageBAsLocalVariable {
     	    public void naughtyMethod() {
     	        InPackageB prohibited = null;
@@ -41,7 +41,7 @@ public class UsesPackageTestCase extends RuleTestCase {
     	assertNumMatches(1, rule, UsesClassInPackageBAsLocalVariable.class);
     }
 
-    public void testUsesAsAnonymouseLocalVariable() throws ADarwinException {
+    public void testUsesAsAnonymouseLocalVariable() {
     	class UsesClassInPackageBAsAnonymousLocalVariable {
     	    public void naughty() {
     	        new InPackageB();
@@ -51,7 +51,7 @@ public class UsesPackageTestCase extends RuleTestCase {
     	assertNumMatches(1, rule, UsesClassInPackageBAsAnonymousLocalVariable.class);
     }
 
-    public void testUsesForInvocation() throws ADarwinException {
+    public void testUsesForInvocation() {
     	class UsesClassInPackageBForInvocation {
     	    public void naughty() {
     	        new InPackageB().empty();
@@ -61,7 +61,7 @@ public class UsesPackageTestCase extends RuleTestCase {
     	assertNumMatches(1, rule, UsesClassInPackageBForInvocation.class);
     }
 
-    public void testUsesForStaticInvocation() throws ADarwinException {
+    public void testUsesForStaticInvocation() {
     	class UsesClassInPackageBForStaticInvocation {
     	    public void naughty() {
     	        InPackageB.staticEmpty();
@@ -71,7 +71,7 @@ public class UsesPackageTestCase extends RuleTestCase {
     	assertNumMatches(1, rule, UsesClassInPackageBForStaticInvocation.class);
     }
 
-    public void testUsesForClassInstanceField() throws ADarwinException {
+    public void testUsesForClassInstanceField() {
     	class UsesClassInPackageBForClassInstanceField {
     	    Class naughtyClass = InPackageB.class;
     	}
@@ -85,11 +85,11 @@ public class UsesPackageTestCase extends RuleTestCase {
 		}
 	}
 
-	public void testUsesForStaticReturnValue() throws ADarwinException {
+	public void testUsesForStaticReturnValue() {
 		assertNumMatches(1, rule, UsesClassInStaticReturnValue.class);
     }
 
-    public void testUsesForClassInstanceInMethod() throws ADarwinException {
+    public void testUsesForClassInstanceInMethod() {
     	class UsesClassInPackageBForClassInstanceInMethod {
     	    public void naughty() {
     	        System.out.println(InPackageB.class.getName());
@@ -99,25 +99,25 @@ public class UsesPackageTestCase extends RuleTestCase {
     	assertNumMatches(1, rule, UsesClassInPackageBForClassInstanceInMethod.class);
     }
 
-	public void testUsesForBaseClass() throws ADarwinException {
+	public void testUsesForBaseClass() {
 		class UsesClassForBaseClass extends InPackageB {
 		}
 		
 		assertNumMatches(1, rule, UsesClassForBaseClass.class);
 	}
 
-	public void testUsesForBaseInterface() throws ADarwinException {
+	public void testUsesForBaseInterface() {
 		assertNumMatches(1, rule, IUsesClassForBaseInterface.class);
 	}
 
-	public void testUsesForInterfaceImplementation() throws ADarwinException {
+	public void testUsesForInterfaceImplementation() {
 		class UsesClassForBaseInterface implements IInPackageB {
 		}
 		
 		assertNumMatches(1, rule, UsesClassForBaseInterface.class);
 	}
 	
-	public void testUsesInMethodReturn() throws ADarwinException {
+	public void testUsesInMethodReturn() {
 		class UsesClassInPackageBInMethodReturn {
 			public InPackageB method() {
 				return null;
@@ -127,7 +127,7 @@ public class UsesPackageTestCase extends RuleTestCase {
 		assertNumMatches(1, rule, UsesClassInPackageBInMethodReturn.class);
 	}
 
-	public void testUsesInMethodParameters() throws ADarwinException {
+	public void testUsesInMethodParameters() {
 		class UsesClassInPackageBInMethodParameters {
 			public void method(InPackageB naughty) {
 			}
@@ -136,7 +136,7 @@ public class UsesPackageTestCase extends RuleTestCase {
 		assertNumMatches(1, rule, UsesClassInPackageBInMethodParameters.class);
 	}
 	
-	public void testUsesInConstructorParameters() throws ADarwinException {
+	public void testUsesInConstructorParameters() {
 		class UsesClassInPackageBInConstructorParameters {
 			public UsesClassInPackageBInConstructorParameters(
 				InPackageB naughty) {
@@ -146,7 +146,7 @@ public class UsesPackageTestCase extends RuleTestCase {
 		assertNumMatches(1, rule, UsesClassInPackageBInConstructorParameters.class);
 	}
 
-	public void testUsesInMethodThrowsClause() throws ADarwinException {
+	public void testUsesInMethodThrowsClause() {
 		class UsesClassInPackageBInMethodThrowsClause {
 			public void naughty() throws ExceptionInPackageB {
 			}
@@ -155,7 +155,7 @@ public class UsesPackageTestCase extends RuleTestCase {
 		assertNumMatches(1, rule, UsesClassInPackageBInMethodThrowsClause.class);
 	}
 
-	public void testUsesInThrow() throws ADarwinException {
+	public void testUsesInThrow() {
 		class UsesClassInPackageBInThrow {
 			public void naughty() {
 				throw new ExceptionInPackageB();

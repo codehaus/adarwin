@@ -21,6 +21,8 @@ import org.adarwin.rule.SourceRule;
 import org.adarwin.rule.UsesRule;
 import org.easymock.MockControl;
 
+import java.util.Properties;
+
 public class RuleBuilderTestCase extends RuleTestCase {
 	private final MockControl ruleConsumerControl =
 		MockControl.createNiceControl(RuleConsumer.class);
@@ -29,62 +31,88 @@ public class RuleBuilderTestCase extends RuleTestCase {
 	private final MockControl loggerControl = MockControl.createNiceControl(Logger.class);
 	private final Logger logger = (Logger) loggerControl.getMock();
 
-	private final RuleClassBindings ruleClassBindings = new RuleClassBindings(
-		new String[] {
-			"true", "and", "parent", "constructor", "src", "package", "method", "uses", "not"
-		},
-		new Class[] {
-			TrueRule.class, AndRule.class, ParentRule.class, ConstructorRule.class,
-			SourceRule.class, PackageRule.class, MethodRule.class, UsesRule.class,
-			NotRule.class
-		});
+	private final String[] ruleNames = new String[] {
+		"true", "and", "parent", "constructor",
+		"src", "package", "method", "uses",
+		"not", "false"
+	};
+	
+	private final Class[] ruleClasses = new Class[] {
+		TrueRule.class, AndRule.class, ParentRule.class, ConstructorRule.class,
+		SourceRule.class, PackageRule.class, MethodRule.class, UsesRule.class,
+		NotRule.class, FalseRule.class
+	};
+	
+	private final Properties ruleMapping = buildMapping(ruleNames, ruleClasses);
 
-    public void testTrueRuleGrammer() throws ADarwinException {
+    public void testTrueRuleGrammer() {
     	assertEquals(new TrueRule(), "true");
     }
 
-	public void testInPackageRuleGrammer() throws ADarwinException {
+	private Properties buildMapping(String[] ruleNames, Class[] ruleClasses) {
+		Properties properties = new Properties();
+		
+		for (int rLoop = 0; rLoop < ruleClasses.length; rLoop++) {
+			properties.put(ruleNames[rLoop], ruleClasses[rLoop].getName());
+		}
+
+		return properties;
+	}
+
+	public void testInPackageRuleGrammer() {
 		assertEquals(new SourceRule(new PackageRule("x")), "src(package(x))");
     }
 
-    public void testInPackageAndUsesPackage() throws ADarwinException {
+    public void testInPackageAndUsesPackage() {
     	assertEquals(new AndRule(new Rule[] {
         	new SourceRule(new PackageRule("package-a")),
 			new UsesRule(new PackageRule("package-b"))
         }), "and(src(package(package-a)), uses(package(package-b)))");
     }
 
-    public void testTwoLevelsOfNesting() throws ADarwinException {
+    public void testTwoLevelsOfNesting() {
     	assertEquals(new NotRule(new AndRule(new Rule[] {new TrueRule(), new TrueRule()})),
     		"not(and(true, true))");
     }
 
-    public void testInPackageRule() throws ADarwinException, ADarwinException {
+    public void testInPackageRule() {
     	assertEquals(new SourceRule(new PackageRule("package-a")), "src(package(package-a))");
     }
 
-    public void testAndRule() throws ADarwinException, ADarwinException {
+    public void testAndRule() {
     	assertEquals(new AndRule(new Rule[] {new TrueRule(), new TrueRule(), new TrueRule()}),
     		"and(true, true, true)");
     }
 
-    public void testConstructorRule() throws ADarwinException {
+    public void testConstructorRule() {
     	assertEquals(new ConstructorRule("className(param1, param2)"), 
     		"constructor(className(param1, param2))");
 	}
 
-    public void testMethodRule() throws ADarwinException {
+    public void testMethodRule() {
     	assertEquals(new MethodRule("returnType methodName(param1, param2, param3)"),
     		"method(returnType methodName(param1, param2, param3))");
     }
 
-	public void testParentRule() throws ADarwinException {
+	public void testParentRule() {
 		assertEquals(new ParentRule("someClass"), "parent(someClass)");
 	}
 
-	public void testWhiteSpaceInRuleIsIrrelevant() throws ADarwinException {
+	public void testWhiteSpaceInRuleIsIrrelevant() {
 		assertEquals(new AndRule(new Rule[] {new TrueRule(), new TrueRule()}),
 			"  \t\nand \n\t(\n\n\t  true  \t\n\t , \t\t\n true  \t\t\n)  \n\n\t");
+	}
+	
+	public void testSimpleVariable() {
+		assertEquals(new TrueRule(), "var = true(), var");
+	}
+	
+	public void testComplexVariable() {
+		assertEquals(new AndRule(new Rule[] {new TrueRule()}), "var = true(), and(var)");
+	}
+	
+	public void testReassignVariable() {
+		assertEquals(new FalseRule(), "var = true(), var = false(), var");
 	}
 
     public void testUnknownRule() {
@@ -96,7 +124,7 @@ public class RuleBuilderTestCase extends RuleTestCase {
 			fail();
 		}
 		catch (ADarwinException be) {
-			assertEquals("No such rule: " + "\"gobbledygook\"", be.getMessage());
+			assertEquals("No such rule, or variable: " + "\"gobbledygook\"", be.getMessage());
 		}
 
 		ruleConsumerControl.verify();
@@ -116,7 +144,7 @@ public class RuleBuilderTestCase extends RuleTestCase {
 		ruleConsumerControl.verify();
 	}
 
-	public void testMultipleRules() throws ADarwinException {
+	public void testMultipleRules() {
 		expectRule(new TrueRule());
 		expectRule(new TrueRule());
 
@@ -127,7 +155,7 @@ public class RuleBuilderTestCase extends RuleTestCase {
 		ruleConsumerControl.verify();
 	}
 
-	public void testMultipleComplexRules() throws ADarwinException {
+	public void testMultipleComplexRules() {
 		expectRule(new SourceRule(new PackageRule("package-a")));
 		expectRule(new SourceRule(new PackageRule("package-b")));
 
@@ -138,7 +166,7 @@ public class RuleBuilderTestCase extends RuleTestCase {
 		ruleConsumerControl.verify();
 	}
 
-	public void testWhiteSpaceBetweenRulesIsIrrelevant() throws ADarwinException {
+	public void testWhiteSpaceBetweenRulesIsIrrelevant() {
 		AndRule expectedRule = new AndRule(new Rule[] {new TrueRule(), new TrueRule()});
 		expectRule(expectedRule);
 		expectRule(expectedRule);
@@ -150,7 +178,7 @@ public class RuleBuilderTestCase extends RuleTestCase {
 		ruleConsumerControl.verify();
 	}
 
-	public void testWhiteSpaceBetweenVariableAssignmentIsIrrelevant() throws ADarwinException {
+	public void testWhiteSpaceBetweenVariableAssignmentIsIrrelevant() {
 		ruleConsumer.consume(new AndRule(new Rule[] {new TrueRule()}), logger);
 		ruleConsumerControl.setReturnValue(true);
 		ruleConsumerControl.replay();
@@ -193,7 +221,7 @@ public class RuleBuilderTestCase extends RuleTestCase {
 		assertEquals(second, parsed[1]);
 	}
 
-	private void assertEquals(Rule expectedRule, String expression) throws ADarwinException {
+	private void assertEquals(Rule expectedRule, String expression) {
 		expectRule(expectedRule);
 
 		ruleConsumerControl.replay();
@@ -205,11 +233,11 @@ public class RuleBuilderTestCase extends RuleTestCase {
 		loggerControl.verify();
 	}
 
-	private void produceRules(String expression) throws ADarwinException {
-		new RuleBuilder(ruleClassBindings, expression, logger).produce(ruleConsumer);
+	private void produceRules(String expression) {
+		new RuleBuilder(expression, logger, ruleMapping).produce(ruleConsumer);
 	}
 
-	private void expectRule(Rule rule) throws ADarwinException {
+	private void expectRule(Rule rule) {
 		ruleConsumer.consume(rule, logger);
 		ruleConsumerControl.setReturnValue(true);
 	}

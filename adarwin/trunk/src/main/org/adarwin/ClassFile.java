@@ -21,7 +21,7 @@ public class ClassFile implements Code {
 		this.inputStream = inputStream;
     }
 
-	public boolean evaluate(Rule rule, RuleListener ruleListener) throws ADarwinException {
-		return ruleListener.matchesEvent(rule.inspect(RuleClassVisitor.visit(inputStream)), rule, this);
+	public boolean evaluate(Rule rule, RuleListener ruleListener) {
+		return ruleListener.matchesEvent(rule.inspect(RuleClassVisitor.visit(inputStream)));
 	}
 }

@@ -15,15 +15,15 @@ import org.adarwin.rule.PackageRule;
 import java.util.Date;
 
 public class PackageRuleTestCase extends RuleTestCase {
-	public void testMatchingUsingClass() throws ADarwinException {
+	public void testMatchingUsingClass() {
 		assertNumMatches(1, new PackageRule(Util.packageName(Date.class)), Date.class);
     }
 
-	public void testMatchingUsingRegularExpression() throws ADarwinException {
+	public void testMatchingUsingRegularExpression() {
 		assertNumMatches(1, new PackageRule(".*util"), Date.class);
 	}
 
-	public void testNonMatchingUsingRegularExpression() throws ADarwinException {
+	public void testNonMatchingUsingRegularExpression() {
 		assertNumMatches(0, new PackageRule(".*flibble"), Date.class);
 	}
 }

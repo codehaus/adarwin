@@ -64,7 +64,7 @@ public class ClassName {
 			getClassName().equals(other.getClassName());
 	}
 
-	public static String packageName(String fullClassName) {
+	private static String packageName(String fullClassName) {
 		if (fullClassName.indexOf('.') != -1) {
 			return fullClassName.substring(0, fullClassName.lastIndexOf('.'));
 		}
@@ -73,7 +73,7 @@ public class ClassName {
 		}
 	}
 
-	public static String className(String fullClassName) {
+	private static String className(String fullClassName) {
 		if (fullClassName.indexOf('.') != -1) {
 			return fullClassName.substring(fullClassName.lastIndexOf('.') + 1);
 		}
