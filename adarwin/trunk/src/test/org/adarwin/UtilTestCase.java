@@ -11,6 +11,7 @@
 package org.adarwin;
 
 import junit.framework.TestCase;
+
 import org.adarwin.testmodel.a.InPackageA;
 
 public class UtilTestCase extends TestCase {

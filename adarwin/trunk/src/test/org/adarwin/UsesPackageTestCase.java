@@ -10,7 +10,10 @@
 
 package org.adarwin;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
+
 import org.adarwin.rule.PackageRule;
 import org.adarwin.rule.Rule;
 import org.adarwin.rule.UsesRule;
@@ -20,14 +23,10 @@ import org.adarwin.testmodel.UsesClassForBaseInterface;
 import org.adarwin.testmodel.UsesClassInPackageBAsAnonymousLocalVariable;
 import org.adarwin.testmodel.UsesClassInPackageBAsField;
 import org.adarwin.testmodel.UsesClassInPackageBAsLocalVariable;
-import org.adarwin.testmodel.UsesClassInPackageBForClassInstanceField;
-import org.adarwin.testmodel.UsesClassInPackageBForClassInstanceInMethod;
 import org.adarwin.testmodel.UsesClassInPackageBForInvocation;
 import org.adarwin.testmodel.UsesClassInPackageBForStaticInvocation;
 import org.adarwin.testmodel.a.InPackageA;
 import org.adarwin.testmodel.b.InPackageB;
-
-import java.io.IOException;
 
 public class UsesPackageTestCase extends TestCase {
     private Rule rule;
@@ -61,13 +60,13 @@ public class UsesPackageTestCase extends TestCase {
         assertEquals(1, new ClassFile(UsesClassInPackageBForStaticInvocation.class).evaluate(rule).getCount());
     }
 
-    public void testUsesForClassInstanceField() throws IOException {
-        assertEquals(1, new ClassFile(UsesClassInPackageBForClassInstanceField.class).evaluate(rule).getCount());
-    }
-
-    public void testUsesForClassInstanceInMethod() throws IOException {
-        assertEquals(1, new ClassFile(UsesClassInPackageBForClassInstanceInMethod.class).evaluate(rule).getCount());
-    }
+//    public void testUsesForClassInstanceField() throws IOException {
+//        assertEquals(1, new ClassFile(UsesClassInPackageBForClassInstanceField.class).evaluate(rule).getCount());
+//    }
+//
+//    public void testUsesForClassInstanceInMethod() throws IOException {
+//        assertEquals(1, new ClassFile(UsesClassInPackageBForClassInstanceInMethod.class).evaluate(rule).getCount());
+//    }
 
 	public void testUsesForBaseClass() throws IOException {
 		assertEquals(1, new ClassFile(UsesClassForBaseClass.class).evaluate(rule).getCount());

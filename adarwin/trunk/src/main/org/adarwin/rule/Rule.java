@@ -11,7 +11,6 @@
 package org.adarwin.rule;
 
 import org.adarwin.ClassSummary;
-import org.adarwin.CodeElement;
 import org.adarwin.Grammar;
 
 public interface Rule {

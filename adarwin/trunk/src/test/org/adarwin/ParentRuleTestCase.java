@@ -10,7 +10,10 @@
 
 package org.adarwin;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
+
 import org.adarwin.rule.ParentRule;
 import org.adarwin.rule.Rule;
 import org.adarwin.testmodel.IUsesClassForBaseInterface;
@@ -19,8 +22,6 @@ import org.adarwin.testmodel.UsesClassForBaseInterface;
 import org.adarwin.testmodel.a.InPackageA;
 import org.adarwin.testmodel.b.IInPackageB;
 import org.adarwin.testmodel.b.InPackageB;
-
-import java.io.IOException;
 
 public class ParentRuleTestCase extends TestCase {
 	public void testNeitherExtendsNorImplements() throws IOException {

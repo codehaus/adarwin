@@ -10,11 +10,11 @@
 
 package org.adarwin;
 
-import org.adarwin.rule.Rule;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+
+import org.adarwin.rule.Rule;
 
 public class ClassDirectory extends CodeBase {
     private String directory;

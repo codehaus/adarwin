@@ -10,32 +10,26 @@
 
 package org.adarwin;
 
-import com.mockobjects.dynamic.OrderedMock;
-import junit.framework.TestCase;
-import org.adarwin.rule.ElementType;
-import org.adarwin.rule.Rule;
-import org.adarwin.testmodel.a.InPackageA;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
+import org.adarwin.rule.ElementType;
+import org.adarwin.testmodel.a.InPackageA;
+
 public class RuleClassVisitorTestCase extends TestCase{
 	public void testSendsSummaryToRule() throws IOException {
-		OrderedMock mockRule = new OrderedMock(Rule.class);
-		mockRule.expectAndReturn("inspect", new ClassSummary(
+        ClassSummary expected = new ClassSummary(
 			createSet(new CodeElement[] {
 					new CodeElement(InPackageA.class.getName(), ElementType.SOURCE),
 					new CodeElement(Object.class.getName(), ElementType.EXTENDS_OR_IMPLEMENTS),
 					new CodeElement(Object.class.getName(), ElementType.USES)
-				})), new Boolean(false));
+				}));
 
-		Rule rule = (Rule) mockRule.proxy();
-		RuleClassVisitor ruleClassVisitor = new RuleClassVisitor(rule);
-		ruleClassVisitor.visit(new ClassFile(InPackageA.class));
-
-		mockRule.verify();
+        assertEquals(expected, new RuleClassVisitor().visit(new ClassFile(InPackageA.class)));
 	}
 
 	private Set createSet(CodeElement[] codeElements) {

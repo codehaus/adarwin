@@ -10,37 +10,30 @@
 
 package org.adarwin;
 
-import org.adarwin.rule.ElementType;
-import org.adarwin.rule.Rule;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.CodeVisitor;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.Type;
-
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.adarwin.rule.ElementType;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.CodeVisitor;
+import org.objectweb.asm.Label;
+
 class RuleClassVisitor implements ClassVisitor {
-    private Rule rule;
     private CodeVisitor codeVisitor;
 	private String fullyQualifiedClassName;
 	private Set dependancies;
 
-	public RuleClassVisitor(Rule rule) {
-		if (rule == null) {
-			throw new NullPointerException();
-		}
-        this.rule = rule;
+	public RuleClassVisitor() {
 		dependancies = new HashSet();
         codeVisitor = new RuleCodeVisitor();
     }
 
-    public Result visit(ClassReader reader) {
+    public ClassSummary visit(ClassReader reader) {
 		reader.accept(this, false);
 
-		return new Result(rule.inspect(new ClassSummary(dependancies)), fullyQualifiedClassName);
+        return new ClassSummary(dependancies, fullyQualifiedClassName);
     }
 
 	public void visit(int access, String sourceClassPath, String baseClassPath, String[] interfaces, String fileName) {
@@ -182,7 +175,7 @@ class RuleClassVisitor implements ClassVisitor {
 		return packagePath.replace('/', '.');
 	}
 
-	public Result visit(ClassFile classFile) throws IOException {
+	public ClassSummary visit(ClassFile classFile) throws IOException {
 		return classFile.accept(this);
 	}
 

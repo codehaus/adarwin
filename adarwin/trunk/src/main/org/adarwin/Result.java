@@ -20,6 +20,10 @@ public class Result {
 	protected Result() {
 	}
 
+    public Result(boolean result, ClassSummary classSummary) {
+        this(result, classSummary.getClassName());
+    }
+
 	public Result(boolean result, String fullyQualifiedClassName) {
 		this.result = result;
 		this.className = fullyQualifiedClassName;

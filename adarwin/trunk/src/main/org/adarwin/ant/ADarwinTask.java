@@ -10,26 +10,39 @@
 
 package org.adarwin.ant;
 
+import java.io.IOException;
+import java.util.Iterator;
+
 import org.adarwin.BuilderException;
+import org.adarwin.CodeFactory;
 import org.adarwin.Grammar;
+import org.adarwin.ICodeFactory;
 import org.adarwin.LazyCodeFactory;
 import org.adarwin.Result;
 import org.adarwin.RuleBuilder;
-import org.adarwin.CodeFactory;
-import org.adarwin.ICodeFactory;
 import org.adarwin.rule.Rule;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
-import java.io.IOException;
-import java.util.Iterator;
-
-public class ADarwinTask extends Task{
+public class ADarwinTask extends Task {
+	public static interface ILogger {
+		public void log(String toLog);
+	}
+	
     private String rulesFileName;
     private String classPath;
     private String rule;
 	private boolean print;
 	private boolean failOnMatch = true;
+	private ILogger logger;
+	
+	public ADarwinTask() {
+		setLogger(new ILogger() {
+			public void log(String toLog) {
+				ADarwinTask.super.log(toLog);
+			}
+		});
+	}
 
 	public boolean getPrint() {
 		return print;
@@ -62,6 +75,10 @@ public class ADarwinTask extends Task{
     public void setRulesFileName(String rulesFileName) {
         this.rulesFileName = rulesFileName;
     }
+    
+    public void setLogger(ILogger logger) {
+    	this.logger = logger;
+    }
 
 	public boolean isFailOnMatch() {
 		return failOnMatch;
@@ -72,17 +89,19 @@ public class ADarwinTask extends Task{
 	}
 
 	public void execute() throws BuildException {
-        log("aDarwin checking classpath: " + getClassPath() + ", against the rule: " + getRule());
-
         try {
-            Rule rule = new RuleBuilder(new Grammar(getRulesFileName())).buildRule(getRule());
+        	Grammar grammar = new Grammar(getRulesFileName());
+            Rule rule = new RuleBuilder(grammar).buildRule(getRule());
+			logger.log("aDarwin checking classpath: " + getClassPath() + ", against the rule: " +
+				rule.getExpression(grammar));
+            
 			Result result = createCodeFactory().create(getClassPath()).evaluate(rule);
 			if (getPrint()) {
 				for (Iterator iterator = result.getMatchingClasses().iterator(); iterator.hasNext();) {
-					log((String) iterator.next());
+					logger.log((String) iterator.next());
 				}
 			}
-			log("aDarwin evaluate: " + result.getCount());
+			logger.log("aDarwin evaluate: " + result.getCount());
 
 			if (isFailOnMatch() && result.getCount() > 0) {
 				throw new BuildException("aDarwin Rule Violated");

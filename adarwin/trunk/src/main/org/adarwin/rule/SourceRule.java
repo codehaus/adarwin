@@ -10,13 +10,13 @@
 
 package org.adarwin.rule;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
 import org.adarwin.Grammar;
-
-import java.util.Set;
-import java.util.Iterator;
-import java.util.HashSet;
 
 public class SourceRule implements Rule {
 	private Rule wrappedRule;

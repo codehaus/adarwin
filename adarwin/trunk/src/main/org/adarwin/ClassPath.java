@@ -10,13 +10,12 @@
 
 package org.adarwin;
 
-import org.adarwin.rule.Rule;
-
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.StringTokenizer;
+
+import org.adarwin.rule.Rule;
 
 public class ClassPath extends CodeBase {
 	private Code[] path;

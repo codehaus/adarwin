@@ -10,8 +10,11 @@
 
 package org.adarwin;
 
+import java.io.IOException;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
+
 import org.adarwin.rule.AndRule;
 import org.adarwin.rule.FalseRule;
 import org.adarwin.rule.PackageRule;
@@ -25,43 +28,45 @@ import org.adarwin.testmodel.b.InPackageB;
 import org.adarwin.testmodel.c.InPackagaeCUsesClassFromPackageB;
 import org.adarwin.testmodel.c.InPackageC;
 
-import java.io.IOException;
-
 public class AndRuleTestCase extends TestCase {
     public void testFalseAndFalse() throws IOException {
-        Rule rule = new AndRule(new FalseRule(), new FalseRule());
+        Rule rule = new AndRule(new Rule[] {new FalseRule(), new FalseRule()});
 
         Assert.assertEquals(0, new ClassFile(InPackageC.class).evaluate(rule).getCount());
     }
 
     public void testFalseAndTrue() throws IOException {
-        Rule rule = new AndRule(new FalseRule(), new TrueRule());
+        Rule rule = new AndRule(new Rule[] {new FalseRule(), new TrueRule()});
 
         assertEquals(0, new ClassFile(InPackageA.class).evaluate(rule).getCount());
     }
 
     public void testTrueAndFalse() throws IOException {
-        Rule rule = new AndRule(new TrueRule(), new FalseRule());
+        Rule rule = new AndRule(new Rule[] {new TrueRule(), new FalseRule()});
 
         assertEquals(0, new ClassFile(InPackagaeCUsesClassFromPackageB.class).evaluate(rule).getCount());
     }
 
     public void testTrueAndTrue() throws IOException {
-        Rule rule = new AndRule(new TrueRule(), new TrueRule());
+        Rule rule = new AndRule(new Rule[] {new TrueRule(), new TrueRule()});
 
         assertTrue(new ClassFile(InPackageAUsesClassFromPackageB.class).evaluate(rule).getCount() > 0);
     }
 
 	public void testRealTrueAndTrue() throws IOException {
-		Rule rule = new AndRule(new SourceRule(PackageRule.create(InPackageA.class)),
-			new UsesRule(PackageRule.create(InPackageB.class)));
+		Rule rule = new AndRule(new Rule[] {
+			new SourceRule(PackageRule.create(InPackageA.class)),
+			new UsesRule(PackageRule.create(InPackageB.class))
+		});
 
 		assertTrue(new ClassFile(InPackageAUsesClassFromPackageB.class).evaluate(rule).getCount() > 0);
 	}
 
     public void testSequentialCoincedence() throws IOException {
-        Rule rule = new AndRule(PackageRule.create(InPackageA.class),
-			PackageRule.create(InPackageB.class));
+        Rule rule = new AndRule(new Rule[] {
+        	PackageRule.create(InPackageA.class),
+			PackageRule.create(InPackageB.class)
+		});
 
 		int count = new ClassFile(InPackageA.class).evaluate(rule).getCount();
 		count += new ClassFile(InPackageB.class).evaluate(rule).getCount();

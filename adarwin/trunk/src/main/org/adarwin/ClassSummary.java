@@ -14,10 +14,16 @@ import java.util.Set;
 
 public class ClassSummary {
 	private Set dependancies;
+    private String className;
 
-	public ClassSummary(Set dependancies) {
+    public ClassSummary(Set dependancies) {
+        this.dependancies = dependancies;
+    }
+
+    public ClassSummary(Set dependancies, String className) {
 		this.dependancies = dependancies;
-	}
+        this.className = className;
+    }
 
 	public boolean equals(Object object) {
 		if (object == null || !object.getClass().equals(getClass())) {
@@ -40,4 +46,8 @@ public class ClassSummary {
 	public Set getDependancies() {
 		return dependancies;
 	}
+
+    public String getClassName() {
+        return className;
+    }
 }

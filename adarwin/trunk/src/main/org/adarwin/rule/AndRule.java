@@ -11,29 +11,39 @@
 package org.adarwin.rule;
 
 import org.adarwin.ClassSummary;
-import org.adarwin.CodeElement;
 import org.adarwin.Grammar;
 
 
 public class AndRule implements Rule {
-	private Rule leftRule;
-    private Rule rightRule;
+	private Rule[] rules;
 
-    public AndRule(Rule leftRule, Rule rightRule) {
-        super();
-		if (leftRule == null || rightRule == null) {
-			throw new NullPointerException();
-		}
-        this.leftRule = leftRule;
-        this.rightRule = rightRule;
-    }
+	public AndRule(Rule[] rules) {
+		this.rules = rules;
+	}
 
 	public boolean inspect(ClassSummary classSummary) {
-		return leftRule.inspect(classSummary) && rightRule.inspect(classSummary);
+		boolean result = true;
+		
+		for (int rLoop = 0; rLoop < rules.length; ++rLoop) {
+			result &= rules[rLoop].inspect(classSummary);
+		}
+		
+		return result;
+		
+		//return leftRule.inspect(classSummary) && rightRule.inspect(classSummary);
 	}
 
 	public String getExpression(Grammar grammar) {
-        return grammar.getRule(getClass()) + '(' + leftRule.getExpression(grammar) + ", " +
-            rightRule.getExpression(grammar) + ')';
+		StringBuffer buffer = new StringBuffer(grammar.getRule(getClass()) + '(');
+		
+		for (int rLoop = 0; rLoop < rules.length; ++rLoop) {
+			if (rLoop != 0) {
+				buffer.append(", ");
+			}
+			buffer.append(rules[rLoop].getExpression(grammar));
+		}
+		buffer.append(')');
+		
+		return buffer.toString();
     }
 }

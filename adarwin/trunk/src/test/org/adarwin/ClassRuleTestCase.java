@@ -10,12 +10,13 @@
 
 package org.adarwin;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
+
 import org.adarwin.rule.ClassRule;
 import org.adarwin.rule.Rule;
 import org.adarwin.testmodel.a.InPackageA;
-
-import java.io.IOException;
 
 public class ClassRuleTestCase extends TestCase {
     public void testNonMatchingClass() throws BuilderException, IOException {

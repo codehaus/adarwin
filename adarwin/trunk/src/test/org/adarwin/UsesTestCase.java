@@ -10,13 +10,14 @@
 
 package org.adarwin;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
+
 import org.adarwin.rule.Rule;
 import org.adarwin.rule.TrueRule;
 import org.adarwin.rule.UsesRule;
 import org.adarwin.testmodel.a.InPackageAUsesClassFromPackageB;
-
-import java.io.IOException;
 
 public class UsesTestCase extends TestCase {
     public void testMinimal() throws IOException, BuilderException {

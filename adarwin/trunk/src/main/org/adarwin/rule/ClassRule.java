@@ -10,12 +10,12 @@
 
 package org.adarwin.rule;
 
+import java.util.Iterator;
+import java.util.regex.Pattern;
+
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
 import org.adarwin.Grammar;
-
-import java.util.regex.Pattern;
-import java.util.Iterator;
 
 public class ClassRule implements Rule {
 	private String pattern;

@@ -10,11 +10,11 @@
 
 package org.adarwin;
 
-import org.adarwin.rule.Rule;
-import org.objectweb.asm.ClassReader;
-
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.adarwin.rule.Rule;
+import org.objectweb.asm.ClassReader;
 
 public class ClassFile extends CodeBase {
 	private InputStream inputStream;
@@ -33,13 +33,14 @@ public class ClassFile extends CodeBase {
 
     public Result evaluate(Rule rule) throws IOException {
         try {
-			return new RuleClassVisitor(rule).visit(this);
+			ClassSummary classSummary = new RuleClassVisitor().visit(this);
+            return new Result(rule.inspect(classSummary), classSummary);
         } finally {
             inputStream.close();
         }
     }
 
-	public Result accept(RuleClassVisitor ruleClassVisitor) throws IOException {
+	public ClassSummary accept(RuleClassVisitor ruleClassVisitor) throws IOException {
 		return ruleClassVisitor.visit(new ClassReader(inputStream));
 	}
 }

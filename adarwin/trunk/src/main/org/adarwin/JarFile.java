@@ -10,8 +10,6 @@
 
 package org.adarwin;
 
-import org.adarwin.rule.Rule;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -21,6 +19,8 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import org.adarwin.rule.Rule;
 
 public class JarFile extends CodeBase {
     private String fileName;

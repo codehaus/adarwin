@@ -10,12 +10,12 @@
 
 package org.adarwin;
 
-import org.adarwin.rule.Rule;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.adarwin.rule.Rule;
 
 public class RuleBuilder {
     private Grammar grammar;
@@ -63,6 +63,8 @@ public class RuleBuilder {
     }
 
     private String[] getParameters(String expression) {
+		expression = expression.replaceAll(",\\s++", ",");
+    	
         String[] parameters = new String[0];
 
         int firstParathesesPos = expression.indexOf('(');
@@ -85,11 +87,7 @@ public class RuleBuilder {
                                 parameterList.add(innerBit.substring(startPos, cLoop));
                                 startPos = cLoop+1;
                             }
-                            break;
-                        case ' ' :
-                            if (depth == 0) {
-                                startPos = cLoop+1;
-                            }
+                            
                             break;
                     }
                 }
@@ -113,19 +111,29 @@ public class RuleBuilder {
 		}
 
 		Constructor ruleConstructor = getConstructor(name, ruleClass, arguments);
+		if (!hasAggregateForm(ruleConstructor)) {
+			Object[] constructorParameters = new Object[arguments.length];
 
-		Object[] constructorParameters = new Object[arguments.length];
+			for (int cLoop = 0; cLoop < constructorParameters.length; cLoop++) {
+				if (Rule.class.isAssignableFrom(ruleConstructor.getParameterTypes()[cLoop])) {
+					constructorParameters[cLoop] = buildRule(arguments[cLoop]);
+				}
+				else {
+					constructorParameters[cLoop] = arguments[cLoop];
+				}
+			}
 
-		for (int cLoop = 0; cLoop < constructorParameters.length; cLoop++) {
-			if (Rule.class.isAssignableFrom(ruleConstructor.getParameterTypes()[cLoop])) {
-				constructorParameters[cLoop] = buildRule(arguments[cLoop]);
-			}
-			else {
-				constructorParameters[cLoop] = arguments[cLoop];
-			}
+			return (Rule) ruleConstructor.newInstance(constructorParameters);
 		}
+		else {
+			Rule[] constructorParameter = new Rule[arguments.length];
 
-		return (Rule) ruleConstructor.newInstance(constructorParameters);
+			for (int cLoop = 0; cLoop < arguments.length; cLoop++) {
+				constructorParameter[cLoop] = buildRule(arguments[cLoop]);
+			}
+			
+			return (Rule) ruleConstructor.newInstance(new Object[] {constructorParameter});
+		}
     }
 
     private Constructor getConstructor(String name, Class ruleClass, String[] arguments) throws BuilderException {
@@ -156,6 +164,17 @@ public class RuleBuilder {
 	}
 
 	private boolean hasCorrectSignature(String name, Constructor constructor, int length) {
+		return hasCorrectSimpleForm(constructor, length) ||
+			hasAggregateForm(constructor);
+	}
+
+	private boolean hasAggregateForm(Constructor constructor) {
+		Class[] parameterTypes = constructor.getParameterTypes();
+		return parameterTypes.length == 1 &&
+			Rule[].class.equals(parameterTypes[0]);
+	}
+
+	private boolean hasCorrectSimpleForm(Constructor constructor, int length) {
 		return constructor.getParameterTypes().length == length &&
 				parametersHaveCorrectTypes(constructor.getParameterTypes());
 	}
