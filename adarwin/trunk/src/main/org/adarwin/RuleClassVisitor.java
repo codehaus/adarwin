@@ -84,7 +84,7 @@ public class RuleClassVisitor implements ClassVisitor {
 		else {
 			inspect(CodeElement.createUses(typeParser.returnType(desc)));
 
-			dependancies.add(MethodDeclaration.createDeclaration(className, typeParser.returnType(desc),
+			dependancies.add(Method.createDeclaration(className, typeParser.returnType(desc),
 				methodName, parameterNames));
 		}
 
@@ -144,7 +144,7 @@ public class RuleClassVisitor implements ClassVisitor {
 
             	inspect(CodeElement.createUses(typeParser.returnType(desc)));
 
-        		inspect(MethodDeclaration.createInvocation(className, typeParser.returnType(desc), methodName,
+        		inspect(Method.createInvocation(className, typeParser.returnType(desc), methodName,
         			parameterTypes));
         	}
         }

@@ -13,11 +13,10 @@ package org.adarwin.rule;
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
 import org.adarwin.Filter;
-import org.adarwin.MethodDeclaration;
+import org.adarwin.Method;
 import org.adarwin.Util;
 
 import java.util.Arrays;
-import java.util.regex.Pattern;
 
 public class MethodRule implements Rule, Filter {
 	private final String returnType;
@@ -43,8 +42,8 @@ public class MethodRule implements Rule, Filter {
 	}
 
 	public boolean matches(CodeElement codeElement) {
-		return codeElement instanceof MethodDeclaration &&
-			matchesMethod((MethodDeclaration) codeElement);
+		return codeElement instanceof Method &&
+			((Method) codeElement).matches(returnType, methodName, parameterTypes);
 	}
 
 	private static String getReturnType(String signature) {
@@ -57,12 +56,6 @@ public class MethodRule implements Rule, Filter {
 
 	private static String[] getParameterTypes(String signature) {
 		return Util.getTokens(2, signature, " (,)");
-	}
-
-	private boolean matchesMethod(MethodDeclaration method) {
-		return Pattern.matches(returnType, method.getReturnType()) &&
-			Pattern.matches(methodName, method.getMethodName()) &&
-			Util.matchesPatterns(parameterTypes, method.getParameterTypes());
 	}
 
 	public int hashCode() {
