@@ -1,6 +1,9 @@
 package org.ajester;
 
 public class Report {
+	public static final String NO_PROBLEMS = "No problems";
+	public static final String SOME_PROBLEMS = "Some problems";
+	
 	private String codeClassName;
 	private TestResults results;
 
@@ -21,10 +24,10 @@ public class Report {
 		if (results.getErrors().size() == 0 &&
 			results.getFailures().size() == 0) {
 			
-			return "Some problems";
+			return SOME_PROBLEMS;
 		}
 		else {
-			return "No problems";
+			return NO_PROBLEMS;
 		}
 	}
 }

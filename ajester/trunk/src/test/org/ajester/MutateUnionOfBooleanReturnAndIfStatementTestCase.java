@@ -1,0 +1,53 @@
+package org.ajester;
+
+import org.ajester.testmodel.UnionOfBooleanReturnAndIfStatement;
+import org.ajester.testmodel.UnionOfBooleanReturnAndIfStatementTestCase;
+
+import junit.framework.TestCase;
+import junit.framework.TestFailure;
+
+public class MutateUnionOfBooleanReturnAndIfStatementTestCase extends TestCase {
+	public void testBooleanReturnMutation() throws Exception {
+		TestResults results = new TestRunnerWrapper().run(TEST_CLASS, GET_TRUE_MUTATOR);
+
+		assertEquals(1, results.getFailures().size());
+		assertEquals(0, results.getErrors().size());
+	}
+	
+	public void testIfStatementMutationWithIfEqualMethod() throws Exception {
+		TestResults results = new TestRunnerWrapper().run(TEST_CLASS, IF_EQUAL_MUTATOR);
+		
+		assertEquals(1, results.getFailures().size());
+		TestFailure failure = (TestFailure) results.getFailures().toArray()[0];
+		Util.assertEqualsTestCase(failure, TEST_CLASS, "testIfEqual");
+		assertEquals(0, results.getErrors().size());
+	}
+	
+	public void testIfStatementMutationWithIfNotEqualMethod() throws Exception {
+		TestResults results = new TestRunnerWrapper().run(TEST_CLASS, IF_NOT_EQUAL_MUTATOR);
+		
+		assertEquals(1, results.getFailures().size());
+		TestFailure failure = (TestFailure) results.getFailures().toArray()[0];
+		Util.assertEqualsTestCase(failure, TEST_CLASS, "testIfNotEqual");
+		assertEquals(0, results.getErrors().size());
+	}
+	
+	public void atestBooleanReturnAndIfStatementMutation() throws Exception {
+		TestResults results = new TestRunnerWrapper().run(TEST_CLASS,
+			new AggregateMutator(GET_TRUE_MUTATOR, IF_EQUAL_MUTATOR));
+		
+		assertEquals(2, results.getFailures().size());
+		assertEquals(0, results.getErrors().size());
+	}
+
+	private static Class TEST_CLASS = UnionOfBooleanReturnAndIfStatementTestCase.class;
+	
+	private static final Mutator GET_TRUE_MUTATOR =
+		new BooleanReturnMutator(UnionOfBooleanReturnAndIfStatement.GET_TRUE_LOCATION);
+
+	private static final Mutator IF_EQUAL_MUTATOR =
+		new IfStatementMutator(UnionOfBooleanReturnAndIfStatement.IF_EQUAL_LOCATION);
+	
+	private static final Mutator IF_NOT_EQUAL_MUTATOR =
+		new IfStatementMutator(UnionOfBooleanReturnAndIfStatement.IF_NOT_EQUAL_LOCATION);
+}

@@ -19,19 +19,22 @@ public class TestRunnerWrapper {
 //		}
 //	}
 //
-	public TestResults run(String testClassName, MutatingClassAdapter mutatingClassAdapter)
-		throws Exception {
-		
-		return new TestRunner(mutatingClassAdapter).run(testClassName);
+
+	public TestResults run(Class testClass, Mutator mutator) throws Exception {
+		return run(testClass.getName(), mutator);
 	}
-
+	
+	public TestResults run(String testClassName, Mutator mutator) throws Exception {
+		return new TestRunner(mutator).run(testClassName);
+	}
+	
 	private class TestRunner extends BaseTestRunner {
-		private MutatingClassAdapter mutatingClassAdapter;
+		private Mutator mutator;
 
-		public TestRunner(MutatingClassAdapter mutatingClassAdapter) {
-			this.mutatingClassAdapter = mutatingClassAdapter;
+		public TestRunner(Mutator mutator) {
+			this.mutator = mutator;
 		}
-		
+
 		public TestResults run(String testClassName) throws Exception {
 			try {
 				Test test = getTest(testClassName);
@@ -46,7 +49,7 @@ public class TestRunnerWrapper {
 		}
 
 		public TestSuiteLoader getLoader() {
-			return new MutatingClassLoader(mutatingClassAdapter);
+			return new MutatingClassLoader(mutator);
 		}
 
 		public void testFailed(int status, Test test, Throwable t) {

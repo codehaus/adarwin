@@ -11,27 +11,22 @@ import junit.framework.TestCase;
 
 public class ReportingTestCase extends TestCase {
 	public void testReport() throws Exception {
-		AJester ajester = new AJester(BooleanReturn.class.getName(),
-			BooleanReturnTestCase.class.getName(),
-			new BooleanReturnClassAdapter(BooleanReturn.class.getName()));
-		Report report = ajester.run();
-		assertEquals("No problems: BooleanReturn", report.getReport());
+		AJester ajester = new AJester(BooleanReturn.class, BooleanReturnTestCase.class,
+			new BooleanReturnMutator(BooleanReturn.GET_TRUE_LOCATION));
+		assertEquals("No problems: BooleanReturn", ajester.run().getReport());
 	}
 	
 	public void testReportWithAnotherClass() throws Exception {
-		AJester ajester = new AJester(IfStatement.class.getName(),
-			IfStatementTestCase.class.getName(),
-			new BooleanReturnClassAdapter(IfStatement.class.getName()));
-		Report report = ajester.run();
-		assertEquals("No problems: IfStatement", report.getReport());
+		AJester ajester = new AJester(IfStatement.class, IfStatementTestCase.class,
+			new BooleanReturnMutator(IfStatement.IF_EQUAL_LOCATION));
+		assertEquals("No problems: IfStatement", ajester.run().getReport());
 	}
 	
 	public void testReportWithProblematicIfStatement() throws Exception {
-		AJester ajester = new AJester(ProblematicIfStatement.class.getName(),
-			ProblematicIfStatementTestCase.class.getName(),
-			new IfStatementClassAdapter(ProblematicIfStatement.class.getName(), "ifEquals"));
-		Report report = ajester.run();
-		assertEquals("Some problems: ProblematicIfStatement", report.getReport());
+		AJester ajester = new AJester(ProblematicIfStatement.class,
+			ProblematicIfStatementTestCase.class,
+			new IfStatementMutator(ProblematicIfStatement.IF_EQUAL_LOCATION));
+		assertEquals("Some problems: ProblematicIfStatement", ajester.run().getReport());
 	}
 	
 //	public void testReportWithProblematicIfStatementWhenModifyingDifferentMethod() throws Exception {

@@ -3,15 +3,15 @@ package org.ajester;
 import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Constants;
 
-public class MethodCoverageClassAdapter extends MutatingClassAdapter {
+public class MethodCoverageMutator extends Mutator {
+	public MethodCoverageMutator(CodeLocation codeLocation) {
+		super(codeLocation);
+	}
+
 	private static final String COVERAGE_CLASS = Coverage.class.getName().replace('.', '/');
 	
 	private String methodCovered;
 
-	public MethodCoverageClassAdapter(String classToMutate) {
-		super(classToMutate);
-	}
-	
 	public String getMethodCovered() {
 		return methodCovered;
 	}
