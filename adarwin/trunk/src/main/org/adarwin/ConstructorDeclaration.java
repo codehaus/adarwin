@@ -15,30 +15,14 @@ import java.util.Arrays;
 
 public class ConstructorDeclaration extends CodeElement implements Constructor {
 	private final String[] parameterTypes;
-	private String toString;
 
-	public ConstructorDeclaration(ClassName sourceClassName, String[] parameterTypes) {
-		super(sourceClassName, ElementType.SOURCE);
+	public ConstructorDeclaration(String sourceClassName, String[] parameterTypes) {
+		super(sourceClassName);
 		this.parameterTypes = parameterTypes;
 	}
 
 	public String[] getParameterTypes() {
 		return parameterTypes;
-	}
-
-	public String toString() {
-		synchronized (this) {
-			if (toString == null) {
-				StringBuffer buffer = new StringBuffer(getClassName() + "(");
-				//StringBuffer buffer = new StringBuffer("Constructor(");
-				Util.appendArray(buffer, parameterTypes);
-				buffer.append(')');
-
-				toString = buffer.toString();
-			}
-		}
-
-		return toString;
 	}
 
 	public int hashCode() {
@@ -60,5 +44,9 @@ public class ConstructorDeclaration extends CodeElement implements Constructor {
 		ConstructorDeclaration other = (ConstructorDeclaration) obj;		
 
 		return Arrays.equals(parameterTypes, other.parameterTypes);
+	}
+
+	public boolean matches(String className, String[] parameterTypes) {
+		return matches(className) && Util.matchesPatterns(getParameterTypes(), parameterTypes);
 	}
 }

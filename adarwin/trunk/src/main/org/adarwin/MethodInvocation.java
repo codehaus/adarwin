@@ -13,21 +13,21 @@ package org.adarwin;
 
 import java.util.Arrays;
 
-public class MethodInvocation extends UsesCodeElement implements Method {
+public class MethodInvocation extends CodeElement implements Method {
 	private final String returnType;
 	private final String methodName;
 	private final String[] parameterTypes;
 
-	public static MethodInvocation create(ClassName usesClassName, String returnType,
+	public static MethodInvocation create(String usesClassName, String returnType,
 		String methodName, String[] parameterTypes) {
 
 		return new MethodInvocation(usesClassName, returnType, methodName, parameterTypes);
 	}
 
-	private MethodInvocation(ClassName usesClassName, String returnType,
+	private MethodInvocation(String usesClassName, String returnType,
 		String methodName, String[] parameterTypes) {
 
-		super(usesClassName, ElementType.USES);
+		super(usesClassName, CodeElement.USES);
 
 		this.returnType = returnType;
 		this.methodName = methodName;

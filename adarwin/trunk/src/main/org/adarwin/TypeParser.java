@@ -10,64 +10,79 @@
 
 package org.adarwin;
 
+import org.objectweb.asm.Type;
+
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 public class TypeParser {
-	public final Map primativeTypeMap;
-	
+	private final Map objectWebTypeMap = new HashMap();
+
 	public TypeParser() {
-		primativeTypeMap = new HashMap();
-		primativeTypeMap.put("Z", Type.BOOLEAN);
-		primativeTypeMap.put("B", Type.BYTE);
-		primativeTypeMap.put("C", Type.CHAR);
-		primativeTypeMap.put("D", Type.DOUBLE);
-		primativeTypeMap.put("F", Type.FLOAT);
-		primativeTypeMap.put("I", Type.INT);
-		primativeTypeMap.put("J", Type.LONG);
-		primativeTypeMap.put("S", Type.SHORT);
-		primativeTypeMap.put("V", Type.VOID);
+		addObjectWebType(boolean.class, Type.BOOLEAN_TYPE);
+		addObjectWebType(byte.class, Type.BYTE_TYPE);
+		addObjectWebType(char.class, Type.CHAR_TYPE);
+		addObjectWebType(double.class, Type.DOUBLE_TYPE);
+		addObjectWebType(float.class, Type.FLOAT_TYPE);
+		addObjectWebType(int.class, Type.INT_TYPE);
+		addObjectWebType(long.class, Type.LONG_TYPE);
+		addObjectWebType(short.class, Type.SHORT_TYPE);
+		addObjectWebType(void.class, Type.VOID_TYPE);
+	}
+
+	public boolean isPrimative(String desc) {
+		return isPrimative(Type.getType(desc));
+	}
+
+	public boolean isMethodReturnPrimative(String desc) {
+		return isPrimative(Type.getReturnType(desc));
+	}
+
+	public String typeName(String desc) {
+		return typeName(descendArray(Type.getType(desc)));
+	}
+
+	public String returnType(String desc) {
+		return typeName(Type.getReturnType(desc));
 	}
 	
-	public IType parse(String toParse) {
-		IType type = null;
-		if (toParse.startsWith("[")) {
-			type = new ArrayType(parse(toParse.substring(1)));
-		}
-		else if ('L' == toParse.charAt(0)) {
-			toParse = toParse.substring(1, toParse.indexOf(';'));
-			type = new Type(toParse.replace('/', '.'));
-		}		
-		else {
-			type = (IType) primativeTypeMap.get(toParse.substring(0, 1));
+	public String[] parameterTypes(String desc) {
+		Type[] types = Type.getArgumentTypes(desc);
+		
+		String[] methodParameters = new String[types.length];
+		
+		for (int tLoop = 0; tLoop < types.length; tLoop++) {
+			methodParameters[tLoop] = typeName(types[tLoop]);
 		}
 		
+		return methodParameters;
+	}
+
+	private boolean isPrimative(Type type) {
+		return primativeTypeName(type) != null;
+	}
+
+	private String typeName(Type type) {
+		if (isPrimative(type)) {
+			return primativeTypeName(type);
+		}
+		else {
+			return descendArray(type).getClassName();
+		}
+	}
+
+	private String primativeTypeName(Type type) {
+		return (String) objectWebTypeMap.get(descendArray(type));
+	}
+
+	private Type descendArray(Type type) {
+		while (type.getSort() == Type.ARRAY) {
+			type = type.getElementType();
+		}
 		return type;
 	}
-	
-	public IType parseMethodReturn(String toParse) {
-		return parse(toParse.substring(toParse.indexOf(')') + 1));
-	}
 
-	public IType[] parseMethodParameters(String toParse) {
-		String parameters = toParse.substring(1, toParse.indexOf(')'));
-		
-		return parseMulti(parameters);
-	}
-
-	private IType[] parseMulti(String parameters) {
-		List types = new LinkedList();
-		
-		String toParse = parameters;
-		
-		while (toParse.length() > 0) {
-			IType type = parse(toParse);
-			types.add(type);
-			toParse = toParse.substring(type.getForm().length());
-		}
-		
-		return (IType[]) types.toArray(new IType[0]);
+	private void addObjectWebType(Class typeClass, Type type) {
+		objectWebTypeMap.put(type, typeClass.getName());
 	}
 }

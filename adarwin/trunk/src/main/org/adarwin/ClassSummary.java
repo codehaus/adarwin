@@ -17,8 +17,8 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class ClassSummary {
-	private final ClassName className;
 	private final Set dependancies;
+	private final String className;
 
 	public static ClassSummary or(ClassSummary[] summaries) {
 		Set union = new HashSet();
@@ -27,7 +27,7 @@ public class ClassSummary {
 			union.addAll(summaries[sLoop].dependancies);
 		}
 
-		return new ClassSummary(summaries[0].getClassName(), union);
+		return new ClassSummary(summaries[0].className, union);
 	}
 
 	public static ClassSummary and(ClassSummary[] summaries) {
@@ -37,22 +37,18 @@ public class ClassSummary {
 			Set set = summaries[sLoop].dependancies;
 
 			if (set.isEmpty()) {
-				return new ClassSummary(summaries[0].getClassName(), new HashSet());
+				return new ClassSummary(summaries[0].className, new HashSet());
 			}
 
 			intersection.addAll(set);
 		}
 
-		return new ClassSummary(summaries[0].getClassName(), intersection);
+		return new ClassSummary(summaries[0].className, intersection);
 	}
 
-	public ClassSummary(ClassName className, Set dependancies) {
+	public ClassSummary(String className, Set dependancies) {
     	this.className = className;
     	this.dependancies = dependancies;
-    }
-
-    public ClassName getClassName() {
-    	return className;
     }
 
 	public ClassSummary filter(Filter filter) {
@@ -66,7 +62,7 @@ public class ClassSummary {
 			}
 		}
 
-		return new ClassSummary(getClassName(), filtered);
+		return new ClassSummary(className, filtered);
 	}
 
 	public boolean contains(CodeElement element) {
@@ -79,8 +75,8 @@ public class ClassSummary {
 
 	public void log(Logger logger, boolean printDetail) {
 		if (!isEmpty()) {
-			logger.log("  " + getClassName().getFullClassName());
-			
+			logger.log("  " + className);
+
 			if (printDetail) {
 				for(Iterator iterator = dependancies.iterator(); iterator.hasNext();) {
 					logger.log("    " + iterator.next());
@@ -98,6 +94,14 @@ public class ClassSummary {
 	}
 
 	public ClassSummary empty() {
-		return new ClassSummary(getClassName(), Collections.EMPTY_SET);
+		return new ClassSummary(className, Collections.EMPTY_SET);
+	}
+
+	public boolean classMatches(String pattern) {
+		return Util.classMatches(pattern, className);
+	}
+
+	public boolean packageMatches(String pattern) {
+		return Util.packageMatches(pattern, className);
 	}
 }

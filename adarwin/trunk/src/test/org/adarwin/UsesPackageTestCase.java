@@ -117,7 +117,7 @@ public class UsesPackageTestCase extends RuleTestCase {
 		assertNumMatches(1, rule, UsesClassForBaseInterface.class);
 	}
 	
-	public void testUsesInMethodReturn() {
+	public void testUsesInMethodReturnInDeclaration() {
 		class UsesClassInPackageBInMethodReturn {
 			public InPackageB method() {
 				return null;
@@ -125,6 +125,22 @@ public class UsesPackageTestCase extends RuleTestCase {
 		}
 
 		assertNumMatches(1, rule, UsesClassInPackageBInMethodReturn.class);
+	}
+	
+	public void testUsesClassInPackageBInMethodReturnOfInvokedMetho() {
+		class UsesClassInPackageBInMethodReturn {
+			public InPackageB method() {
+				return null;
+			}
+		}
+
+		class UsesClassInPackageBInMethodReturnOfInvokedMetho {
+			public void method() {
+				new UsesClassInPackageBInMethodReturn().method();
+			}
+		}
+
+		assertNumMatches(1, rule, UsesClassInPackageBInMethodReturnOfInvokedMetho.class);
 	}
 
 	public void testUsesInMethodParameters() {

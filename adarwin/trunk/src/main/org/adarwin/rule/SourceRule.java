@@ -13,7 +13,6 @@ package org.adarwin.rule;
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
 import org.adarwin.Filter;
-import org.adarwin.UsesCodeElement;
 
 public class SourceRule implements Rule, Filter {
 	private final Rule wrappedRule;
@@ -27,7 +26,7 @@ public class SourceRule implements Rule, Filter {
 	}
 
 	public boolean matches(CodeElement codeElement) {
-		return !(codeElement instanceof UsesCodeElement);
+		return codeElement.isSource(); 
 	}
 
 	public int hashCode() {

@@ -11,7 +11,5 @@
 package org.adarwin;
 
 public interface Constructor {
-	ClassName getClassName();
-	
-	String[] getParameterTypes();
+	boolean matches(String className, String[] parameterTypes);
 }

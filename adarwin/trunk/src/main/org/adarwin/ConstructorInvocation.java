@@ -11,20 +11,23 @@
 package org.adarwin;
 
 
-
-public class ConstructorInvocation extends UsesCodeElement implements Constructor {
+public class ConstructorInvocation extends CodeElement implements Constructor {
 	private final String[] parameterTypes;
 
-	public static CodeElement create(ClassName usesClassName, String[] parameterTypes) {
+	public static CodeElement create(String usesClassName, String[] parameterTypes) {
 		return new ConstructorInvocation(usesClassName, parameterTypes);
 	}
 
-	private ConstructorInvocation(ClassName usesClassName, String[] parameterTypes) {
-		super(usesClassName, ElementType.USES);
+	private ConstructorInvocation(String usesClassName, String[] parameterTypes) {
+		super(usesClassName, CodeElement.USES);
 		this.parameterTypes = parameterTypes;
 	}
 
 	public String[] getParameterTypes() {
 		return parameterTypes;
+	}
+
+	public boolean matches(String className, String[] parameterTypes) {
+		return matches(className) && Util.matchesPatterns(getParameterTypes(), parameterTypes);
 	}
 }

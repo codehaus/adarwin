@@ -117,6 +117,6 @@ public class MethodRuleTestCase extends RuleTestCase {
 
 	private Rule createMethodRule(String methodName, Class returnType, Class[] parameterTypes) {
 		return MethodRule.create(returnType.getName(), methodName,
-			Util.convertClassArrayToStringArray(parameterTypes));
+			RuleTestCase.convertClassArrayToStringArray(parameterTypes));
 	}
 }

@@ -10,45 +10,16 @@
 
 package org.adarwin;
 
-import java.io.InputStream;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 public class Util {
-	public static String className(Class aClass) {
-        String name = aClass.getName();
+	public static String className(String name) {
 		return name.substring(name.lastIndexOf('.') + 1);
-    }
-
-	public static String packageName(Class clazz) {
-		String name = clazz.getName();
-		return packageName(name);
 	}
 
 	public static String packageName(String name) {
 		return name.substring(0, Math.max(0, name.lastIndexOf('.')));
-	}
-
-	public static String[] convertClassArrayToStringArray(Class[] classParameterTypes) {
-		String[] parameterTypes = new String[classParameterTypes.length];
-		
-		for (int cLoop = 0; cLoop < classParameterTypes.length; ++cLoop) {
-			parameterTypes[cLoop] = classParameterTypes[cLoop].getName();
-		}
-		
-		return parameterTypes;
-	}
-
-	public static InputStream getInputStream(Class clazz) {
-		return clazz.getResourceAsStream(className(clazz) + ".class");
-	}
-
-	public static String concat(Object[] arguments) {
-		StringBuffer buffer = new StringBuffer();
-
-		appendArray(buffer, arguments);
-
-		return buffer.toString();
 	}
 
 	public static void appendArray(StringBuffer buffer, Object[] array) {
@@ -114,5 +85,13 @@ public class Util {
 		}
 
 		return count;
+	}
+
+	public static boolean classMatches(String pattern, String className) {
+		return Pattern.matches(pattern, className(className));
+	}
+
+	public static boolean packageMatches(String pattern, String className) {
+		return Pattern.matches(pattern, packageName(className));
 	}
 }

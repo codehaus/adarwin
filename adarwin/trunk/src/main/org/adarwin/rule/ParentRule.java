@@ -10,18 +10,15 @@
 
 package org.adarwin.rule;
 
-import org.adarwin.ClassName;
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
-import org.adarwin.ElementType;
 import org.adarwin.Filter;
-import org.adarwin.UsesCodeElement;
 
 public class ParentRule implements Rule, Filter {
-	private final ClassName className;
+	private final String className;
 
-	public ParentRule(String fullClassName) {
-		this.className = new ClassName(fullClassName);
+	public ParentRule(String className) {
+		this.className = className;
 	}
 
 	public ParentRule(Class clazz) {
@@ -33,8 +30,7 @@ public class ParentRule implements Rule, Filter {
 	}
 
 	public boolean matches(CodeElement codeElement) {
-		return UsesCodeElement.create(className, ElementType.EXTENDS_OR_IMPLEMENTS).equals(
-			codeElement);
+		return CodeElement.createExtends(className).equals(codeElement);
 	}
 
 	public int hashCode() {
