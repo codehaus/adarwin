@@ -10,6 +10,10 @@
 
 package org.adarwin;
 
+import java.io.InputStream;
+import java.util.StringTokenizer;
+import java.util.regex.Pattern;
+
 public class Util {
 	public static String className(Class aClass) {
         String name = aClass.getName();
@@ -33,5 +37,57 @@ public class Util {
 		}
 		
 		return parameterTypes;
+	}
+
+	public static InputStream getInputStream(Class clazz) {
+		return clazz.getResourceAsStream(className(clazz) + ".class");
+	}
+
+	public static void appendArray(StringBuffer buffer, Object[] array) {
+		for (int pLoop = 0; pLoop < array.length; pLoop++) {
+			if (pLoop != 0) {
+				buffer.append(", ");
+			}
+			buffer.append(array[pLoop]);
+		}
+	}
+
+	public static String getToken(int index, String signature, String delimiters) {
+		StringTokenizer stringTokenizer = new StringTokenizer(signature, delimiters);
+
+		while (index-- > 0) {
+			stringTokenizer.nextToken();
+		}
+
+		return stringTokenizer.nextToken();
+	}
+
+	public static String[] getTokens(int index, String signature, String delimiters) {
+		StringTokenizer stringTokenizer = new StringTokenizer(signature, delimiters);
+		String[] parameterTypes = new String[stringTokenizer.countTokens() - index];
+
+		while (index-- > 0) {
+			stringTokenizer.nextToken();
+		}
+
+		for (int pLoop = 0; pLoop < parameterTypes.length; pLoop++) {
+			parameterTypes[pLoop] = stringTokenizer.nextToken();
+		}
+
+		return parameterTypes;
+	}
+
+	public static boolean matchesPatterns(String[] patterns, String[] parameterTypes) {
+		if (patterns.length != parameterTypes.length) {
+			return false;
+		}
+
+		for (int pLoop = 0; pLoop < patterns.length; pLoop++) {
+			if (!Pattern.matches(patterns[pLoop], parameterTypes[pLoop])) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

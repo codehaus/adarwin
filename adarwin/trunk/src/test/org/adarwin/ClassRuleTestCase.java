@@ -10,28 +10,25 @@
 
 package org.adarwin;
 
-import java.io.IOException;
-
-import junit.framework.TestCase;
-
 import org.adarwin.rule.ClassRule;
 import org.adarwin.rule.Rule;
 import org.adarwin.testmodel.a.InPackageA;
 
-public class ClassRuleTestCase extends TestCase {
-    public void testNonMatchingClass() throws BuilderException, IOException {
-        String expression = "class(Fred)";
+import java.io.IOException;
 
-        Rule rule = new RuleBuilder(new RuleClassBindings("class", ClassRule.class)).buildRule(expression);
+public class ClassRuleTestCase extends RuleTestCase {
+    private final RuleBuilder ruleBuilder =
+    	new RuleBuilder(new RuleClassBindings("class", ClassRule.class));
 
-        assertEquals(0, new ClassFile(InPackageA.class).evaluate(rule).getCount());
+	public void testNonMatchingClass() throws BuilderException, IOException {
+		Rule rule = ruleBuilder.buildRule("class(Fred)");
+
+		assertNumMatches(0, rule, InPackageA.class);
     }
 
     public void testMatchingClass() throws BuilderException, IOException {
-        String expression = "class(In.*)";
+        Rule rule = ruleBuilder.buildRule("class(In.*)");
 
-        Rule rule = new RuleBuilder(new RuleClassBindings("class", ClassRule.class)).buildRule(expression);
-
-        assertEquals(1, new ClassFile(InPackageA.class).evaluate(rule).getCount());
+        assertNumMatches(1, rule, InPackageA.class);
     }
 }

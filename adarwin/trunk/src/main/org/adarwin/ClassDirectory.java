@@ -10,42 +10,27 @@
 
 package org.adarwin;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
 import org.adarwin.rule.Rule;
 
+import java.io.File;
+import java.io.IOException;
+
 public class ClassDirectory implements Code {
-    private String directory;
+    private final String directory;
+	private final ICodeFactory codeFactory;
 
-    public ClassDirectory(String directory) {
+    public ClassDirectory(String directory, ICodeFactory codeFactory) {
         this.directory = directory;
+		this.codeFactory = codeFactory;
     }
 
-    public Result evaluate(Rule rule) throws IOException {
-        File[] files = new File(directory).listFiles();
-		AggregateResult result = new AggregateResult();
+	public void evaluate(Rule rule, RuleListener ruleListener) throws IOException {
+		File[] files = new File(directory).listFiles();
 
-        for (int fLoop = 0; files != null && fLoop < files.length; ++fLoop) {
-            File file = files[fLoop];
-            if (file.isDirectory()) {
-				Code code = new ClassDirectory(files[fLoop].getAbsolutePath());
-				Result directoryResult = code.evaluate(rule);
-				if (directoryResult.getCount() > 0) {
-					result.append(directoryResult);
-				}
+		for (int fLoop = 0; files != null && fLoop < files.length; ++fLoop) {
+			Code code = codeFactory.create(files[fLoop].getAbsolutePath());
 
-            }
-            else if (file.getName().endsWith(".class")) {
-				Code code = new ClassFile(new FileInputStream(file));
-				Result fileResult = code.evaluate(rule);
-				if (fileResult.getCount() > 0) {
-					result.append(fileResult);
-				}
-            }
-        }
-
-		return result;
-    }
+			code.evaluate(rule, ruleListener);
+		}
+	}
 }

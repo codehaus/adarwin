@@ -10,10 +10,6 @@
 
 package org.adarwin;
 
-import java.io.IOException;
-
-import junit.framework.TestCase;
-
 import org.adarwin.rule.ParentRule;
 import org.adarwin.rule.Rule;
 import org.adarwin.testmodel.IUsesClassForBaseInterface;
@@ -23,28 +19,30 @@ import org.adarwin.testmodel.a.InPackageA;
 import org.adarwin.testmodel.b.IInPackageB;
 import org.adarwin.testmodel.b.InPackageB;
 
-public class ParentRuleTestCase extends TestCase {
+import java.io.IOException;
+
+public class ParentRuleTestCase extends RuleTestCase {
 	public void testNeitherExtendsNorImplements() throws IOException {
 		Rule rule = new ParentRule(InPackageB.class);
 
-		assertEquals(0, new ClassFile(InPackageA.class).evaluate(rule).getCount());
+		assertNumMatches(0, rule, InPackageA.class);
 	}
 
 	public void testExtends() throws IOException {
 		Rule rule = new ParentRule(InPackageB.class);
 
-		assertEquals(1, new ClassFile(UsesClassForBaseClass.class).evaluate(rule).getCount());
+		assertNumMatches(1, rule, UsesClassForBaseClass.class);
 	}
 
 	public void testImplements() throws IOException {
 		Rule rule = new ParentRule(IInPackageB.class);
 
-		assertEquals(1, new ClassFile(UsesClassForBaseInterface.class).evaluate(rule).getCount());
+		assertNumMatches(1, rule, UsesClassForBaseInterface.class);
 	}
 
 	public void testExtendsInterface() throws IOException {
 		Rule rule = new ParentRule(IInPackageB.class);
 
-		assertEquals(1, new ClassFile(IUsesClassForBaseInterface.class).evaluate(rule).getCount());
+		assertNumMatches(1, rule, IUsesClassForBaseInterface.class);
 	}
 }

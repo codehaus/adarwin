@@ -10,22 +10,19 @@
 
 package org.adarwin;
 
-import java.io.IOException;
-
-import junit.framework.TestCase;
-
 import org.adarwin.rule.Rule;
 import org.adarwin.rule.SourceRule;
-import org.adarwin.rule.TrueRule;
 import org.adarwin.testmodel.a.InPackageA;
 
-public class SourceTestCase extends TestCase {
+import java.io.IOException;
+
+public class SourceTestCase extends RuleTestCase {
     public void testMatchesMinimalClass() throws BuilderException, IOException {
         String expression = "src(true)";
 
         Rule rule = new RuleBuilder(new RuleClassBindings(new String[] {"src", "true"},
             new Class[] {SourceRule.class, TrueRule.class})).buildRule(expression);
 
-        assertEquals(1, new ClassFile(InPackageA.class).evaluate(rule).getCount());
+        assertNumMatches(1, rule, InPackageA.class);
     }
 }

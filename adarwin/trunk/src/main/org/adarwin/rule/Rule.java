@@ -14,6 +14,6 @@ import org.adarwin.ClassSummary;
 import org.adarwin.RuleClassBindings;
 
 public interface Rule {
-	boolean inspect(ClassSummary classSummary);
+	ClassSummary inspect(ClassSummary classSummary);
 	String toString(RuleClassBindings ruleClassBindings);
 }

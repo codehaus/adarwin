@@ -10,29 +10,17 @@
 
 package org.adarwin;
 
-import java.io.IOException;
-
-import junit.framework.TestCase;
-
-import org.adarwin.rule.FalseRule;
 import org.adarwin.rule.OrRule;
 import org.adarwin.rule.Rule;
-import org.adarwin.rule.TrueRule;
 import org.adarwin.testmodel.a.InPackageA;
 
-public class OrRuleTestCase extends TestCase {
-    private RuleClassBindings ruleClassBindings;
-    private ClassFile code;
+import java.io.IOException;
 
-    protected void setUp() throws Exception {
-        super.setUp();
-
-		ruleClassBindings = new RuleClassBindings(new String[] {"or", "true", "false"},
-                    new Class[] {OrRule.class, TrueRule.class, FalseRule.class});
-
-        code = new ClassFile(InPackageA.class);
-    }
-
+public class OrRuleTestCase extends RuleTestCase {
+    private final RuleClassBindings ruleClassBindings = new RuleClassBindings(
+    	new String[] {"or", "true", "false"},
+    	new Class[] {OrRule.class, TrueRule.class, FalseRule.class});
+    
     public void testFalseOrFalse() throws BuilderException, IOException {
         String expression = "or(false, false)";
 
@@ -40,7 +28,7 @@ public class OrRuleTestCase extends TestCase {
 
         assertEquals(expression, rule.toString(ruleClassBindings));
 
-        assertEquals(0, code.evaluate(rule).getCount());
+        assertNumMatches(0, rule, InPackageA.class);
     }
 
     public void testTrueOrFalse() throws IOException, BuilderException {
@@ -50,7 +38,7 @@ public class OrRuleTestCase extends TestCase {
 
         assertEquals(expression, rule.toString(ruleClassBindings));
 
-        assertTrue(code.evaluate(rule).getCount() > 0);
+        assertNumMatches(1, rule, InPackageA.class);
     }
 
     public void testFalseOrTrue() throws BuilderException, IOException {
@@ -60,6 +48,6 @@ public class OrRuleTestCase extends TestCase {
 
         assertEquals(expression, rule.toString(ruleClassBindings));
 
-        assertTrue(code.evaluate(rule).getCount() > 0);
+        assertNumMatches(1, rule, InPackageA.class);
     }
 }

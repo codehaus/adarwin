@@ -21,8 +21,8 @@ public class NotRule implements Rule {
 		this.ruleToNegate = ruleToNegate;
 	}
 
-	public boolean inspect(ClassSummary classSummary) {
-		return !ruleToNegate.inspect(classSummary);
+	public ClassSummary inspect(ClassSummary classSummary) {
+		return ruleToNegate.inspect(classSummary).negate(classSummary);
 	}
 
 	public String toString(RuleClassBindings ruleClassBindings) {

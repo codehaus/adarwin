@@ -8,18 +8,10 @@
  * Idea and Original Code by Stacy Curl                                      *
  *****************************************************************************/
 
-package org.adarwin;
+package org.adarwin.testmodel;
 
-import java.io.IOException;
-
-import org.adarwin.rule.Rule;
-
-import junit.framework.Assert;
-
-public class TestUtil {
-	public void assertRuleMatchingCount(int expectedCount, Rule rule, Class clazz)
-		throws IOException {
-		
-		Assert.assertEquals(expectedCount, new ClassFile(clazz).evaluate(rule).getCount());
+public class CallsSimple {
+	public void method() {
+		new Simple().noArgMethod();
 	}
 }

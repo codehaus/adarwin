@@ -26,7 +26,16 @@ public class ADarwinTask extends Task {
 	public ADarwinTask(Runner runner) {
 		this.runner = runner;
 		runner.setLogger(new Logger() {
+			private String prefix = null;
+			public void reset(String prefix) {
+				this.prefix = prefix;
+			}
+			
 			public void log(String toLog) {
+				if (prefix != null) {
+					ADarwinTask.super.log(prefix);
+					prefix = null;
+				}
 				ADarwinTask.super.log(toLog);
 			}
 		});

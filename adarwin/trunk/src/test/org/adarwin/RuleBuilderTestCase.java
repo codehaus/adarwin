@@ -10,26 +10,23 @@
 
 package org.adarwin;
 
-import java.io.IOException;
-
-import junit.framework.TestCase;
-
 import org.adarwin.rule.AndRule;
 import org.adarwin.rule.ConstructorRule;
+import org.adarwin.rule.MethodRule;
 import org.adarwin.rule.NotRule;
 import org.adarwin.rule.PackageRule;
 import org.adarwin.rule.ParentRule;
 import org.adarwin.rule.Rule;
 import org.adarwin.rule.SourceRule;
-import org.adarwin.rule.TrueRule;
 import org.adarwin.rule.UsesRule;
 import org.adarwin.testmodel.a.InPackageA;
 
-public class RuleBuilderTestCase extends TestCase {
-    private final String INCORRECT_RULE_BUILT = "Incorrect rule built";
-    private final String INCORRECT_NUMBER_OF_RULE_MATCHES = "Incorrect number of rule matches";
+import java.io.IOException;
 
-    public void testTrueRuleGrammer() throws BuilderException, ClassNotFoundException {
+public class RuleBuilderTestCase extends RuleTestCase {
+    private final String INCORRECT_RULE_BUILT = "Incorrect rule built";
+
+    public void testTrueRuleGrammer() throws BuilderException {
 		RuleClassBindings ruleClassBindings = new RuleClassBindings("true", TrueRule.class);
 
         RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
@@ -41,7 +38,7 @@ public class RuleBuilderTestCase extends TestCase {
         assertEquals(expression, rule.toString(ruleClassBindings));
     }
 
-    public void testInPackageRuleGrammer() throws BuilderException, ClassNotFoundException {
+    public void testInPackageRuleGrammer() throws BuilderException {
 		RuleClassBindings ruleClassBindings = new RuleClassBindings(new String[] {"src", "package"},
             new Class[] {SourceRule.class, PackageRule.class});
 
@@ -54,7 +51,7 @@ public class RuleBuilderTestCase extends TestCase {
         assertEquals(expression, rule.toString(ruleClassBindings));
     }
 
-    public void testInPackageAndUsesPackage() throws BuilderException, ClassNotFoundException {
+    public void testInPackageAndUsesPackage() throws BuilderException {
 		RuleClassBindings ruleClassBindings = new RuleClassBindings(
             new String[] {"and", "src", "uses", "package"},
             new Class[] {AndRule.class, SourceRule.class, UsesRule.class, PackageRule.class});
@@ -68,7 +65,7 @@ public class RuleBuilderTestCase extends TestCase {
         assertEquals(expression, rule.toString(ruleClassBindings));
     }
 
-    public void testTwoLevelsOfNesting() throws BuilderException, ClassNotFoundException {
+    public void testTwoLevelsOfNesting() throws BuilderException {
 		RuleClassBindings ruleClassBindings = new RuleClassBindings(new String[] {"not", "and", "true"},
             new Class[] {NotRule.class, AndRule.class, TrueRule.class});
 
@@ -81,7 +78,7 @@ public class RuleBuilderTestCase extends TestCase {
         assertEquals(expression, rule.toString(ruleClassBindings));
     }
 
-    public void testInPackageRule() throws BuilderException, IOException, ClassNotFoundException {
+    public void testInPackageRule() throws BuilderException, IOException {
         RuleBuilder ruleBuilder = new RuleBuilder(new RuleClassBindings(
             new String[] {"src", "package"},
             new Class[] {SourceRule.class, PackageRule.class}));
@@ -90,10 +87,10 @@ public class RuleBuilderTestCase extends TestCase {
 
         Rule rule = ruleBuilder.buildRule(expression);
 
-        assertEquals("Incorrect number of rule matches", 1, new ClassFile(InPackageA.class).evaluate(rule).getCount());
+        assertNumMatches(1, rule, InPackageA.class);
     }
 
-    public void testAndRule() throws BuilderException, IOException, ClassNotFoundException {
+    public void testAndRule() throws BuilderException, IOException {
 		RuleClassBindings ruleClassBindings = new RuleClassBindings(new String[] {"and", "true"},
             new Class[] {AndRule.class, TrueRule.class});
 
@@ -105,19 +102,29 @@ public class RuleBuilderTestCase extends TestCase {
 
         assertEquals(INCORRECT_RULE_BUILT, expression, rule.toString(ruleClassBindings));
 
-        assertTrue(INCORRECT_NUMBER_OF_RULE_MATCHES, new ClassFile(InPackageA.class).evaluate(rule).getCount() > 0);
+        assertNumMatches(1, rule, InPackageA.class);
     }
 
     public void testConstructorRule() throws BuilderException {
     	RuleClassBindings bindings = new RuleClassBindings("constructor", ConstructorRule.class);
 		RuleBuilder ruleBuilder = new RuleBuilder(bindings);
 		
-		String expression = "constructor(java.lang.Integer, myClass)";
+		String expression = "constructor(className(param1, param2))";
 		Rule rule = ruleBuilder.buildRule(expression);
 		
 		assertEquals(expression, rule.toString(bindings));
 	}
-	
+    
+    public void testMethodRule() throws BuilderException {
+    	RuleClassBindings bindings = new RuleClassBindings("method", MethodRule.class);
+    	RuleBuilder ruleBuilder = new RuleBuilder(bindings);
+
+    	String expression = "method(returnType methodName(param1, param2, param3))";
+    	Rule rule = ruleBuilder.buildRule(expression);
+
+    	assertEquals(expression, rule.toString(bindings));
+    }
+
 	public void testParentRule() throws BuilderException {
 		RuleClassBindings bindings = new RuleClassBindings("parent", ParentRule.class);
 		RuleBuilder ruleBuilder = new RuleBuilder(bindings);
@@ -128,7 +135,7 @@ public class RuleBuilderTestCase extends TestCase {
 		assertEquals(expression, rule.toString(bindings));
 	}
 
-    public void testUnknownRule() throws BuilderException, ClassNotFoundException {
+    public void testUnknownRule() {
         RuleBuilder ruleBuilder = new RuleBuilder(new RuleClassBindings("true", TrueRule.class));
 
 		try {
@@ -151,7 +158,7 @@ public class RuleBuilderTestCase extends TestCase {
 		}
 	}
 
-	public void testMultipleRules() throws BuilderException, ClassNotFoundException {
+	public void testMultipleRules() throws BuilderException {
 		RuleClassBindings ruleClassBindings = new RuleClassBindings("true", TrueRule.class);
 
 		RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
@@ -248,5 +255,5 @@ public class RuleBuilderTestCase extends TestCase {
 		assertEquals(2, parsed.length);
 		assertEquals(first, parsed[0]);
 		assertEquals(second, parsed[1]);
-	}	
+	}
 }

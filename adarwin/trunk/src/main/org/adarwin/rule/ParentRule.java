@@ -10,27 +10,31 @@
 
 package org.adarwin.rule;
 
+import org.adarwin.ClassName;
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
 import org.adarwin.RuleClassBindings;
 
-public class ParentRule implements Rule {
-	private String fullyQualifiedClassName;
+public class ParentRule implements Rule, Filter {
+	private final ClassName className;
 
-	public ParentRule(String fullyQualifiedClassName) {
-		this.fullyQualifiedClassName = fullyQualifiedClassName;
+	public ParentRule(String fullClassName) {
+		this.className = new ClassName(fullClassName);
 	}
 
 	public ParentRule(Class clazz) {
 		this(clazz.getName());
 	}
 
-	public boolean inspect(ClassSummary classSummary) {
-		return classSummary.getDependancies().contains(new CodeElement(fullyQualifiedClassName,
-			ElementType.EXTENDS_OR_IMPLEMENTS));
+	public ClassSummary inspect(ClassSummary classSummary) {
+		return classSummary.filter(this);
+	}
+
+	public boolean matches(CodeElement codeElement) {
+		return CodeElement.create(className, ElementType.EXTENDS_OR_IMPLEMENTS).equals(codeElement);
 	}
 
 	public String toString(RuleClassBindings ruleClassBindings) {
-		return ruleClassBindings.getRule(getClass()) + '(' + fullyQualifiedClassName + ')';
+		return ruleClassBindings.getRule(getClass()) + '(' + className.getFullClassName() + ')';
 	}
 }

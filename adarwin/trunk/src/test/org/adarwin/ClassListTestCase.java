@@ -10,43 +10,20 @@
 
 package org.adarwin;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import junit.framework.TestCase;
-
-import org.adarwin.rule.PackageRule;
+import org.adarwin.rule.Rule;
 import org.adarwin.testmodel.a.InPackageA;
 import org.adarwin.testmodel.b.InPackageB;
 
-public class ClassListTestCase extends TestCase {
+import java.io.IOException;
+
+public class ClassListTestCase extends RuleTestCase {
+	private final Rule rule = createPackageRule(InPackageB.class);
+
 	public void testNoMatch() throws IOException {
-		PackageRule rule = PackageRule.create(InPackageB.class);
-
-		Code code = new ClassFile(InPackageA.class);
-
-		assertFalse(code.evaluate(rule).iterator().hasNext());
+		assertNumMatches(0, rule, InPackageA.class);
 	}
 
 	public void testOneMatch() throws IOException {
-		PackageRule rule = PackageRule.create(InPackageB.class);
-
-		Code code = new ClassFile(InPackageB.class);
-
-		assertEquals(InPackageB.class.getName(), code.evaluate(rule).iterator().next());
-	}
-
-	private Set createSet(Class[] classes) {
-		Set set = new HashSet();
-		for (int nLoop = 0; nLoop < classes.length; nLoop++) {
-			set.add(classes[nLoop].getName());
-		}
-		return set;
-	}
-
-	private Set createSet(Class name) {
-		return createSet(new Class[] {name});
+		assertNumMatches(1, rule, InPackageB.class);
 	}
 }

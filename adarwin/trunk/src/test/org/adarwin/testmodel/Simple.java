@@ -10,12 +10,33 @@
 
 package org.adarwin.testmodel;
 
-public class Simple {
-	public static final String VOID_RETURN_METHOD = "voidReturnMethod";
-	public static final String NO_ARG_METHOD = "noArgMethod";
-	public static final String SINGLE_ARG_METHOD = "singleArgMethod";
-	public static final String TWO_ARG_METHOD = "twoArgMethod";
+import org.adarwin.ClassName;
+import org.adarwin.Method;
+import org.adarwin.MethodDeclaration;
+import org.adarwin.Util;
 
+public class Simple {
+	public static final MethodDeclaration VOID_RETURN_METHOD =
+		create("voidReturnMethod", Void.TYPE, new Class[0]);
+
+	public static final MethodDeclaration NO_ARG_METHOD =
+		create("noArgMethod", Integer.class, new Class[0]);
+
+	public static final MethodDeclaration SINGLE_ARG_METHOD =
+		create("singleArgMethod", Integer.class, new Class[] {String.class});
+
+	public static final MethodDeclaration TWO_ARG_METHOD =
+		create("twoArgMethod", Integer.class, new Class[] {String.class, String.class});
+
+	public static final MethodDeclaration METHOD_RETURNING_PRIMITIVE = 
+		create("methodReturningPrimitive", Integer.TYPE, new Class[0]);
+
+	public Simple() {
+	}
+	
+	public Simple(String parameter) {
+	}
+	
 	public void voidReturnMethod() {
 	}
 
@@ -29,5 +50,14 @@ public class Simple {
 	
 	public Integer twoArgMethod(String firstParameter, String secondParameter) {
 		return new Integer(0);
+	}
+	
+	public int methodReturningPrimitive() {
+		return 0;
+	}
+
+	private static MethodDeclaration create(String methodName, Class returnType, Class[] parameterTypes) {
+		return new MethodDeclaration(new ClassName(Simple.class.getName()), methodName, returnType.getName(),
+			Util.convertClassArrayToStringArray(parameterTypes));
 	}
 }

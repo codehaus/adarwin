@@ -10,25 +10,29 @@
 
 package org.adarwin;
 
-import java.io.IOException;
-
-import junit.framework.TestCase;
-
-import org.adarwin.rule.PackageRule;
 import org.adarwin.rule.Rule;
-import org.adarwin.rule.SourceRule;
-import org.adarwin.testmodel.a.InPackageA;
-import org.adarwin.testmodel.a.InPackageAUsesClassFromPackageB;
 
-public class PathTestCase extends TestCase {
-    public void testPath() throws IOException {
-        Rule rule = new SourceRule(PackageRule.create(InPackageA.class));
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
-		Code classPath = new ClassPath(new Code[] {
-			new JarFile(JarFile.createJarFile(InPackageA.class)),
-			new ClassFile(InPackageAUsesClassFromPackageB.class)
-		});
+public class Jar implements Code {
+    private final String fileName;
 
-        assertEquals(2, classPath.evaluate(rule).getCount());
+    public Jar(String fileName) {
+        this.fileName = fileName;
     }
+
+	public void evaluate(Rule rule, RuleListener ruleListener) throws IOException {
+		JarFile jarFile = new JarFile(fileName);
+
+		for (Enumeration entries = jarFile.entries(); entries.hasMoreElements();) {
+			JarEntry entry = (JarEntry) entries.nextElement();
+			
+			if (CodeFactory.isClass(entry.getName())) {
+				new ClassFile(jarFile.getInputStream(entry)).evaluate(rule, ruleListener);
+			}
+		}
+	}
 }

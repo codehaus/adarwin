@@ -11,5 +11,6 @@
 package org.adarwin;
 
 public interface Logger {
-	public void log(String toLog);
+	void reset(String prefix);
+	void log(String toLog);
 }

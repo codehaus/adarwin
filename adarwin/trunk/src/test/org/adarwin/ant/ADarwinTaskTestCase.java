@@ -46,7 +46,7 @@ public class ADarwinTaskTestCase extends TestCase {
 	}
 
 	public void testRuleInAntFile() {
-		mockLogger.expect("log", "3 classes violated: " + RULE);
+		mockLogger.expect("reset", "classes violated: " + RULE);
 
 		task.setRuleExpression(RULE);
 		task.setFailOnMatch(true);
@@ -58,11 +58,11 @@ public class ADarwinTaskTestCase extends TestCase {
 	
 	public void testRuleInFile() throws IOException {
 		task.setPrint(true);
-		mockLogger.expect("log", "3 classes violated: " + RULE);
-		mockLogger.expect("log", "  " + UsesPackageAAndPackageB.class.getName());
+		mockLogger.expect("reset", "classes violated: " + RULE);
 		mockLogger.expect("log", "  " + InPackageA.class.getName());
 		mockLogger.expect("log", "  " + InPackageAUsesClassFromPackageB.class.getName());
-		
+		mockLogger.expect("log", "  " + UsesPackageAAndPackageB.class.getName());
+
 		task.setRuleFileName(createTempRuleFile(RULE));
 		
 		executeTask();		
@@ -71,7 +71,8 @@ public class ADarwinTaskTestCase extends TestCase {
 	}
 
 	public void testMultipleRulesOneRuleMatches() {
-		mockLogger.expect("log", "3 classes violated: " + RULE);
+		mockLogger.expect("reset", "classes violated: " + RULE);
+		mockLogger.expect("reset", "classes violated: " + SECOND_RULE);
 				
 		task.setRuleExpression(COMPOSITE_RULE);
 		

@@ -13,28 +13,15 @@ package org.adarwin;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.StringTokenizer;
 
 public class CodeFactory implements ICodeFactory {
 	public Code create(String name) throws FileNotFoundException {
 		if (name.indexOf(File.pathSeparator) != -1) {
-			return createPath(name);
+			return new ClassPath(name, this);
 		}
 		else {
 			return createSingle(name);
 		}
-	}
-
-	private Code createPath(String name) throws FileNotFoundException {
-		StringTokenizer tokenizer = new StringTokenizer(name, File.pathSeparator);
-
-		Code[] code = new Code[tokenizer.countTokens()];
-
-		for (int cLoop = 0; tokenizer.hasMoreTokens(); ++cLoop) {
-			code[cLoop] = create(tokenizer.nextToken());
-		}
-
-		return new ClassPath(code);
 	}
 
 	private Code createSingle(String name) throws FileNotFoundException {
@@ -42,18 +29,18 @@ public class CodeFactory implements ICodeFactory {
 			return new ClassFile(new FileInputStream(name));
 		}
 		else if (isJar(name)) {
-			return new JarFile(name);
+			return new Jar(name);
 		}
 		else { // Directory
-			return new ClassDirectory(name);
+			return new ClassDirectory(name, this);
 		}
 	}
 
-	private boolean isClass(String token) {
+	public static boolean isClass(String token) {
 		return token.endsWith(".class");
 	}
 
-	private boolean isJar(String token) {
+	public static boolean isJar(String token) {
 		return token.endsWith(".jar");
 	}
 }

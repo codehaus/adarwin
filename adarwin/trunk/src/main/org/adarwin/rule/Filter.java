@@ -8,28 +8,10 @@
  * Idea and Original Code by Stacy Curl                                      *
  *****************************************************************************/
 
-package org.adarwin;
+package org.adarwin.rule;
 
-public class ArrayType implements IType {
-	private final IType type;
+import org.adarwin.CodeElement;
 
-	public ArrayType(IType type) {
-		this.type = type;
-	}
-	
-	public IType getType() {
-		return type;
-	}
-	
-	public String getTypeName() {
-		return type.getTypeName();
-	}
-
-	public String getForm() {
-		return "[" + type.getForm();
-	}
-	
-	public boolean isPrimative() {
-		return type.isPrimative();
-	}
+public interface Filter {
+	boolean matches(CodeElement codeElement);
 }

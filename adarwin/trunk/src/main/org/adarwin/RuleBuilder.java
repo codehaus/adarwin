@@ -22,12 +22,11 @@ import java.util.StringTokenizer;
 import org.adarwin.rule.Rule;
 
 public class RuleBuilder {
-    private RuleClassBindings ruleClassBindings;
-    private Map variables;
+    private final RuleClassBindings ruleClassBindings;
+    private final Map variables = new HashMap();
 
     public RuleBuilder(RuleClassBindings ruleClassBindings) {
         this.ruleClassBindings = ruleClassBindings;
-        variables = new HashMap();
     }
     
 	public Rule[] buildRules(String expression) throws BuilderException {
@@ -163,7 +162,7 @@ public class RuleBuilder {
     private Rule buildRule(String name, String[] arguments) throws BuilderException,
     	IllegalAccessException, InstantiationException, InvocationTargetException {
 
-        Class ruleClass = getRuleClass(name);
+        Class ruleClass = ruleClassBindings.getClass(name);
 
 		if (ruleClass == null) {
 			throw new BuilderException("No such rule: " + name);
@@ -255,10 +254,6 @@ public class RuleBuilder {
 		return true;
 	}
 
-	private Class getRuleClass(String name) {
-        return ruleClassBindings.getClass(name);
-    }
-    
 	public static String[] parse(String expression) {
 		StringBuffer buffer = new StringBuffer(expression);
 		
