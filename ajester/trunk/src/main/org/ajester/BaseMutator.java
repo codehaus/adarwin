@@ -49,13 +49,10 @@ class BaseMutator extends ClassAdapter implements Mutator {
 		Access methodAccess = new Access(access);
 		boolean abstractOrNative = methodAccess.isAbstract || methodAccess.isNative; 
 		if (!abstractOrNative && instructionMatcher.getCodeMatcher().matches(getCurrentCodeLocation())) {
-			MethodCoverageMatcher matcher =
-				new MethodCoverageMatcher(null);
-			
 			MethodCoverageInstructionMutator mutator =
 				new MethodCoverageInstructionMutator(null);
 			
-			if (matcher.matches(instruction)) {
+			if (mutator.matches(instruction)) {
 				mutator.mutate(instruction).visit(getClassVisitor(), codeVisitor);
 			}
 

@@ -8,12 +8,10 @@ import junit.framework.TestCase;
 
 public class IfStatementMutatorTestCase extends TestCase {
 	private InstructionMutator mutator;
-	private InstructionMatcher matcher;
 
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		matcher = new IfStatementMatcher(new CodeLocationMatcher(IfEqualsStatement.LOCATION));
 		mutator = new IfStatementInstructionMutator(new CodeLocationMatcher(IfEqualsStatement.LOCATION));
 	}
 
@@ -25,7 +23,7 @@ public class IfStatementMutatorTestCase extends TestCase {
 		JumpInstruction expectedMutatedJumpInstruction =
 			new JumpInstruction(IfEqualsStatement.LOCATION, Constants.IFNE, label);
 		
-		assertTrue(matcher.matches(jumpInstruction));
+		assertTrue(mutator.matches(jumpInstruction));
 		assertEquals(expectedMutatedJumpInstruction, mutator.mutate(jumpInstruction));
 	}
 }
