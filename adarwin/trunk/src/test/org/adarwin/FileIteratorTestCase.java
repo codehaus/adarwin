@@ -76,7 +76,20 @@ public class FileIteratorTestCase extends TestCase {
 
 		fileAccessorControl.verify();
 	}
-	
+
+	public void testDirectoryWithNoFiles() {
+		fileAccessorControl.expectAndReturn(fileAccessor.isDirectory("directory"), true);
+		fileAccessorControl.expectAndReturn(fileAccessor.listFiles("directory"), (new String[0]));
+		
+		fileAccessorControl.replay();
+
+		IFileIterator iterator = new DirectoryFileIterator("directory", fileAccessor);
+
+		assertFalse(iterator.hasNext());
+
+		fileAccessorControl.verify();
+	}
+
 	public static void main(String[] args) {
 		IFileIterator iterator = new FileAccessor().files(args[0]);
 

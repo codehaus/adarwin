@@ -19,7 +19,7 @@ public class RuleClassVisitorTestCase extends RuleTestCase {
 	}
 
 	public void testConstructor() {
-		assertContains(HasZeroArgConstructor.class, new ConstructorDeclaration(
+		assertContains(HasZeroArgConstructor.class, ConstructorInvocation.createDeclaration(
 			HasZeroArgConstructor.class.getName(), new String[0]));
 	}
 

@@ -29,8 +29,6 @@ public class RunnerTestCase extends TestCase {
 	private MockControl loggerControl = MockControl.createNiceControl(Logger.class);
 	private Logger logger = (Logger) loggerControl.getMock();
 
-	private MockControl codeControl = MockControl.createNiceControl(Code.class);
-	private Code code = (Code) codeControl.getMock();
 
 	private MockControl ruleBuilderControl = MockControl.createNiceControl(RuleProducer.class);
 	private RuleProducer ruleBuilder = (RuleProducer) ruleBuilderControl.getMock();
@@ -82,7 +80,7 @@ public class RunnerTestCase extends TestCase {
 //
 //		verify();
 //	}
-
+//
 //	public void testMultipleRulesOneRuleMatches() {
 //		ruleExpression = COMPOSITE_RULE;
 //
@@ -90,8 +88,8 @@ public class RunnerTestCase extends TestCase {
 //
 //		expectRuleViolated(logger, RULE, new Class[] {InPackageA.class,
 //			InPackageAUsesClassFromPackageB.class, UsesPackageAAndPackageB.class});
-//		
-//		logger.reset(Runner.CLASSES_VIOLATED + SECOND_RULE);
+//
+//		logger.reset(RuleBuilder.CLASSES_VIOLATED + SECOND_RULE);
 //
 //		replay();
 //

@@ -19,10 +19,10 @@ public class InPackageTestCase extends RuleTestCase {
     private final Rule rule = new SourceRule(createPackageRule(InPackageA.class));
     
     public void testInPackage() {
-    	assertNumMatches(1, rule, InPackageA.class);
+    	assertTrue(matches(rule, InPackageA.class));
     }
 
     public void testNotInPackage() {
-    	assertNumMatches(0, rule, InPackageB.class);
+    	assertFalse(matches(rule, InPackageB.class));
     }
 }

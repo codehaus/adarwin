@@ -28,4 +28,15 @@ public class NameRule implements Rule {
 	public ClassSummary inspect(ClassSummary classSummary) {
 		return rule.inspect(classSummary);
 	}
+
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+
+	public boolean equals(Object object) {
+		return object != null &&
+			getClass().equals(object.getClass()) &&
+			name.equals(((NameRule) object).name) &&
+			rule.equals(((NameRule) object).rule);
+	}
 }

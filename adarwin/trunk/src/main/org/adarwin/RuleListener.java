@@ -10,7 +10,6 @@
 
 package org.adarwin;
 
-
 public interface RuleListener {
 	boolean matchesEvent(ClassSummary classSummary);
 }

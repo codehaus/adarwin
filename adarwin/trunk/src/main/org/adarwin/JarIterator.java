@@ -22,18 +22,17 @@ public class JarIterator implements CodeIterator {
 		return entries.hasMoreElements();
 	}
 
-	public Code next() {
+	public ClassSummary next() {
 		JarEntry entry = (JarEntry) entries.nextElement();
-		
+
 		if (CodeProducer.isClass(entry.getName())) {
 			try {
-				return new ClassFile(jarFile.getInputStream(entry));
+				return RuleClassVisitor.visit(jarFile.getInputStream(entry));
 			} catch (IOException e) {
 				throw new ADarwinException(e);
 			}
 		}
-		else {
-			return Code.NULL;
-		}
+
+		return null;
 	}
 }

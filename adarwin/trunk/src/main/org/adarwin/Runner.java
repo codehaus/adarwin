@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class Runner {
+	public static final String EVALUATING_RULES_AGAINST = "Evaluating rules against: ";
 	public static final String BINDING = "binding";
 	public static final String CLASSPATH = "classPath";
 	public static final String RULE_EXPRESSION = "ruleExpression";
@@ -32,6 +33,16 @@ public class Runner {
 	private final RuleProducer ruleProducer;
 	private final CodeProducer codeProducer;
 
+	public static void run(boolean printDetail, String binding, String classPath,
+		boolean failFast, boolean failOnMatch, String rule, Logger logger) {
+
+		IFileAccessor fileAccessor = new FileAccessor();
+
+		new Runner(printDetail, failOnMatch, failFast, binding, classPath, logger,
+			new RuleBuilder(rule, logger, getProperties(binding, fileAccessor)),
+			new CodeProducer(classPath, fileAccessor)).run();
+	}
+
 	public Runner(boolean printDetail, boolean failOnMatch, boolean failFast, String binding,
 		String classPath, Logger logger, RuleProducer ruleProducer, CodeProducer codeProducer) {
 
@@ -45,60 +56,30 @@ public class Runner {
 		this.codeProducer = codeProducer;
 	}
 
-	public final RuleConsumer ruleConsumer = new RuleConsumer() {
-		public boolean consume(final Rule rule, final Logger logger) {
-			class RuleListenerImpl implements RuleListener {
-				private boolean matched;
-
-				public boolean isMatched() {
-					return matched;
-				}
-
-				public boolean matchesEvent(ClassSummary classSummary) {
-					matched = true;
-					classSummary.log(logger, printDetail);
-
-					return classSummary.isEmpty() || !failFast;
-				}
-			}
-
-			final RuleListenerImpl ruleListener = new RuleListenerImpl();
-
-			codeProducer.produce(new CodeConsumer() {
-				public void consume(Code code) {
-					if (!code.evaluate(rule, ruleListener)) {
-						logger.log(RULE_EVALUATION_STOPPED_EARLY);
-					}
-				}
-			});
-
-			return ruleListener.isMatched();
-		}
-	};
-
 	public void run() {
-		logger.log("Evaluating rules against: " + classPath);
+		logger.log(EVALUATING_RULES_AGAINST + classPath);
 
-		class Boolean {
-			boolean matches = false;
+		boolean matches = false;
+
+		rules: for(RuleIterator ruleIterator = ruleProducer.iterator(); ruleIterator.hasNext();) {
+			Rule rule = ruleIterator.next();
+
+			for(CodeIterator codeIterator = codeProducer.iterator(); codeIterator.hasNext();) {
+				matches = matches | rule.inspect(codeIterator.next()).log(logger, printDetail);
+
+				if (matches && failFast) {
+					logger.log(RULE_EVALUATION_STOPPED_EARLY);
+					break rules;
+				}
+			}
 		}
 
-		final Boolean matches = new Boolean();
-
-		ruleProducer.produce(new RuleConsumer() {
-			public boolean consume(Rule rule, Logger logger) {
-				matches.matches = matches.matches | ruleConsumer.consume(rule, logger);
-
-				return true;
-			}
-		});
-
-		if (matches.matches && failOnMatch) {
+		if (matches && failOnMatch) {
 			throw new ADarwinException(Runner.RULE_VIOLATED);
 		}
 	}
 
-	public static void verifyParameter(String value, String name) {
+	private static void verifyParameter(String value, String name) {
 		if (isParameterNullOrEmpty(value)) {
 			throw new ADarwinException(name + Runner.MISSING_OR_EMPTY);
 		}
@@ -107,7 +88,6 @@ public class Runner {
 	public static boolean isParameterNullOrEmpty(String value) {
 		return value == null || value.length() == 0;
 	}
-
 
 	public static final int MIN_ARGS = 6;
 	public static final int MAX_ARGS = 7;
@@ -157,7 +137,7 @@ public class Runner {
 		verifyParameter(binding, Runner.BINDING);
 		verifyParameter(classPath, Runner.CLASSPATH);
 		verifyParameter(ruleExpression, RULE_EXPRESSION);
-		
+
 		Logger logger = new Logger() {
 			private String prefix;
 			public void reset(String prefix) {
@@ -172,12 +152,7 @@ public class Runner {
 			}
 		};
 		
-		Properties ruleMapping = getProperties(binding, fileAccessor);
-
-		RuleProducer ruleBuilder = new RuleBuilder(ruleExpression, logger, ruleMapping);
-
-		new Runner(printDetail, failOnMatch, failFast, binding, classPath,
-			logger, ruleBuilder, new CodeProducer(classPath, fileAccessor)).run();
+		run(printDetail, binding, classPath, failFast, failOnMatch, ruleExpression, logger);
 	}
 
     private static Properties getProperties(String propertiesFileName, IFileAccessor fileAccessor) {
@@ -192,19 +167,9 @@ public class Runner {
 
 	private static void checkMoreArgs(int currentIndex, int numArgs, String argument)
 		throws UsageException {
-	
+
 		if (numArgs <= currentIndex) {
 			throw new UsageException("Missing parameter after: " + argument);
 		}
-	}
-
-	public static void run(boolean printDetail, String binding, String classPath,
-		boolean failFast, boolean failOnMatch, String rule, Logger logger) {
-
-		IFileAccessor fileAccessor = new FileAccessor();
-		
-		new Runner(printDetail, failOnMatch, failFast, binding, classPath, logger,
-			new RuleBuilder(rule, logger, getProperties(binding, fileAccessor)),
-			new CodeProducer(classPath, fileAccessor)).run();
 	}
 }

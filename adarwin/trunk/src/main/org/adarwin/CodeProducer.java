@@ -2,11 +2,6 @@ package org.adarwin;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.StringTokenizer;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 public class CodeProducer {
 	private final String name;
@@ -26,9 +21,9 @@ public class CodeProducer {
 					return !done;
 				}
 
-				public Code next() {
+				public ClassSummary next() {
 					try {
-						return new ClassFile(fileAccessor.openFile(name));
+						return RuleClassVisitor.visit(fileAccessor.openFile(name));
 					}
 					catch (FileNotFoundException e) {
 						throw new ADarwinException(e);
@@ -45,63 +40,11 @@ public class CodeProducer {
 		else if (isJar(name)) {
 			return new JarIterator(name, fileAccessor);
 		}
-		else if (isDirectory(name)) {
+		else if (fileAccessor.isDirectory(name)) {
 			return new ClassDirectoryIterator(fileAccessor, fileAccessor.files(name));
 		}
 
 		return CodeIterator.NULL;
-	}
-
-	public void produce(CodeConsumer codeConsumer) {
-		try {
-			produce(name, codeConsumer);
-		}
-		catch (IOException ioException) {
-			throw new ADarwinException(ioException);
-		}
-	}
-
-	private void produce(String name, CodeConsumer codeConsumer) throws IOException {
-		if (isClass(name)) {
-			codeConsumer.consume(new ClassFile(fileAccessor.openFile(name)));
-		}
-		else if (isClassPath(name)) {
-			produceClassPath(name, codeConsumer);
-		}
-		else if (isJar(name)) {
-			produceJar(name, codeConsumer);
-		}
-		else if (isDirectory(name)) {
-			produceDirectory(name, codeConsumer);
-		}
-	}
-
-	private void produceClassPath(String name, CodeConsumer codeConsumer) throws IOException {
-		StringTokenizer tokenizer = new StringTokenizer(name, File.pathSeparator);
-
-		while(tokenizer.hasMoreTokens()) {
-			produce(tokenizer.nextToken(), codeConsumer);
-		}
-	}
-
-	private void produceJar(String name, CodeConsumer codeConsumer) throws IOException {
-		JarFile jarFile = new JarFile(name);
-
-		for (Enumeration entries = jarFile.entries(); entries.hasMoreElements();) {
-			JarEntry entry = (JarEntry) entries.nextElement();
-		
-			if (isClass(entry.getName())) {
-				codeConsumer.consume(new ClassFile(jarFile.getInputStream(entry)));
-			}
-		}
-	}
-
-	private void produceDirectory(String name, CodeConsumer codeConsumer) throws IOException {
-		String[] fileNames = new FileAccessor().listFiles(name);
-
-		for (int fLoop = 0; fLoop < fileNames.length; ++fLoop) {
-			produce(fileNames[fLoop], codeConsumer);
-		}
 	}
 
 	private boolean isClassPath(String name) {
@@ -114,9 +57,5 @@ public class CodeProducer {
 
 	private boolean isJar(String token) {
 		return token.endsWith(".jar");
-	}
-
-	private boolean isDirectory(String name) {
-		return fileAccessor.isDirectory(name);
 	}
 }

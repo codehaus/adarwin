@@ -20,7 +20,7 @@ public class UsesPackageTestCase extends RuleTestCase {
     private final Rule rule = new UsesRule(createPackageRule(InPackageB.class));
 
     public void testNotUsingPackage() {
-		assertNumMatches(0, rule, String.class);
+    	assertFalse(matches(rule, String.class));
     }    
 
 	public void testUsesAsField() {
@@ -28,7 +28,7 @@ public class UsesPackageTestCase extends RuleTestCase {
 		    InPackageB empty;
 		}
 
-		assertNumMatches(1, rule, UsesClassInPackageBAsField.class);
+		assertTrue(matches(rule, UsesClassInPackageBAsField.class));
     }
 
     public void testUsesAsLocalVariable() {
@@ -38,7 +38,7 @@ public class UsesPackageTestCase extends RuleTestCase {
     	    }
     	}
 
-    	assertNumMatches(1, rule, UsesClassInPackageBAsLocalVariable.class);
+    	assertTrue(matches(rule, UsesClassInPackageBAsLocalVariable.class));
     }
 
     public void testUsesAsAnonymouseLocalVariable() {
@@ -48,7 +48,7 @@ public class UsesPackageTestCase extends RuleTestCase {
     	    }
     	}
 
-    	assertNumMatches(1, rule, UsesClassInPackageBAsAnonymousLocalVariable.class);
+    	assertTrue(matches(rule, UsesClassInPackageBAsAnonymousLocalVariable.class));
     }
 
     public void testUsesForInvocation() {
@@ -58,7 +58,7 @@ public class UsesPackageTestCase extends RuleTestCase {
     	    }
     	}
 
-    	assertNumMatches(1, rule, UsesClassInPackageBForInvocation.class);
+    	assertTrue(matches(rule, UsesClassInPackageBForInvocation.class));
     }
 
     public void testUsesForStaticInvocation() {
@@ -68,7 +68,7 @@ public class UsesPackageTestCase extends RuleTestCase {
     	    }
     	}
 
-    	assertNumMatches(1, rule, UsesClassInPackageBForStaticInvocation.class);
+    	assertTrue(matches(rule, UsesClassInPackageBForStaticInvocation.class));
     }
 
     public void testUsesForClassInstanceField() {
@@ -76,7 +76,7 @@ public class UsesPackageTestCase extends RuleTestCase {
     	    Class naughtyClass = InPackageB.class;
     	}
 
-    	assertNumMatches(1, rule, UsesClassInPackageBForClassInstanceField.class);
+    	assertTrue(matches(rule, UsesClassInPackageBForClassInstanceField.class));
     }
     
 	static class UsesClassInStaticReturnValue {
@@ -86,7 +86,7 @@ public class UsesPackageTestCase extends RuleTestCase {
 	}
 
 	public void testUsesForStaticReturnValue() {
-		assertNumMatches(1, rule, UsesClassInStaticReturnValue.class);
+		assertTrue(matches(rule, UsesClassInStaticReturnValue.class));
     }
 
     public void testUsesForClassInstanceInMethod() {
@@ -96,25 +96,25 @@ public class UsesPackageTestCase extends RuleTestCase {
     	    }
     	}
 
-    	assertNumMatches(1, rule, UsesClassInPackageBForClassInstanceInMethod.class);
+    	assertTrue(matches(rule, UsesClassInPackageBForClassInstanceInMethod.class));
     }
 
 	public void testUsesForBaseClass() {
 		class UsesClassForBaseClass extends InPackageB {
 		}
 		
-		assertNumMatches(1, rule, UsesClassForBaseClass.class);
+		assertTrue(matches(rule, UsesClassForBaseClass.class));
 	}
 
 	public void testUsesForBaseInterface() {
-		assertNumMatches(1, rule, IUsesClassForBaseInterface.class);
+		assertTrue(matches(rule, IUsesClassForBaseInterface.class));
 	}
 
 	public void testUsesForInterfaceImplementation() {
 		class UsesClassForBaseInterface implements IInPackageB {
 		}
 		
-		assertNumMatches(1, rule, UsesClassForBaseInterface.class);
+		assertTrue(matches(rule, UsesClassForBaseInterface.class));
 	}
 	
 	public void testUsesInMethodReturnInDeclaration() {
@@ -124,7 +124,7 @@ public class UsesPackageTestCase extends RuleTestCase {
 			}
 		}
 
-		assertNumMatches(1, rule, UsesClassInPackageBInMethodReturn.class);
+		assertTrue(matches(rule, UsesClassInPackageBInMethodReturn.class));
 	}
 	
 	public void testUsesClassInPackageBInMethodReturnOfInvokedMetho() {
@@ -140,7 +140,7 @@ public class UsesPackageTestCase extends RuleTestCase {
 			}
 		}
 
-		assertNumMatches(1, rule, UsesClassInPackageBInMethodReturnOfInvokedMetho.class);
+		assertTrue(matches(rule, UsesClassInPackageBInMethodReturnOfInvokedMetho.class));
 	}
 
 	public void testUsesInMethodParameters() {
@@ -149,7 +149,7 @@ public class UsesPackageTestCase extends RuleTestCase {
 			}
 		}
 
-		assertNumMatches(1, rule, UsesClassInPackageBInMethodParameters.class);
+		assertTrue(matches(rule, UsesClassInPackageBInMethodParameters.class));
 	}
 	
 	public void testUsesInConstructorParameters() {
@@ -159,7 +159,7 @@ public class UsesPackageTestCase extends RuleTestCase {
 			}
 		}
 
-		assertNumMatches(1, rule, UsesClassInPackageBInConstructorParameters.class);
+		assertTrue(matches(rule, UsesClassInPackageBInConstructorParameters.class));
 	}
 
 	public void testUsesInMethodThrowsClause() {
@@ -168,7 +168,7 @@ public class UsesPackageTestCase extends RuleTestCase {
 			}
 		}
 
-		assertNumMatches(1, rule, UsesClassInPackageBInMethodThrowsClause.class);
+		assertTrue(matches(rule, UsesClassInPackageBInMethodThrowsClause.class));
 	}
 
 	public void testUsesInThrow() {
@@ -178,7 +178,7 @@ public class UsesPackageTestCase extends RuleTestCase {
 			}
 		}
 
-		assertNumMatches(1, rule, UsesClassInPackageBInThrow.class);
+		assertTrue(matches(rule, UsesClassInPackageBInThrow.class));
 	}
 	
 	interface IUsesClassForBaseInterface extends IInPackageB {

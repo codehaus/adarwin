@@ -20,7 +20,7 @@ public class ParentRuleTestCase extends RuleTestCase {
 	public void testNeitherExtendsNorImplements() {
 		Rule rule = new ParentRule(InPackageB.class);
 
-		assertNumMatches(0, rule, InPackageA.class);
+		assertFalse(matches(rule, InPackageA.class));
 	}
 
 	public void testExtends() {
@@ -29,7 +29,7 @@ public class ParentRuleTestCase extends RuleTestCase {
 		
 		Rule rule = new ParentRule(InPackageB.class);
 
-		assertNumMatches(1, rule, UsesClassForBaseClass.class);
+		assertTrue(matches(rule, UsesClassForBaseClass.class));
 	}
 
 	public void testImplements() {
@@ -38,7 +38,7 @@ public class ParentRuleTestCase extends RuleTestCase {
 		
 		Rule rule = new ParentRule(IInPackageB.class);
 
-		assertNumMatches(1, rule, UsesClassForBaseInterface.class);
+		assertTrue(matches(rule, UsesClassForBaseInterface.class));
 	}
 
 	static interface IUsesClassForBaseInterface extends IInPackageB {
@@ -47,6 +47,6 @@ public class ParentRuleTestCase extends RuleTestCase {
 	public void testExtendsInterface() {
 		Rule rule = new ParentRule(IInPackageB.class);
 
-		assertNumMatches(1, rule, IUsesClassForBaseInterface.class);
+		assertTrue(matches(rule, IUsesClassForBaseInterface.class));
 	}
 }

@@ -14,6 +14,6 @@ import org.adarwin.rule.UsesRule;
 
 public class UsesTestCase extends RuleTestCase {
     public void testMinimal() {
-        assertNumMatches(1, new UsesRule(new TrueRule()), String.class);
+        assertTrue(matches(new UsesRule(new TrueRule()), String.class));
     }
 }
