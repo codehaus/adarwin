@@ -2,6 +2,7 @@ package picounit.impl;
 
 
 public interface Scope {
+	boolean matches(String typeNameFilter);
 	boolean matches(Class filter);
 
 	Object value();
@@ -9,6 +10,6 @@ public interface Scope {
 	Class getType();
 
 	void setFailure(Throwable reason);
-	
+
 	Throwable getFailure();
 }

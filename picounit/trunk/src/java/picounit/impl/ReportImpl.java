@@ -14,13 +14,16 @@ public class ReportImpl implements ResultListener {
 	private final Date start;
 
 	private final Collection visited = new LinkedList();
-	
+
 	private List stack = new LinkedList();
 
-	public ReportImpl() {
+	private final MethodInvoker methodInvoker;
+
+	public ReportImpl(MethodInvoker methodInvoker) {
+		this.methodInvoker = methodInvoker;
 		this.start = new Date();
 	}
-	
+
 	public Scope[] matching(ScopeFilter scopeFilter) {
 		Collection matching = new LinkedList();
 
@@ -33,7 +36,7 @@ public class ReportImpl implements ResultListener {
 
 		return (Scope[]) matching.toArray(new Scope[matching.size()]);
 	}
-	
+
 	public int count(ScopeFilter scopeFilter) {
 		return matching(scopeFilter).length;
 	}
@@ -64,11 +67,13 @@ public class ReportImpl implements ResultListener {
 
 	public void enter(Scope scope) {
 		visited.add(scope);
-		if (Method.class.equals(scope.getType())) {
-			System.out.print(".");
-		}
 
 		stack.add(0, scope);
+
+		if (Method.class.equals(scope.getType())) {
+			System.out.print(".");
+			methodInvoker.invokeMethod((Method) scope.value());
+		}
 	}
 
 	public void exit() {
@@ -76,23 +81,14 @@ public class ReportImpl implements ResultListener {
 	}
 
 	public void exit(Throwable reason) {
-		Scope scope = (Scope) stack.remove(0);
+		Scope scope = (Scope) stack.get(0);
+		// This will cause errors to overwrite each other
 		scope.setFailure(reason);
-
-//		System.err.println("matches: " + new FailingTypeFilter(Method.class).matches(scope) +
-//			", " + scope.getType());
-//		reason.printStackTrace();
 	}
 	
-	public void error(Scope scope, Throwable reason) {
-		scope.setFailure(reason);
-		visited.add(scope);
-	}
-
 	public String toString() {
 		StringBuffer stringBuffer = new StringBuffer();
 		Scope[] failures = matching(ScopeFilter.FAILING_FILTER); 
-			//matching(new FailingTypeFilter(Method.class));
 
 		for (int index = 0; index < failures.length; index++) {
 			stringBuffer.append("Failure[" + (index + 1) + "] = " + failures[index].value() + "\n");
@@ -111,5 +107,5 @@ public class ReportImpl implements ResultListener {
 			"\nSuites: " + visitedCount(Suite.class) + ", Tests: " + visitedCount(Test.class) +
 			", Methods: " + visitedCount(Method.class) + ", Successes: " + successesCount(Method.class) +
 			", Failures: " + failuresCount() + "\n\n" + stringBuffer.toString();
-	} 
+	}
 }

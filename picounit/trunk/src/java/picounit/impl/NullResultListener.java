@@ -9,7 +9,4 @@ public class NullResultListener implements ResultListener {
 
 	public void exit(Throwable throwable) {
 	}
-
-	public void error(Scope scope, Throwable throwable) {
-	}
 }

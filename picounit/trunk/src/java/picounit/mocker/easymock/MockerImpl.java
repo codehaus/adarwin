@@ -60,6 +60,26 @@ public class MockerImpl implements Mocker {
 
 		return refinement;
 	}
+	
+	public void expectAndThrow(Object ignore, Throwable throwable) {
+		if (lastMockControl == null) {
+			throw new RuntimeException("Cannot set expected return without invoking mocked method");
+		}
+
+		lastMockControl.expectAndThrow(ignore, throwable);
+		
+		lastMockControl = null;
+	}
+	
+	public void setThrowable(Throwable throwable) {
+		if (lastMockControl == null) {
+			throw new RuntimeException("Cannot set expected return without invoking mocked method");
+		}
+
+		lastMockControl.setThrowable(throwable);
+		
+		lastMockControl = null;
+	}
 
 	public Refinement ignoreReturn(Object ignore) {
 		return expectAndReturn(ignore, null);

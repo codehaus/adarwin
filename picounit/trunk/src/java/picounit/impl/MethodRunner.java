@@ -1,6 +1,7 @@
 package picounit.impl;
 
 
+
 public interface MethodRunner {
 	void invokeMatchingMethods(Class someClass, String prefix, ScopeFactory scopeFactory);
 

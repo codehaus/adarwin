@@ -1,8 +1,11 @@
 package picounit.impl;
 
+import java.lang.reflect.Method;
 
 public interface ScopeFactory {
-	Scope createClassScope(Object scope);
+	void enterClass(Class someClass);
 
-	Scope createMethodScope(Object scope);
+	void runMethod(Method method);
+
+	void exit();
 }
