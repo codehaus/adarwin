@@ -12,7 +12,7 @@ package org.adarwin.rule;
 
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
-import org.adarwin.RuleClassBindings;
+import org.adarwin.Filter;
 import org.adarwin.UsesCodeElement;
 
 import java.util.regex.Pattern;
@@ -36,10 +36,6 @@ public class PackageRule implements Rule, Filter {
 	public boolean matches(CodeElement codeElement) {
 		return codeElement instanceof UsesCodeElement && 
 			Pattern.matches(pattern, codeElement.getClassName().getPackageName());
-	}
-
-	public String toString(RuleClassBindings ruleClassBindings) {
-		return ruleClassBindings.getRule(getClass()) + '(' + pattern + ')';
 	}
 
 	public int hashCode() {

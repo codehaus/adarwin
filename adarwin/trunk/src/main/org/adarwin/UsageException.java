@@ -11,13 +11,6 @@
 package org.adarwin;
 
 public class UsageException extends Exception {
-	public static final String USAGE = "Usage: " + Runner.class.getName() +
-	" -b <binding-file> -c <class-path> {-r <rule> | -f <rule-file>} -p";
-
-	public UsageException() {
-		this(USAGE);
-	}
-	
 	public UsageException(String message) {
 		super(message);
 	}

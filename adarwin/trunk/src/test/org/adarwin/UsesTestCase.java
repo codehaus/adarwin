@@ -13,7 +13,7 @@ package org.adarwin;
 import org.adarwin.rule.UsesRule;
 
 public class UsesTestCase extends RuleTestCase {
-    public void testMinimal() throws ADarwinException {
+    public void testMinimal() {
         assertNumMatches(1, new UsesRule(new TrueRule()), String.class);
     }
 }

@@ -11,6 +11,7 @@
 package org.adarwin;
 
 
+
 public class ConstructorInvocation extends UsesCodeElement implements Constructor {
 	private final String[] parameterTypes;
 
@@ -19,7 +20,7 @@ public class ConstructorInvocation extends UsesCodeElement implements Constructo
 	}
 
 	private ConstructorInvocation(ClassName usesClassName, String[] parameterTypes) {
-		super(usesClassName);
+		super(usesClassName, ElementType.USES);
 		this.parameterTypes = parameterTypes;
 	}
 

@@ -10,8 +10,7 @@
 
 package org.adarwin;
 
-import org.adarwin.rule.Rule;
 
 public interface RuleListener {
-	boolean matchesEvent(ClassSummary classSummary, Rule rule, Code code);
+	boolean matchesEvent(ClassSummary classSummary);
 }

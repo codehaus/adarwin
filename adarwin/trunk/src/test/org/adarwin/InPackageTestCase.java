@@ -18,11 +18,11 @@ import org.adarwin.testmodel.b.InPackageB;
 public class InPackageTestCase extends RuleTestCase {
     private final Rule rule = new SourceRule(createPackageRule(InPackageA.class));
     
-    public void testInPackage() throws ADarwinException {
+    public void testInPackage() {
     	assertNumMatches(1, rule, InPackageA.class);
     }
 
-    public void testNotInPackage() throws ADarwinException {
+    public void testNotInPackage() {
     	assertNumMatches(0, rule, InPackageB.class);
     }
 }

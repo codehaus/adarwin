@@ -13,14 +13,14 @@ package org.adarwin;
 import org.adarwin.rule.Rule;
 
 import java.io.IOException;
+import java.util.Properties;
 
-public class Runner implements IRunner {
+public class Runner {
 	public static final String BINDING = "binding";
 	public static final String CLASSPATH = "classPath";
 	public static final String RULE_EXPRESSION = "ruleExpression";
 	public static final String RULE_VIOLATED = "aDarwin rule violated";
 	public static final String MISSING_OR_EMPTY = " parameter missing or empty";
-	public static final String CLASSES_VIOLATED = "classes violated: ";
 	public static final String RULE_EVALUATION_STOPPED_EARLY = "Rule evaluation stopped early";
 
 	private final boolean printDetail;
@@ -46,9 +46,7 @@ public class Runner implements IRunner {
 	}
 
 	public final RuleConsumer ruleConsumer = new RuleConsumer() {
-		public boolean consume(final Rule rule, final Logger logger)
-			throws ADarwinException {
-
+		public boolean consume(final Rule rule, final Logger logger) {
 			class RuleListenerImpl implements RuleListener {
 				private boolean matched;
 
@@ -56,7 +54,7 @@ public class Runner implements IRunner {
 					return matched;
 				}
 
-				public boolean matchesEvent(ClassSummary classSummary, Rule rule, Code code) {
+				public boolean matchesEvent(ClassSummary classSummary) {
 					matched = true;
 					classSummary.log(logger, printDetail);
 
@@ -67,7 +65,7 @@ public class Runner implements IRunner {
 			final RuleListenerImpl ruleListener = new RuleListenerImpl();
 
 			codeProducer.produce(new CodeConsumer() {
-				public void consume(Code code) throws ADarwinException {
+				public void consume(Code code) {
 					if (!code.evaluate(rule, ruleListener)) {
 						logger.log(RULE_EVALUATION_STOPPED_EARLY);
 					}
@@ -78,7 +76,7 @@ public class Runner implements IRunner {
 		}
 	};
 
-	public void run() throws ADarwinException {
+	public void run() {
 		logger.log("Evaluating rules against: " + classPath);
 
 		class Boolean {
@@ -88,7 +86,7 @@ public class Runner implements IRunner {
 		final Boolean matches = new Boolean();
 
 		ruleProducer.produce(new RuleConsumer() {
-			public boolean consume(Rule rule, Logger logger) throws ADarwinException {
+			public boolean consume(Rule rule, Logger logger) {
 				matches.matches = matches.matches | ruleConsumer.consume(rule, logger);
 
 				return true;
@@ -100,7 +98,7 @@ public class Runner implements IRunner {
 		}
 	}
 
-	public static void verifyParameter(String value, String name) throws ADarwinException {
+	public static void verifyParameter(String value, String name) {
 		if (isParameterNullOrEmpty(value)) {
 			throw new ADarwinException(name + Runner.MISSING_OR_EMPTY);
 		}
@@ -113,8 +111,10 @@ public class Runner implements IRunner {
 
 	public static final int MIN_ARGS = 6;
 	public static final int MAX_ARGS = 7;
+	public static final String USAGE = "Usage: " + Runner.class.getName() +
+		" -b <binding-file> -c <class-path> {-r <rule> | -f <rule-file>} -p";
 
-	public static void main(String[] args) throws ADarwinException, UsageException, IOException{
+	public static void main(String[] args) throws UsageException, IOException {
 		boolean printDetail = false;
 		boolean failOnMatch = false;
 		boolean failFast = false;
@@ -123,7 +123,7 @@ public class Runner implements IRunner {
 		String ruleExpression = null;
 
 		if (args.length < MIN_ARGS || args.length > MAX_ARGS) {
-			throw new UsageException();
+			throw new UsageException(USAGE);
 		}
 
 		IFileAccessor fileAccessor = new FileAccessor();
@@ -153,7 +153,7 @@ public class Runner implements IRunner {
 				default:
 			}
 		}
-		
+
 		verifyParameter(binding, Runner.BINDING);
 		verifyParameter(classPath, Runner.CLASSPATH);
 		verifyParameter(ruleExpression, RULE_EXPRESSION);
@@ -171,12 +171,23 @@ public class Runner implements IRunner {
 				System.out.println(toLog);
 			}
 		};
+		
+		Properties ruleMapping = getProperties(binding, fileAccessor);
 
-		RuleProducer ruleBuilder = new RuleBuilder(
-			new RuleClassBindings(binding, new FileAccessor()), ruleExpression, logger);
+		RuleProducer ruleBuilder = new RuleBuilder(ruleExpression, logger, ruleMapping);
 
 		new Runner(printDetail, failOnMatch, failFast, binding, classPath,
-			logger, ruleBuilder, new CodeProducer(classPath)).run();
+			logger, ruleBuilder, new CodeProducer(classPath, fileAccessor)).run();
+	}
+
+    private static Properties getProperties(String propertiesFileName, IFileAccessor fileAccessor) {
+        try {
+			Properties properties = new Properties();
+			properties.load(fileAccessor.openFile(propertiesFileName));
+			return properties;
+		} catch (IOException e) {
+			throw new ADarwinException("Unable to loading bindings: " + propertiesFileName, e);
+		}
 	}
 
 	private static void checkMoreArgs(int currentIndex, int numArgs, String argument)
@@ -185,5 +196,15 @@ public class Runner implements IRunner {
 		if (numArgs <= currentIndex) {
 			throw new UsageException("Missing parameter after: " + argument);
 		}
+	}
+
+	public static void run(boolean printDetail, String binding, String classPath,
+		boolean failFast, boolean failOnMatch, String rule, Logger logger) {
+
+		IFileAccessor fileAccessor = new FileAccessor();
+		
+		new Runner(printDetail, failOnMatch, failFast, binding, classPath, logger,
+			new RuleBuilder(rule, logger, getProperties(binding, fileAccessor)),
+			new CodeProducer(classPath, fileAccessor)).run();
 	}
 }

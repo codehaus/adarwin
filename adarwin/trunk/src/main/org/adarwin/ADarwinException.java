@@ -10,7 +10,7 @@
 
 package org.adarwin;
 
-public class ADarwinException extends Exception {
+public class ADarwinException extends RuntimeException {
 	public ADarwinException(String message) {
 		super(message);
 	}

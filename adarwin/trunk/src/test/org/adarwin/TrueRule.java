@@ -10,16 +10,10 @@
 
 package org.adarwin;
 
-import org.adarwin.ClassSummary;
-import org.adarwin.RuleClassBindings;
 import org.adarwin.rule.Rule;
 
 
 public class TrueRule implements Rule {
-	public String toString(RuleClassBindings ruleClassBindings) {
-        return ruleClassBindings.getRule(getClass());
-    }
-
 	public ClassSummary inspect(ClassSummary classSummary) {
 		return classSummary;
 	}

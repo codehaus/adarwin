@@ -10,7 +10,6 @@
 
 package org.adarwin;
 
-import org.adarwin.rule.Filter;
 
 import java.util.Collections;
 import java.util.HashSet;

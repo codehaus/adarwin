@@ -8,7 +8,7 @@
  * Idea and Original Code by Stacy Curl                                      *
  *****************************************************************************/
 
-package org.adarwin.rule;
+package org.adarwin;
 
 public class ElementType {
 	public static final ElementType SOURCE = new ElementType("source");

@@ -14,7 +14,7 @@ import org.adarwin.rule.SourceRule;
 import org.adarwin.testmodel.a.InPackageA;
 
 public class SourceTestCase extends RuleTestCase {
-    public void testMatchesMinimalClass() throws ADarwinException {
+    public void testMatchesMinimalClass() {
         assertNumMatches(1, new SourceRule(new TrueRule()), InPackageA.class);
     }
 }

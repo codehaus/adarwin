@@ -10,7 +10,6 @@
 
 package org.adarwin;
 
-import org.adarwin.rule.ElementType;
 
 public class CodeElement {
 	public static final CodeElement[] EMPTY_ARRAY = new CodeElement[0];
@@ -19,9 +18,9 @@ public class CodeElement {
 	private final ElementType elementType;
 
 	public static CodeElement create(ClassName className, ElementType codeType) {
-		if (ElementType.USES.equals(codeType)) {
-			return UsesCodeElement.create(className);
-		}
+//		if (ElementType.USES.equals(codeType)) {
+//			return UsesCodeElement.create(className);
+//		}
 
 		return new CodeElement(className, codeType);
 	}

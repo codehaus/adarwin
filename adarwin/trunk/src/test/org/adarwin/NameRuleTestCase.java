@@ -12,33 +12,29 @@ package org.adarwin;
 
 import junit.framework.TestCase;
 
-import org.adarwin.rule.AndRule;
 import org.adarwin.rule.NameRule;
 import org.adarwin.rule.Rule;
+import org.easymock.MockControl;
+
+import java.util.Collections;
 
 public class NameRuleTestCase extends TestCase {
-	private static final String SOME_NAME = "some name";
-	
-	private RuleClassBindings ruleClassBindings;
+	public void testDelegatesToWrappedRule() {
+		MockControl ruleControl = MockControl.createNiceControl(Rule.class);
+		Rule rule = (Rule) ruleControl.getMock();
 
-	protected void setUp() throws Exception {
-		super.setUp();
+		ClassSummary classSummary = new ClassSummary(
+			new ClassName("className"), Collections.EMPTY_SET);
+		ClassSummary inspectedClassSummary = new ClassSummary(
+				new ClassName("inspectedClassName"), Collections.EMPTY_SET);
 
-		ruleClassBindings = new RuleClassBindings(
-			new String[] {"name", "and", "true"},
-			new Class[] {NameRule.class, AndRule.class, TrueRule.class}
-		);
-	}
-	
-	public void testExpression() {
-		Rule rule = new NameRule(SOME_NAME, new AndRule(new Rule[] {new TrueRule(), new TrueRule()}));
+		rule.inspect(classSummary);
+		ruleControl.setReturnValue(inspectedClassSummary);
+
+		ruleControl.replay();
+
+		assertEquals(inspectedClassSummary, new NameRule("name", rule).inspect(classSummary));
 		
-		assertEquals(SOME_NAME, rule.toString(ruleClassBindings));
-	}
-	
-	public void testBuild() {
-		Rule rule = new NameRule(SOME_NAME, new AndRule(new Rule[] {new TrueRule(), new TrueRule()})); 
-		
-		assertEquals(SOME_NAME, rule.toString(ruleClassBindings));
+		ruleControl.verify();
 	}
 }

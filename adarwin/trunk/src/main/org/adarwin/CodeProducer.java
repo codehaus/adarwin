@@ -9,12 +9,14 @@ import java.util.jar.JarFile;
 
 public class CodeProducer {
 	private final String name;
+	private final IFileAccessor fileAccessor;
 
-	public CodeProducer(String name) {
+	public CodeProducer(String name, IFileAccessor fileAccessor) {
 		this.name = name;
+		this.fileAccessor = fileAccessor;
 	}
 
-	public void produce(CodeConsumer codeConsumer) throws ADarwinException {
+	public void produce(CodeConsumer codeConsumer) {
 		try {
 			produce(name, codeConsumer);
 		}
@@ -23,37 +25,46 @@ public class CodeProducer {
 		}
 	}
 
-	private void produce(String name, CodeConsumer codeConsumer) throws ADarwinException, IOException {
+	private void produce(String name, CodeConsumer codeConsumer) throws IOException {
 		if (isClassPath(name)) {
-			StringTokenizer tokenizer = new StringTokenizer(name, File.pathSeparator);
-
-			while(tokenizer.hasMoreTokens()) {
-				produce(tokenizer.nextToken(), codeConsumer);
-			}
+			produceClassPath(name, codeConsumer);
 		}
 		else if (isClass(name)) {
-			codeConsumer.consume(new ClassFile(getFileAccessor().openFile(name)));
+			codeConsumer.consume(new ClassFile(fileAccessor.openFile(name)));
 		}
 		else if (isJar(name)) {
-			JarFile jarFile = new JarFile(name);
-			
-			for (Enumeration entries = jarFile.entries(); entries.hasMoreElements();) {
-				JarEntry entry = (JarEntry) entries.nextElement();
-			
-				if (isClass(entry.getName())) {
-					codeConsumer.consume(new ClassFile(jarFile.getInputStream(entry)));
-				}
-			}
+			produceJar(name, codeConsumer);
 		}
 		else if (isDirectory(name)) {
-			String[] fileNames = new FileAccessor().listFiles(name);
-			
-			for (int fLoop = 0; fLoop < fileNames.length; ++fLoop) {
-				produce(fileNames[fLoop], codeConsumer);
+			produceDirectory(name, codeConsumer);
+		}
+	}
+
+	private void produceClassPath(String name, CodeConsumer codeConsumer) throws IOException {
+		StringTokenizer tokenizer = new StringTokenizer(name, File.pathSeparator);
+
+		while(tokenizer.hasMoreTokens()) {
+			produce(tokenizer.nextToken(), codeConsumer);
+		}
+	}
+
+	private void produceJar(String name, CodeConsumer codeConsumer) throws IOException {
+		JarFile jarFile = new JarFile(name);
+
+		for (Enumeration entries = jarFile.entries(); entries.hasMoreElements();) {
+			JarEntry entry = (JarEntry) entries.nextElement();
+		
+			if (isClass(entry.getName())) {
+				codeConsumer.consume(new ClassFile(jarFile.getInputStream(entry)));
 			}
 		}
-		else {
-			codeConsumer.consume(Code.NULL);
+	}
+
+	private void produceDirectory(String name, CodeConsumer codeConsumer) throws IOException {
+		String[] fileNames = new FileAccessor().listFiles(name);
+
+		for (int fLoop = 0; fLoop < fileNames.length; ++fLoop) {
+			produce(fileNames[fLoop], codeConsumer);
 		}
 	}
 
@@ -70,10 +81,6 @@ public class CodeProducer {
 	}
 
 	private boolean isDirectory(String name) {
-		return getFileAccessor().isDirectory(name);
-	}
-	
-	private IFileAccessor getFileAccessor() {
-		return new FileAccessor();
+		return fileAccessor.isDirectory(name);
 	}
 }

@@ -13,7 +13,9 @@ package org.adarwin.rule;
 import org.adarwin.ClassName;
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
-import org.adarwin.RuleClassBindings;
+import org.adarwin.ElementType;
+import org.adarwin.Filter;
+import org.adarwin.UsesCodeElement;
 
 public class ParentRule implements Rule, Filter {
 	private final ClassName className;
@@ -31,11 +33,8 @@ public class ParentRule implements Rule, Filter {
 	}
 
 	public boolean matches(CodeElement codeElement) {
-		return CodeElement.create(className, ElementType.EXTENDS_OR_IMPLEMENTS).equals(codeElement);
-	}
-
-	public String toString(RuleClassBindings ruleClassBindings) {
-		return ruleClassBindings.getRule(getClass()) + '(' + className.getFullClassName() + ')';
+		return UsesCodeElement.create(className, ElementType.EXTENDS_OR_IMPLEMENTS).equals(
+			codeElement);
 	}
 
 	public int hashCode() {

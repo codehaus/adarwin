@@ -11,8 +11,6 @@
 package org.adarwin.ant;
 
 
-import org.adarwin.IRunner;
-import org.adarwin.IRunnerFactory;
 import org.adarwin.ADarwinException;
 import org.adarwin.Logger;
 import org.apache.tools.ant.BuildException;
@@ -23,36 +21,22 @@ import junit.framework.TestCase;
 // TODO: This should become an integration test and then IRunnerFactory can go
 public class ADarwinTaskTestCase extends TestCase {
 	private ADarwinTask aDarwinTask;
-	private MockControl runnerFactoryControl;
-	private IRunnerFactory runnerFactory;
-	private MockControl runnerControl;
-	private IRunner runner;
 
 	private boolean printDetail = false;
 	private boolean failFast = false;
 	private boolean failOnMatch = false;
-	private String binding = "binding";
+	private String binding = "rules.properties";
 	private String classPath = "classPath";
-	private String ruleExpression = "ruleExpression";
+	private String ruleExpression = "class(Rule)";
 	private Logger logger;
 
 	protected void setUp() throws Exception {
-		runnerFactoryControl = MockControl.createControl(IRunnerFactory.class);
-		runnerFactory = (IRunnerFactory) runnerFactoryControl.getMock();
+		logger = (Logger) MockControl.createNiceControl(Logger.class).getMock();
 
-		runnerControl = MockControl.createControl(IRunner.class);
-		runner = (IRunner) runnerControl.getMock();
-
-		aDarwinTask = new ADarwinTask(runnerFactory);
-		
-		logger = aDarwinTask.getLogger();
+		aDarwinTask = new ADarwinTask(logger);
 	}
 	
-	public void testRun() throws ADarwinException {
-		expectFactory();
-
-		runner.run();
-
+	public void testRun() {
 		replay();
 
 		setProperties();
@@ -62,13 +46,8 @@ public class ADarwinTaskTestCase extends TestCase {
 		verify();
 	}
 	
-	public void testExecuteTranslatesRuleExceptionIntoBuildException() throws ADarwinException {
-		expectFactory();
-
-		runner.run();
-		String message = "message";
-		Throwable throwable = new Throwable();
-		runnerControl.setThrowable(new ADarwinException(message, throwable));
+	public void testExecuteTranslatesRuleExceptionIntoBuildException() {
+		ruleExpression = "blah blah";
 
 		replay();
 
@@ -79,17 +58,10 @@ public class ADarwinTaskTestCase extends TestCase {
 			fail("BuildException expected");
 		}
 		catch (BuildException buildException) {
-			assertEquals(message, buildException.getMessage());
-			assertEquals(throwable, buildException.getCause());
+			assertEquals("No such rule, or variable: \"blah blah\"", buildException.getMessage());
 		}
 
 		verify();
-	}
-
-	private void expectFactory() throws ADarwinException {
-		runnerFactory.create(printDetail, binding, classPath, failFast, failOnMatch,
-			ruleExpression, logger);
-		runnerFactoryControl.setReturnValue(runner);
 	}
 
 	private void setProperties() {
@@ -102,12 +74,8 @@ public class ADarwinTaskTestCase extends TestCase {
 	}
 
 	private void replay() {
-		runnerFactoryControl.replay();
-		runnerControl.replay();
 	}
 
 	private void verify() {
-		runnerFactoryControl.verify();
-		runnerControl.verify();
 	}
 }

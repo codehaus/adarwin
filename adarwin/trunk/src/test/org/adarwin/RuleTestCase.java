@@ -22,15 +22,15 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 public abstract class RuleTestCase extends TestCase {
-	public Collection assertNumMatches(int expected, Rule rule, Class clazz) throws ADarwinException {
+	public Collection assertNumMatches(int expected, Rule rule, Class clazz) {
 		return assertNumMatches(expected, rule, new ClassFile(Util.getInputStream(clazz)));
 	}
 
-	public Collection assertNumMatches(int expected, Rule rule, Code code) throws ADarwinException {
+	public Collection assertNumMatches(int expected, Rule rule, Code code) {
 		final Set matches = new HashSet();
 
 		code.evaluate(rule, new RuleListener() {
-			public boolean matchesEvent(ClassSummary classSummary, Rule rule, Code code) {
+			public boolean matchesEvent(ClassSummary classSummary) {
 				if (!classSummary.isEmpty()) {
 					matches.add(classSummary);
 				}

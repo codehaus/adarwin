@@ -11,7 +11,6 @@
 package org.adarwin.rule;
 
 import org.adarwin.ClassSummary;
-import org.adarwin.RuleClassBindings;
 
 
 public class NotRule implements Rule {
@@ -23,10 +22,6 @@ public class NotRule implements Rule {
 
 	public ClassSummary inspect(ClassSummary classSummary) {
 		return ruleToNegate.inspect(classSummary).negate(classSummary);
-	}
-
-	public String toString(RuleClassBindings ruleClassBindings) {
-		return ruleClassBindings.getRule(getClass()) + '(' + ruleToNegate.toString(ruleClassBindings) + ')';
 	}
 
 	public int hashCode() {

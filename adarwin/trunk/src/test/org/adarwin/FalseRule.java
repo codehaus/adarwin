@@ -14,11 +14,15 @@ import org.adarwin.rule.Rule;
 
 
 public class FalseRule implements Rule {
-	public String toString(RuleClassBindings ruleClassBindings) {
-        return ruleClassBindings.getRule(getClass());
-    }
-
 	public ClassSummary inspect(ClassSummary classSummary) {
 		return classSummary.empty();
+	}
+
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+
+	public boolean equals(Object object) {
+		return object != null && getClass().equals(object.getClass());
 	}
 }

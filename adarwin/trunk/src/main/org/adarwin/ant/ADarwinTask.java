@@ -10,10 +10,9 @@
 
 package org.adarwin.ant;
 
-import org.adarwin.IRunnerFactory;
 import org.adarwin.Logger;
 import org.adarwin.ADarwinException;
-import org.adarwin.RunnerFactory;
+import org.adarwin.Runner;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
@@ -21,13 +20,11 @@ public class ADarwinTask extends Task {
 	private String classPath;
 	private String rule;
 	private String binding;
-	private boolean failOnMatch;
-	private boolean failFast;
+	private boolean failOnMatch = true;
+	private boolean failFast = false;
 	private boolean printDetail;
 
-	private IRunnerFactory runnerFactory;
-	
-	private final Logger logger = new Logger() {
+	private Logger logger = new Logger() {
 		private String prefix = null;
 
 		public void reset(String prefix) {
@@ -44,11 +41,10 @@ public class ADarwinTask extends Task {
 	};
 
 	public ADarwinTask() {
-		this(new RunnerFactory());
 	}
-
-	public ADarwinTask(IRunnerFactory runnerFactory) {
-		this.runnerFactory = runnerFactory;
+	
+	public ADarwinTask(Logger logger) {
+		this.logger = logger;
 	}
 
 	public void setPrintDetail(boolean printDetail) {
@@ -77,14 +73,9 @@ public class ADarwinTask extends Task {
 
 	public void execute() throws BuildException {
 		try {
-			runnerFactory.create(printDetail, binding, classPath, failFast,
-				failOnMatch, rule, logger).run();
+			Runner.run(printDetail, binding, classPath, failFast, failOnMatch, rule, logger);
 		} catch (ADarwinException e) {
 			throw new BuildException(e.getMessage(), e.getCause());
 		}
-	}
-
-	public Logger getLogger() {
-		return logger;
 	}
 }
