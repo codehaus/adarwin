@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 
+import org.adarwin.*;
 import org.adarwin.BuilderException;
 import org.adarwin.CodeFactory;
 import org.adarwin.ICodeFactory;
@@ -35,20 +36,16 @@ public class ADarwinTask extends Task {
 	public static final String MISSING_OR_EMPTY = " parameter missing or empty";
 	public static final String RULE_VIOLATED = "aDarwin rule violated";
 	
-	public static interface ILogger {
-		public void log(String toLog);
-	}
-	
-    private String binding;
+	private String binding;
     private String classPath;
     private String ruleExpression;
 	private boolean print;
 	private boolean failOnMatch = true;
-	private ILogger logger;
+	private Logger logger;
 	private String ruleFileName;
 	
 	public ADarwinTask() {
-		setLogger(new ILogger() {
+		setLogger(new Logger() {
 			public void log(String toLog) {
 				ADarwinTask.super.log(toLog);
 			}
@@ -95,7 +92,7 @@ public class ADarwinTask extends Task {
 		return ruleFileName;
 	}
 
-    public void setLogger(ILogger logger) {
+    public void setLogger(Logger logger) {
     	this.logger = logger;
     }
 
