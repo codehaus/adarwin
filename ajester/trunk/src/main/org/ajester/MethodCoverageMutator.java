@@ -1,5 +1,6 @@
 package org.ajester;
 
+import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Constants;
 
@@ -8,30 +9,6 @@ public class MethodCoverageMutator extends BaseMutator {
 
 	public MethodCoverageMutator(CodeMatcher codeMatcher) {
 		super(codeMatcher);
-	}
-
-	public CodeVisitor visitMethod(int access, String name, String desc, String[] exceptions) {
-		CodeVisitor codeVisitor = super.visitMethod(access, name, desc, exceptions);
-
-		if (matches(new MethodInstruction(access, name, desc, exceptions))) {
-			addMethodCoverageCall(codeVisitor, getCurrentClassName(), name);
-			addCovered();
-		}
-
-		return codeVisitor;
-	}
-	
-	public Instruction mutate(Instruction instruction) {
-		return instruction;
-	}
-
-	public void addMethodCoverageCall(CodeVisitor codeVisitor, String className,
-		String methodName) {
-
-		codeVisitor.visitLdcInsn(className);
-		codeVisitor.visitLdcInsn(methodName);
-		codeVisitor.visitMethodInsn(Constants.INVOKESTATIC, COVERAGE_CLASS,
-			Coverage.METHOD_COVERED, "(Ljava/lang/String;Ljava/lang/String;)V");
 	}
 
 	public boolean matches(Instruction instructionType) {
@@ -44,5 +21,18 @@ public class MethodCoverageMutator extends BaseMutator {
 		}
 
 		return false;
+	}
+
+	public Instruction mutate(Instruction instruction) {
+		final MethodInstruction methodInstruction = (MethodInstruction) instruction;
+		
+		return new Instruction() {
+			public void visit(ClassVisitor classVisitor, CodeVisitor codeVisitor) {
+				codeVisitor.visitLdcInsn(methodInstruction.getCurrentClassName());
+				codeVisitor.visitLdcInsn(methodInstruction.getMethodName());
+				codeVisitor.visitMethodInsn(Constants.INVOKESTATIC, COVERAGE_CLASS,
+						Coverage.METHOD_COVERED, "(Ljava/lang/String;Ljava/lang/String;)V");
+			}
+		};
 	}
 }

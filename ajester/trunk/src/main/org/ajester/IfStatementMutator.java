@@ -1,25 +1,11 @@
 package org.ajester;
 
 import org.objectweb.asm.Constants;
-import org.objectweb.asm.Label;
 
 
 public class IfStatementMutator extends BaseMutator {
 	public IfStatementMutator(CodeMatcher codeMatcher) {
 		super(codeMatcher);
-	}
-
-	public void visitJumpInsn(int opcode, Label label) {
-		mutateIfMatches(new JumpInstruction(opcode, label));
-	}
-
-	public void mutateIfMatches(Instruction instruction) {
-		if (matches(instruction)) {
-			addCovered();
-			instruction = mutate(instruction);
-		}
-		
-		instruction.visit(getClassVisitor(), getCodeVisitor());
 	}
 
 	public boolean matches(Instruction instructionType) {
