@@ -2,11 +2,9 @@ package org.ajester;
 
 import org.objectweb.asm.Constants;
 
-public class BooleanReturnInstructionMutator implements InstructionMatcher, InstructionMutator {
-	private CodeMatcher codeMatcher;
-
+public class BooleanReturnInstructionMutator extends AbstractInstructionMutator {
 	public BooleanReturnInstructionMutator(CodeMatcher codeMatcher) {
-		this.codeMatcher = codeMatcher;
+		super(codeMatcher);
 	}
 
 	public boolean matches(Instruction instruction) {
@@ -21,13 +19,9 @@ public class BooleanReturnInstructionMutator implements InstructionMatcher, Inst
 		return false;
 	}
 	
-	public Instruction mutate(Instruction instruction) {
+	public Instruction mutateImpl(Instruction instruction) {
 		OrdinaryInstruction ordinaryInstruction = (OrdinaryInstruction) instruction;
 		
 		return new OrdinaryInstruction(ordinaryInstruction.getCodeLocation(), Constants.ICONST_0);
-	}
-	
-	public CodeMatcher getCodeMatcher() {
-		return codeMatcher;
 	}
 }

@@ -1,34 +1,22 @@
 package org.ajester;
 
 import org.objectweb.asm.ClassAdapter;
-import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Label;
 
-import java.util.HashSet;
-import java.util.Set;
-
-class BaseMutator extends ClassAdapter implements Mutator {
-	private final Set mutations;
+class BaseMutator extends ClassAdapter implements ClassVisitor, CodeVisitor {
 	private CodeVisitor codeVisitor;
 	private String currentClassName;
 	private String currentMethodName;
 	
-	private final InstructionMatcher instructionMatcher;
 	private final InstructionMutator instructionMutator;
 	
 	public BaseMutator(InstructionMutator instructionMutator) {
 		super(new ReuseableClassWriter());
-		this.mutations = new HashSet();
 
-		this.instructionMatcher = instructionMutator;
 		this.instructionMutator = instructionMutator;
 		currentClassName = "";
-	}
-
-	public Set getMutations() {
-		return mutations;
 	}
 
 	public ReuseableClassWriter getClassWriter() {
@@ -48,7 +36,7 @@ class BaseMutator extends ClassAdapter implements Mutator {
 		
 		Access methodAccess = new Access(access);
 		boolean abstractOrNative = methodAccess.isAbstract || methodAccess.isNative; 
-		if (!abstractOrNative && instructionMatcher.getCodeMatcher().matches(getCurrentCodeLocation())) {
+		if (!abstractOrNative && instructionMutator.getCodeMatcher().matches(getCurrentCodeLocation())) {
 			MethodCoverageInstructionMutator mutator =
 				new MethodCoverageInstructionMutator(null);
 			
@@ -58,9 +46,7 @@ class BaseMutator extends ClassAdapter implements Mutator {
 
 			codeVisitor = this;
 			
-			if (instructionMatcher.matches(instruction)) {
-				addCovered();
-			
+			if (instructionMutator.matches(instruction)) {
 				instructionMutator.mutate(instruction).visit(getClassVisitor(), codeVisitor);
 			}
 		}
@@ -175,31 +161,31 @@ class BaseMutator extends ClassAdapter implements Mutator {
 		codeVisitor.visitLineNumber(line, start);
 	}
 
-	public String getMethodName() {
+	private String getMethodName() {
 		return currentMethodName;
 	}	
 
-	public void setMethodName(String methodName) {
+	private void setMethodName(String methodName) {
 		currentMethodName = methodName;
 	}
 
-	public String getCurrentClassName() {
+	private String getCurrentClassName() {
 		return currentClassName;
 	}
 
-	protected String getCurrentClassNameWithDots() {
+	private String getCurrentClassNameWithDots() {
 		return getCurrentClassName().replace('/', '.');
 	}
 
-	public void setCodeVisitor(CodeVisitor codeVisitor) {
+	private void setCodeVisitor(CodeVisitor codeVisitor) {
 		this.codeVisitor = codeVisitor;
 	}
 
-	public void setCurrentClassName(String name) {
+	private void setCurrentClassName(String name) {
 		this.currentClassName = name;
 	}
 	
-	protected void print(final String toPrint) {
+	private void print(final String toPrint) {
 //		System.out.println(this + "[" + getCurrentCodeLocation() + "]." +
 //			toPrint);
 	}
@@ -208,34 +194,19 @@ class BaseMutator extends ClassAdapter implements Mutator {
 		return new ConstantLookup().getOpcodeName(opcode);
 	}
 	
-	public byte[] visit(ClassReader reader) {
-		getClassWriter().reset();
-		reader.accept(this, false);
-		return getClassWriter().toByteArray();
-	}
-	
-	protected ClassVisitor getClassVisitor() {
+	private ClassVisitor getClassVisitor() {
 		return this.cv;
 	}
 	
-	protected CodeVisitor getCodeVisitor() {
+	private CodeVisitor getCodeVisitor() {
 		return codeVisitor;
 	}
 
-	protected void addCovered() {
-		mutations.add(new CodeLocation(getCurrentClassNameWithDots(), getMethodName()));
-	}
-
-	public void mutateIfMatches(Instruction instruction) {
-		if (instructionMatcher.matches(instruction)) {
-			addCovered();
+	private void mutateIfMatches(Instruction instruction) {
+		if (instructionMutator.matches(instruction)) {
 			instruction = instructionMutator.mutate(instruction);
 		}
 		
 		instruction.visit(getClassVisitor(), getCodeVisitor());
-	}
-
-	public InstructionMutator getInstructionMutator() {
-		return instructionMutator;
 	}
 }
