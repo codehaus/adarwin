@@ -18,8 +18,10 @@ public interface IFileAccessor {
 	String[] listFiles(String directory);
 
 	InputStream openFile(String name) throws FileNotFoundException;
-	
+
 	String readFile(String name) throws IOException;
 
 	boolean isDirectory(String name);
+
+	IFileIterator files(String directory);
 }

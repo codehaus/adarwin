@@ -44,29 +44,71 @@ public class RuleBuilder implements RuleProducer {
     	String[] subExpressions = parse(ruleExpression);
 
     	for (int rLoop = 0; rLoop < subExpressions.length; rLoop++) {
-    		String subExpression = subExpressions[rLoop].trim();
-			String ruleName = getRuleName(subExpression);
-
-			if (subExpression.indexOf('=') == -1) {
-				Rule rule = getRuleOrVariable(subExpression);
-
-				if (rule instanceof NameRule) {
-					logger.reset(CLASSES_VIOLATED + ((NameRule) rule).getName());
-				}
-				else {
-					logger.reset(CLASSES_VIOLATED + subExpression);
-				}
-
-				ruleConsumer.consume(rule, logger);
-			}
-			else if (getClass(ruleName) == null) {
-				throw new ADarwinException("No such rule: " + ruleName);
-			}
-			else {
-				variables.put(getVariableName(subExpression), buildRule(ruleName, subExpression));
-			}
+			produceRule(ruleConsumer, subExpressions[rLoop].trim());
     	}
     }
+
+	private void produceRule(RuleConsumer ruleConsumer, String subExpression) {
+		String ruleName = getRuleName(subExpression);
+
+		if (subExpression.indexOf('=') == -1) {
+			Rule rule = getRuleOrVariable(subExpression);
+
+			if (rule instanceof NameRule) {
+				logger.reset(CLASSES_VIOLATED + ((NameRule) rule).getName());
+			}
+			else {
+				logger.reset(CLASSES_VIOLATED + subExpression);
+			}
+
+			ruleConsumer.consume(rule, logger);
+		}
+		else if (getClass(ruleName) == null) {
+			throw new ADarwinException("No such rule: " + ruleName);
+		}
+		else {
+			variables.put(getVariableName(subExpression), buildRule(ruleName, subExpression));
+		}
+	}
+
+	public RuleIterator iterator() {
+		return new RuleIterator() {
+			String[] subExpressions = parse(ruleExpression);
+			int index = 0;
+
+			public boolean hasNext() {
+				return index < subExpressions.length;
+			}
+
+			public Rule next() {
+				if (hasNext()) {
+					String subExpression = subExpressions[index++];
+					String ruleName = getRuleName(subExpression);
+
+					if (subExpression.indexOf('=') == -1) {
+						Rule rule = getRuleOrVariable(subExpression);
+
+						if (rule instanceof NameRule) {
+							logger.reset(CLASSES_VIOLATED + ((NameRule) rule).getName());
+						}
+						else {
+							logger.reset(CLASSES_VIOLATED + subExpression);
+						}
+
+						return rule;
+					}
+					else if (RuleBuilder.this.getClass(ruleName) == null) {
+						throw new ADarwinException("No such rule: " + ruleName);
+					}
+					else {
+						variables.put(getVariableName(subExpression), buildRule(ruleName, subExpression));
+					}
+				}
+
+				return Rule.NULL;
+			}
+		};
+	}
 
 	private Rule getRuleOrVariable(String expression) {
 		String ruleName = getRuleName(expression);

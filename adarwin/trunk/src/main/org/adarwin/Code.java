@@ -13,5 +13,11 @@ package org.adarwin;
 import org.adarwin.rule.Rule;
 
 public interface Code {
+	Code NULL = new Code() {
+		public boolean evaluate(Rule rule, RuleListener ruleListener) {
+			return false;
+		}
+	};
+
 	boolean evaluate(Rule rule, RuleListener ruleListener);
 }
