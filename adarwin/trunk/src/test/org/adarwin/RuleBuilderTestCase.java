@@ -22,11 +22,13 @@ import org.adarwin.rule.UsesRule;
 import org.easymock.MockControl;
 
 public class RuleBuilderTestCase extends RuleTestCase {
-	private final MockControl ruleBuilderListenerControl =
+	private final MockControl ruleConsumerControl =
 		MockControl.createNiceControl(RuleConsumer.class);
-	private final RuleConsumer ruleBuilderListener =
-		(RuleConsumer) ruleBuilderListenerControl.getMock();
+	private final RuleConsumer ruleConsumer = (RuleConsumer) ruleConsumerControl.getMock();
 	
+	private final MockControl loggerControl = MockControl.createNiceControl(Logger.class);
+	private final Logger logger = (Logger) loggerControl.getMock();
+
 	private final RuleClassBindings ruleClassBindings = new RuleClassBindings(
 		new String[] {
 			"true", "and", "parent", "constructor", "src", "package", "method", "uses", "not"
@@ -36,7 +38,6 @@ public class RuleBuilderTestCase extends RuleTestCase {
 			SourceRule.class, PackageRule.class, MethodRule.class, UsesRule.class,
 			NotRule.class
 		});
-	private final RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
 
     public void testTrueRuleGrammer() throws ADarwinException {
     	assertEquals(new TrueRule(), "true");
@@ -87,55 +88,54 @@ public class RuleBuilderTestCase extends RuleTestCase {
 	}
 
     public void testUnknownRule() {
-		ruleBuilderListenerControl.replay();
+		ruleConsumerControl.replay();
 
 		try {
-        	ruleBuilder.buildRule("gobbledygook", ruleBuilderListener);
+			produceRules("gobbledygook");
 
 			fail();
 		}
 		catch (ADarwinException be) {
-			assertEquals("No such rule: " + "gobbledygook", be.getMessage());
+			assertEquals("No such rule: " + "\"gobbledygook\"", be.getMessage());
 		}
 
-		ruleBuilderListenerControl.verify();
+		ruleConsumerControl.verify();
     }
 
 	public void testUnbalancedBrackets() {
-		ruleBuilderListenerControl.replay();
+		ruleConsumerControl.replay();
 
 		String expression = "(";
 		try {
-			new RuleBuilder(null).buildRule(expression, ruleBuilderListener);
+			produceRules("(");
 			fail();
 		}
 		catch (ADarwinException be) {
 			assertEquals("Unbalanced expression: \"" + expression + "\"", be.getMessage());
 		}
-		ruleBuilderListenerControl.verify();
+		ruleConsumerControl.verify();
 	}
 
 	public void testMultipleRules() throws ADarwinException {
 		expectRule(new TrueRule());
 		expectRule(new TrueRule());
 
-		ruleBuilderListenerControl.replay();
+		ruleConsumerControl.replay();
 
-		ruleBuilder.produce("true, true", ruleBuilderListener);
+		produceRules("true, true");
 
-		ruleBuilderListenerControl.verify();
+		ruleConsumerControl.verify();
 	}
 
 	public void testMultipleComplexRules() throws ADarwinException {
 		expectRule(new SourceRule(new PackageRule("package-a")));
 		expectRule(new SourceRule(new PackageRule("package-b")));
 
-		ruleBuilderListenerControl.replay();
+		ruleConsumerControl.replay();
 
-		ruleBuilder.produce("src(package(package-a)),src(package(package-b))",
-			ruleBuilderListener);
+		produceRules("src(package(package-a)),src(package(package-b))");
 
-		ruleBuilderListenerControl.verify();
+		ruleConsumerControl.verify();
 	}
 
 	public void testWhiteSpaceBetweenRulesIsIrrelevant() throws ADarwinException {
@@ -143,31 +143,23 @@ public class RuleBuilderTestCase extends RuleTestCase {
 		expectRule(expectedRule);
 		expectRule(expectedRule);
 
-		ruleBuilderListenerControl.replay();
+		ruleConsumerControl.replay();
 
-		ruleBuilder.produce("and(true, true) \t\n, \n\n\t and(true, true)",
-			ruleBuilderListener);
+		produceRules("and(true, true) \t\n, \n\n\t and(true, true)");
 
-		ruleBuilderListenerControl.verify();
+		ruleConsumerControl.verify();
 	}
 
 	public void testWhiteSpaceBetweenVariableAssignmentIsIrrelevant() throws ADarwinException {
-		RuleClassBindings ruleClassBindings = new RuleClassBindings(new String[] {"and", "true"},
-			new Class[] {AndRule.class, TrueRule.class});
+		ruleConsumer.consume(new AndRule(new Rule[] {new TrueRule()}), logger);
+		ruleConsumerControl.setReturnValue(true);
+		ruleConsumerControl.replay();
 
-		RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
+		produceRules("var = true(), and(true)");
 
-		String variable = "and(true, true)";
-		String expression = "var = " + variable;
-
-		Rule rule = ruleBuilder.buildRule(expression);
-
-		assertEquals(Rule.NULL, rule);
-
-		Rule var = ruleBuilder.getVariable("var");
-
-		assertEquals(variable, var.toString(ruleClassBindings));
+		ruleConsumerControl.verify();
 	}
+
 //	
 //	public void testVariableAssignment() {
 //		
@@ -204,15 +196,21 @@ public class RuleBuilderTestCase extends RuleTestCase {
 	private void assertEquals(Rule expectedRule, String expression) throws ADarwinException {
 		expectRule(expectedRule);
 
-		ruleBuilderListenerControl.replay();
+		ruleConsumerControl.replay();
+		loggerControl.replay();
 
-		ruleBuilder.buildRule(expression, ruleBuilderListener);
+		produceRules(expression);
 
-		ruleBuilderListenerControl.verify();
+		ruleConsumerControl.verify();
+		loggerControl.verify();
+	}
+
+	private void produceRules(String expression) throws ADarwinException {
+		new RuleBuilder(ruleClassBindings, expression, logger).produce(ruleConsumer);
 	}
 
 	private void expectRule(Rule rule) throws ADarwinException {
-		ruleBuilderListener.consume(rule, ruleClassBindings);
-		ruleBuilderListenerControl.setReturnValue(true);
+		ruleConsumer.consume(rule, logger);
+		ruleConsumerControl.setReturnValue(true);
 	}
 }

@@ -36,9 +36,8 @@ public class NameRuleTestCase extends TestCase {
 		assertEquals(SOME_NAME, rule.toString(ruleClassBindings));
 	}
 	
-	public void testBuild() throws ADarwinException {
-		Rule rule = new RuleBuilder(ruleClassBindings).buildRule(
-			"name(" + SOME_NAME + ", and(true, true))");
+	public void testBuild() {
+		Rule rule = new NameRule(SOME_NAME, new AndRule(new Rule[] {new TrueRule(), new TrueRule()})); 
 		
 		assertEquals(SOME_NAME, rule.toString(ruleClassBindings));
 	}

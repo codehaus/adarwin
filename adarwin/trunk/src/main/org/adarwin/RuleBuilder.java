@@ -11,8 +11,6 @@
 package org.adarwin;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,119 +22,64 @@ import org.adarwin.rule.Rule;
 public class RuleBuilder implements RuleProducer {
     private final RuleClassBindings ruleClassBindings;
     private final Map variables = new HashMap();
-
-    public RuleBuilder(RuleClassBindings ruleClassBindings) {
-        this.ruleClassBindings = ruleClassBindings;
-    }
-
-    public void produce(String expression, RuleConsumer ruleBuilderListener)
+	private final String ruleExpression;
+	private final Logger logger;
+	
+    public RuleBuilder(RuleClassBindings ruleClassBindings, String ruleExpression, Logger logger)
 		throws ADarwinException {
 
-    	String[] subExpression = parse(expression);
+        this.ruleClassBindings = ruleClassBindings;
+		this.logger = logger;
+		this.ruleExpression = ruleExpression.replaceAll("\\s++", " ").replaceAll(",\\s++", ",");
 
+		if (!Util.balanced(ruleExpression, '(', ')')) {
+			throw new ADarwinException("Unbalanced expression: \"" + ruleExpression + "\"");
+		}
+    }
+
+	public void produce(RuleConsumer ruleConsumer) throws ADarwinException {
+    	String[] subExpression = parse(ruleExpression);
+    	
     	for (int rLoop = 0; rLoop < subExpression.length; rLoop++) {
-    		buildRule(subExpression[rLoop], ruleBuilderListener);
+    		Rule rule = buildRule(subExpression[rLoop].trim());
+
+			logger.reset(Runner.CLASSES_VIOLATED + rule.toString(ruleClassBindings));
+
+			ruleConsumer.consume(rule, logger);
     	}
     }
 
-	public Rule[] buildRules(String expression) throws ADarwinException {
-		String[] subExpression = parse(expression);
+    private Rule buildRule(String expression) throws ADarwinException {
+		String variable = getVariableValue(expression);
+		String name = getName(expression);
 
-		List rules = new ArrayList(subExpression.length);
-
-		for (int rLoop = 0; rLoop < subExpression.length; rLoop++) {
-			rules.add(buildRule(subExpression[rLoop]));
+		if (ruleClassBindings.getClass(name) == null) {
+			throw new ADarwinException("No such rule: \"" + name + "\"");
 		}
 
-		return (Rule[]) rules.toArray(new Rule[0]);
-	}
+		if (variables.get(name) != null) {
+			return (Rule) variables.get(name);
+		}
 
-    public Rule buildRule(String expression) throws ADarwinException {
-		checkBalancedParathesis(expression);
-        try {
-        	String variable = getVariableValue(expression);
-			String name = getName(expression);
-			
-			if (variables.get(name) != null) {
-				return getVariable(name);
-			}
-			
-            Rule rule = buildRule(name, getParameters(expression));
-            if (variable != null && variable.length() > 0) {
-            	variables.put(variable, rule);
-            	return Rule.NULL;
-            }
-            return rule;
-        } catch (ADarwinException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ADarwinException(e);
+        Rule rule = buildRule(name, getParameters(expression));
+
+        if (variable != null && variable.length() > 0) {
+        	variables.put(variable, rule);
+        	return Rule.NULL;
         }
+
+        return rule;
     }
-
-    public Rule buildRule(String expression, RuleConsumer ruleBuilderListener)
-		throws ADarwinException {
-
-		checkBalancedParathesis(expression);
-        try {
-        	String variable = getVariableValue(expression);
-			String name = getName(expression);
-			
-			if (variables.get(name) != null) {
-				Rule variableValue = getVariable(name);
-				ruleBuilderListener.consume(variableValue, ruleClassBindings);
-				return variableValue;
-			}
-			
-            Rule rule = buildRule(name, getParameters(expression));
-            if (variable != null && variable.length() > 0) {
-            	variables.put(variable, rule);
-            	ruleBuilderListener.consume(Rule.NULL, ruleClassBindings);
-            	return Rule.NULL;
-            }
-            ruleBuilderListener.consume(rule, ruleClassBindings);
-            return rule;
-        } catch (ADarwinException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ADarwinException(e);
-        }
-    }
-
-    public Rule getVariable(String name) {
-		return (Rule) variables.get(name);
-	}
 
 	private String getVariableValue(String expression) {
-		expression = expression.replaceAll("\\s++", "");
-		
 		if (expression.indexOf('=') != -1) {
 			return expression.substring(0, expression.indexOf('='));
 		}
+
 		return "";
-
-	}
-	private void checkBalancedParathesis(String expression) throws ADarwinException {
-		if (countNumberOf(expression, "(") != countNumberOf(expression, ")")) {
-			throw new ADarwinException("Unbalanced expression: \"" + expression + "\"");
-		}
 	}
 
-	private int countNumberOf(String searchIn, String searchFor) {
-		int count = 0;
-		int pos = pos = searchIn.indexOf(searchFor, 0);
-		while (pos != -1) {
-			count++;
-			pos += searchFor.length();
-			pos = searchIn.indexOf(searchFor, pos);
-		}
-
-		return count;
-	}
-
-	private String getName(String expression) {
-		expression = expression.replaceAll("\\s++", "");
-		
+	private String getName(final String expression) {
 		int startOfName = 0;
 		
 		if (expression.indexOf('=') != -1) {
@@ -149,12 +92,10 @@ public class RuleBuilder implements RuleProducer {
 			endOfName = expression.indexOf('(');
         }
 
-		return expression.substring(startOfName, endOfName);        
+		return expression.substring(startOfName, endOfName).trim();        
     }
 
-    private String[] getParameters(String expression) {
-		expression = expression.replaceAll(",\\s++", ",");
-    	
+    private String[] getParameters(final String expression) {
         String[] parameters = new String[0];
 
         int firstParathesesPos = expression.indexOf('(');
@@ -191,21 +132,14 @@ public class RuleBuilder implements RuleProducer {
         return parameters;
     }
 
-    private Rule buildRule(String name, String[] arguments) throws ADarwinException,
-    	IllegalAccessException, InstantiationException, InvocationTargetException {
+    private Rule buildRule(String name, String[] arguments) throws ADarwinException {
+		Constructor constructor = getConstructor(name, arguments);
 
-        Class ruleClass = ruleClassBindings.getClass(name);
-
-		if (ruleClass == null) {
-			throw new ADarwinException("No such rule: " + name);
-		}
-
-		Constructor ruleConstructor = getConstructor(name, ruleClass, arguments);
-		if (!hasAggregateForm(ruleConstructor)) {
+		if (!hasAggregateForm(constructor)) {
 			Object[] constructorParameters = new Object[arguments.length];
 
 			for (int cLoop = 0; cLoop < constructorParameters.length; cLoop++) {
-				if (Rule.class.isAssignableFrom(ruleConstructor.getParameterTypes()[cLoop])) {
+				if (Rule.class.isAssignableFrom(constructor.getParameterTypes()[cLoop])) {
 					constructorParameters[cLoop] = buildRule(arguments[cLoop]);
 				}
 				else {
@@ -213,50 +147,48 @@ public class RuleBuilder implements RuleProducer {
 				}
 			}
 
-			return (Rule) ruleConstructor.newInstance(constructorParameters);
+			return (Rule) constructRule(constructor, constructorParameters);
 		}
-		else if (ruleConstructor.getParameterTypes()[0].equals(Rule[].class)) {
+		else if (constructor.getParameterTypes()[0].equals(Rule[].class)) {
 			Rule[] constructorParameter = new Rule[arguments.length];
 
 			for (int cLoop = 0; cLoop < arguments.length; cLoop++) {
 				constructorParameter[cLoop] = buildRule(arguments[cLoop]);
 			}
-			
-			return (Rule) ruleConstructor.newInstance(new Object[] {constructorParameter});
+
+			return (Rule) constructRule(constructor, new Object[] {constructorParameter});
 		}
 		else {
-			return (Rule) ruleConstructor.newInstance(new Object[] {arguments});
+			return (Rule) constructRule(constructor, new Object[] {arguments});
 		}
     }
 
-    private Constructor getConstructor(String name, Class ruleClass, String[] arguments)
+    private Object constructRule(Constructor constructor, Object[] constructorParameters)
 		throws ADarwinException {
 
-		Constructor[] constructors = ruleClass.getConstructors();
+		try {
+			return constructor.newInstance(constructorParameters);
+		} catch (Exception e) {
+			throw new ADarwinException(e);
+		}
+	}
+
+	private Constructor getConstructor(String ruleName, String[] arguments)
+		throws ADarwinException {
+
+		Constructor[] constructors = ruleClassBindings.getClass(ruleName).getConstructors();
 
 		for (int cLoop = 0; cLoop < constructors.length; ++cLoop) {
 			Constructor constructor = constructors[cLoop];
 
-			if (hasCorrectSignature(name, constructor, arguments.length)) {
+			if (hasCorrectSignature(ruleName, constructor, arguments.length)) {
 				return constructor;
 			}
 		}
 
-		throw new ADarwinException("No constructor for: " + name + '(' + concat(arguments) + ')');
+		throw new ADarwinException(
+			"No constructor for: " + ruleName + '(' + Util.concat(arguments) + ')');
     }
-
-	private String concat(Object[] arguments) {
-		StringBuffer buffer = new StringBuffer();
-
-			for (int aLoop = 0; aLoop < arguments.length; aLoop++) {
-				if (aLoop != 0) {
-					buffer.append(", ");
-				}
-				buffer.append(arguments[aLoop]);
-			}
-
-		return buffer.toString();
-	}
 
 	private boolean hasCorrectSignature(String name, Constructor constructor, int length) {
 		return hasCorrectSimpleForm(constructor, length) ||
@@ -290,7 +222,7 @@ public class RuleBuilder implements RuleProducer {
 
 	public static String[] parse(String expression) {
 		StringBuffer buffer = new StringBuffer(expression);
-		
+
 		int depth = 0;
 		for (int bLoop = 0; bLoop < buffer.length(); ++bLoop) {
 			switch (buffer.charAt(bLoop)) {
@@ -307,7 +239,7 @@ public class RuleBuilder implements RuleProducer {
 					break;
 			}
 		}
-		
+
 		return simpleParse(buffer.toString(), ";");
 	}
 

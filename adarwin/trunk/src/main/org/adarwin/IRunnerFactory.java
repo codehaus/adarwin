@@ -12,6 +12,5 @@ package org.adarwin;
 
 public interface IRunnerFactory {
 	IRunner create(boolean printDetail, String binding, String classPath, boolean failFast,
-		boolean failOnMatch, String ruleExpression, Logger logger, RuleConsumer ruleBuilderListener)
-			throws ADarwinException;
+		boolean failOnMatch, String ruleExpression, Logger logger) throws ADarwinException;
 }

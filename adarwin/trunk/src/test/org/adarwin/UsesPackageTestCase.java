@@ -16,8 +16,6 @@ import org.adarwin.testmodel.b.ExceptionInPackageB;
 import org.adarwin.testmodel.b.IInPackageB;
 import org.adarwin.testmodel.b.InPackageB;
 
-import java.io.IOException;
-
 public class UsesPackageTestCase extends RuleTestCase {
     private final Rule rule = new UsesRule(createPackageRule(InPackageB.class));
 

@@ -12,14 +12,14 @@ package org.adarwin;
 
 public class RunnerFactory implements IRunnerFactory {
 	public IRunner create(boolean printDetail, String binding, String classPath, boolean failFast,
-		boolean failOnMatch, String ruleExpression, Logger logger, RuleConsumer ruleBuilderListener)
-			throws ADarwinException {
+		boolean failOnMatch, String ruleExpression, Logger logger) throws ADarwinException {
 
 		IFileAccessor fileAccessor = new FileAccessor();
 
-		RuleProducer ruleBuilder = new RuleBuilder(new RuleClassBindings(binding, fileAccessor));
+		RuleProducer ruleProducer = new RuleBuilder(new RuleClassBindings(binding, fileAccessor),
+			ruleExpression, logger);
 
-		return new Runner(printDetail, failOnMatch, failFast, binding, classPath, ruleExpression,
-			logger, ruleBuilderListener, ruleBuilder, new CodeProducer(classPath));
+		return new Runner(printDetail, failOnMatch, failFast, binding, classPath, logger,
+			ruleProducer, new CodeProducer(classPath));
 	}
 }

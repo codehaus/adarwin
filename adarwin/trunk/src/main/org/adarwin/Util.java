@@ -43,6 +43,14 @@ public class Util {
 		return clazz.getResourceAsStream(className(clazz) + ".class");
 	}
 
+	public static String concat(Object[] arguments) {
+		StringBuffer buffer = new StringBuffer();
+
+		appendArray(buffer, arguments);
+
+		return buffer.toString();
+	}
+
 	public static void appendArray(StringBuffer buffer, Object[] array) {
 		for (int pLoop = 0; pLoop < array.length; pLoop++) {
 			if (pLoop != 0) {
@@ -89,5 +97,22 @@ public class Util {
 		}
 
 		return true;
+	}
+
+	public static boolean balanced(String searchIn, char left, char right) {
+		return countNumberOf(searchIn, left) == countNumberOf(searchIn, right);
+	}
+
+	public static int countNumberOf(String searchIn, char searchFor) {
+		int count = 0;
+		byte[] chars = searchIn.getBytes();
+
+		for (int cLoop = 0; cLoop < chars.length; cLoop++) {
+			if (chars[cLoop] == searchFor) {
+				count++;
+			}
+		}
+
+		return count;
 	}
 }

@@ -11,22 +11,13 @@
 package org.adarwin;
 
 import org.adarwin.rule.ClassRule;
-import org.adarwin.rule.Rule;
-import org.adarwin.testmodel.a.InPackageA;
 
 public class ClassRuleTestCase extends RuleTestCase {
-    private final RuleBuilder ruleBuilder =
-    	new RuleBuilder(new RuleClassBindings("class", ClassRule.class));
-
 	public void testNonMatchingClass() throws ADarwinException {
-		Rule rule = ruleBuilder.buildRule("class(Fred)");
-
-		assertNumMatches(0, rule, InPackageA.class);
+		assertNumMatches(0, new ClassRule("Fred"), String.class);
     }
 
     public void testMatchingClass() throws ADarwinException {
-        Rule rule = ruleBuilder.buildRule("class(In.*)");
-
-        assertNumMatches(1, rule, InPackageA.class);
+        assertNumMatches(1, new ClassRule("St.*"), String.class);
     }
 }
