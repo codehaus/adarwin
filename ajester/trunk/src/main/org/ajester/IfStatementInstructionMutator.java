@@ -2,7 +2,11 @@ package org.ajester;
 
 import org.objectweb.asm.Constants;
 
-public class IfStatementInstructionMutator implements InstructionMutator {
+public class IfStatementInstructionMutator extends IfStatementMatcher implements InstructionMutator {
+	public IfStatementInstructionMutator(CodeMatcher codeMatcher) {
+		super(codeMatcher);
+	}
+
 	public Instruction mutate(Instruction instruction) {
 		JumpInstruction jumpInstruction = (JumpInstruction) instruction;
 

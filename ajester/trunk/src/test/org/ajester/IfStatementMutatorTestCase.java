@@ -14,7 +14,7 @@ public class IfStatementMutatorTestCase extends TestCase {
 		super.setUp();
 
 		matcher = new IfStatementMatcher(new CodeLocationMatcher(IfEqualsStatement.LOCATION));
-		mutator = new IfStatementInstructionMutator();
+		mutator = new IfStatementInstructionMutator(new CodeLocationMatcher(IfEqualsStatement.LOCATION));
 	}
 
 	public void testMutatesMatchingMethod() {

@@ -10,8 +10,7 @@ public class MutateBooleanReturnTestCase extends TestCase {
 	public void testMutatingBooleanModelCausesBooleanTestToFail() throws Exception {
 		Report report = new TestRunnerWrapper().run(
 			BooleanReturnTestCase.class,
-				new BooleanReturnMatcher(new CodeLocationMatcher(BooleanReturn.LOCATION)),
-				new BooleanReturnInstructionMutator());
+				new BooleanReturnInstructionMutator(new CodeLocationMatcher(BooleanReturn.LOCATION)));
 
 		assertEquals(1, report.getFailures().size());
 		assertEquals(0, report.getErrors().size());
@@ -22,8 +21,7 @@ public class MutateBooleanReturnTestCase extends TestCase {
 	public void testMutatingSomeOtherClassLeavesBooleanTestPassing() throws Exception {
 		Report report = new TestRunnerWrapper().run(
 			BooleanReturnTestCase.class,
-				new BooleanReturnMatcher(new CodeLocationMatcher(IfEqualsStatement.LOCATION)),
-				new BooleanReturnInstructionMutator());
+				new BooleanReturnInstructionMutator(new CodeLocationMatcher(IfEqualsStatement.LOCATION)));
 
 		assertEquals(0, report.getFailures().size());
 		assertEquals(0, report.getErrors().size());

@@ -2,7 +2,11 @@ package org.ajester;
 
 import org.objectweb.asm.Constants;
 
-public class BooleanReturnInstructionMutator implements InstructionMutator {
+public class BooleanReturnInstructionMutator extends BooleanReturnMatcher implements InstructionMutator {
+	public BooleanReturnInstructionMutator(CodeMatcher codeMatcher) {
+		super(codeMatcher);
+	}
+
 	public Instruction mutate(Instruction instruction) {
 		OrdinaryInstruction ordinaryInstruction = (OrdinaryInstruction) instruction;
 		

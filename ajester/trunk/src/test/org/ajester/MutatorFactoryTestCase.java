@@ -6,12 +6,12 @@ import junit.framework.TestCase;
 
 public class MutatorFactoryTestCase extends TestCase {
 	public void testSomething() throws Exception {
-		MutatorFactory mutatorFactory = new MutatorFactory(BooleanReturnMutator.class);
-		Mutator mutator = mutatorFactory.createMutator(
+		MutatorFactory mutatorFactory = new MutatorFactory(BooleanReturnInstructionMutator.class);
+		InstructionMutator mutator = mutatorFactory.createMutator(
 			new CodeLocationMatcher(BooleanReturn.LOCATION));
 		
 		assertNotNull(mutator);
-		assertEquals(BooleanReturnMutator.class, mutator.getClass());
+		assertEquals(BooleanReturnInstructionMutator.class, mutator.getClass());
 //		assertEquals(BooleanReturn.GET_TRUE_LOCATION, mutator.getCodeMatcher());
 	}
 }

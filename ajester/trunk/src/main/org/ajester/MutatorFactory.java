@@ -10,9 +10,9 @@ public class MutatorFactory {
 		this.constructor = mutatorClass.getConstructor(new Class[] {CodeMatcher.class});
 	}
 	
-	public Mutator createMutator(CodeMatcher codeMatcher) throws IllegalArgumentException,
+	public InstructionMutator createMutator(CodeMatcher codeMatcher) throws IllegalArgumentException,
 		InstantiationException, IllegalAccessException, InvocationTargetException {
 
-		return (Mutator) constructor.newInstance(new Object[] {codeMatcher});		
+		return (InstructionMutator) constructor.newInstance(new Object[] {codeMatcher});		
 	}
 }

@@ -8,8 +8,7 @@ import junit.framework.TestCase;
 public class MutateNopTestCase extends TestCase {
 	public void testMutateBooleanReturnLeavesTestPassing() throws Exception {
 		Report report = new TestRunnerWrapper().run(NopTestCase.class,
-			new BooleanReturnMatcher(new CodeLocationMatcher(Nop.NOP_LOCATION)),
-			new BooleanReturnInstructionMutator());
+			new BooleanReturnInstructionMutator(new CodeLocationMatcher(Nop.NOP_LOCATION)));
 
 		assertEquals(0, report.getFailures().size());
 		assertEquals(0, report.getErrors().size());
