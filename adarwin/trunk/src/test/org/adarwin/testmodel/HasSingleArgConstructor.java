@@ -8,8 +8,10 @@
  * Idea and Original Code by Stacy Curl                                      *
  *****************************************************************************/
 
-package org.adarwin.testmodel.b;
+package org.adarwin.testmodel;
 
-public class ExceptionInPackageB extends RuntimeException {
-
+public class HasSingleArgConstructor {
+	public HasSingleArgConstructor(Integer integer) {
+		
+	}
 }

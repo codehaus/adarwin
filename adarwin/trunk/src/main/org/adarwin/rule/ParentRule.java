@@ -13,27 +13,24 @@ package org.adarwin.rule;
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
 import org.adarwin.RuleClassBindings;
-import org.adarwin.Util;
 
 public class ParentRule implements Rule {
-	private String packageName;
-	private String className;
+	private String fullyQualifiedClassName;
 
-	public ParentRule(String packageName, String className) {
-		this.packageName = packageName;
-		this.className = className;
+	public ParentRule(String fullyQualifiedClassName) {
+		this.fullyQualifiedClassName = fullyQualifiedClassName;
 	}
 
 	public ParentRule(Class clazz) {
-		this(Util.packageName(clazz), Util.className(clazz));
+		this(clazz.getName());
 	}
 
 	public boolean inspect(ClassSummary classSummary) {
-		return classSummary.getDependancies().contains(new CodeElement(packageName + "." + className,
+		return classSummary.getDependancies().contains(new CodeElement(fullyQualifiedClassName,
 			ElementType.EXTENDS_OR_IMPLEMENTS));
 	}
 
 	public String toString(RuleClassBindings ruleClassBindings) {
-		return ruleClassBindings.getRule(getClass()) + '(' + packageName + ", " + className + ')';
+		return ruleClassBindings.getRule(getClass()) + '(' + fullyQualifiedClassName + ')';
 	}
 }

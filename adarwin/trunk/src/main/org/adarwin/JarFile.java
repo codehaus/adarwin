@@ -22,7 +22,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.adarwin.rule.Rule;
 
-public class JarFile extends CodeBase {
+public class JarFile implements Code {
     private String fileName;
 
 	public static String createJarFile(Class clazz) throws IOException {

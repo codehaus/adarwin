@@ -8,8 +8,18 @@
  * Idea and Original Code by Stacy Curl                                      *
  *****************************************************************************/
 
-package org.adarwin.testmodel.b;
+package org.adarwin;
 
-public class ExceptionInPackageB extends RuntimeException {
+import java.io.IOException;
 
+import org.adarwin.rule.Rule;
+
+import junit.framework.Assert;
+
+public class TestUtil {
+	public void assertRuleMatchingCount(int expectedCount, Rule rule, Class clazz)
+		throws IOException {
+		
+		Assert.assertEquals(expectedCount, new ClassFile(clazz).evaluate(rule).getCount());
+	}
 }
