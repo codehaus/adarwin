@@ -1,4 +1,9 @@
 <?xml version="1.0"?>
+
+<!DOCTYPE project [
+    <!ENTITY eacute "&#233;">
+]>
+
 <project>
     <pomVersion>3</pomVersion>
     <name>aDarwin</name>
@@ -22,7 +27,7 @@
                 <role>Java Developer</role>
             </roles>
         </developer>
-    </developer>
+    </developers>
 
     <contributors>
         <contributor>
