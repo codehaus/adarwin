@@ -1,0 +1,9 @@
+Fail fast (first rule passes stops further introspection of the whole path)
+
+When a rule that requires another rule(s) as a parameter is constructed, if the
+parameter does not match a rule let the Exception point out that the rule requires a
+rule as a parameter, not a String.
+
+Make the counter more accurate!
+
+Add code to test that true rules always work, regardless of the amount of code
