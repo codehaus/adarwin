@@ -1,5 +1,7 @@
 package picounit.around.setup;
 
+import picounit.Suite;
+import picounit.Test;
 import picounit.impl.MethodInvoker;
 import picounit.test.PicoResolver;
 
@@ -16,10 +18,19 @@ public class SetUpAroundImpl implements SetUpAround {
 	}
 
 	public void before(Object object, Method method) {
-		methodInvoker.invokeMatchingMethods(object, "setUp", picoResolver);
+		if (matches(object)) {
+			methodInvoker.invokeMatchingMethods(object, "setUp", picoResolver);
+		}
 	}
 
 	public void after(Object object, java.lang.reflect.Method method) {
-		methodInvoker.invokeMatchingMethods(object, "tearDown", picoResolver);
+		if (matches(object)) {
+			methodInvoker.invokeMatchingMethods(object, "tearDown", picoResolver);
+		}
+	}
+	
+	private boolean matches(Object object) {
+		return object instanceof Test ||
+			object instanceof Suite;
 	}
 }
