@@ -23,4 +23,12 @@ public class TrueRule implements Rule {
 	public ClassSummary inspect(ClassSummary classSummary) {
 		return classSummary;
 	}
+
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+
+	public boolean equals(Object object) {
+		return object != null && getClass().equals(object.getClass());
+	}
 }

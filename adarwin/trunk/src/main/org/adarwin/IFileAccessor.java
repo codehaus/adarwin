@@ -8,10 +8,18 @@
  * Idea and Original Code by Stacy Curl                                      *
  *****************************************************************************/
 
-package org.adarwin.testmodel;
+package org.adarwin;
 
-public class HasNoZeroArgConstructor {
-	public HasNoZeroArgConstructor(boolean bool) {
-		
-	}
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+
+public interface IFileAccessor {
+	String[] listFiles(String directory);
+
+	InputStream openFile(String name) throws FileNotFoundException;
+	
+	String readFile(String name) throws IOException;
+
+	boolean isDirectory(String name);
 }

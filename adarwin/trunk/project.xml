@@ -8,7 +8,7 @@
     <pomVersion>3</pomVersion>
     <name>aDarwin</name>
     <id>adarwin</id>
-    <currentVersion>1.0</currentVersion>
+    <currentVersion>1.1</currentVersion>
     <inceptionYear>2003</inceptionYear>
     <package>org.adarwin</package>
     <shortDescription>ByteCode scanning, dependancy checking, architectural rules validator</shortDescription>
@@ -24,7 +24,7 @@
 
     <developers>
         <developer>
-			<name>Stacy Curl</name>
+            <name>Stacy Curl</name>
             <id>stacy</id>
             <email>stacy@digitalcompulsion.com</email>
             <roles>
@@ -66,8 +66,8 @@
         </dependency>
 
         <dependency>
-            <id>mockobjects</id>
-            <version>core-0.09</version>
+            <id>easymock</id>
+            <version>1.0.1b</version>
         </dependency>
 
     </dependencies>

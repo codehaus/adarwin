@@ -8,9 +8,10 @@
  * Idea and Original Code by Stacy Curl                                      *
  *****************************************************************************/
 
-package org.adarwin.testmodel;
+package org.adarwin;
 
-public class HasTwoArgConstructor {
-	public HasTwoArgConstructor(Integer integer, String string) {
-	}
+public interface IRunnerFactory {
+	IRunner create(boolean printDetail, String binding, String classPath, boolean failFast,
+		boolean failOnMatch, String ruleExpression, Logger logger, RuleConsumer ruleBuilderListener)
+			throws ADarwinException;
 }

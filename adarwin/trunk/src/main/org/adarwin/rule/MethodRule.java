@@ -16,6 +16,7 @@ import org.adarwin.Method;
 import org.adarwin.RuleClassBindings;
 import org.adarwin.Util;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public class MethodRule implements Rule, Filter {
@@ -26,8 +27,7 @@ public class MethodRule implements Rule, Filter {
 	public static Rule create(String returnType, String methodName, String[] parameterTypes) {
 		return new MethodRule(returnType, methodName, parameterTypes);
 	}
-	
-	// method(returnType methodName(param, param, param))
+
 	public MethodRule(String signature) {
 		this(getReturnType(signature), getMethodName(signature), getParameterTypes(signature));
 	}
@@ -77,5 +77,17 @@ public class MethodRule implements Rule, Filter {
 		return Pattern.matches(returnType, method.getReturnType()) &&
 			Pattern.matches(methodName, method.getMethodName()) &&
 			Util.matchesPatterns(parameterTypes, method.getParameterTypes());
+	}
+
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+
+	public boolean equals(Object object) {
+		return object != null &&
+			getClass().equals(object.getClass()) &&
+			returnType.equals(((MethodRule) object).returnType) &&
+			methodName.equals(((MethodRule) object).methodName) &&
+			Arrays.equals(parameterTypes, ((MethodRule) object).parameterTypes);
 	}
 }

@@ -13,6 +13,8 @@ package org.adarwin.rule;
 import org.adarwin.ClassSummary;
 import org.adarwin.RuleClassBindings;
 
+import java.util.Arrays;
+
 
 public class AndRule implements Rule {
 	private final Rule[] rules;
@@ -44,4 +46,14 @@ public class AndRule implements Rule {
 		
 		return buffer.toString();
     }
+
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+
+	public boolean equals(Object object) {
+		return object != null &&
+			getClass().equals(object.getClass()) &&
+				Arrays.equals(rules, ((AndRule) object).rules);
+	}
 }

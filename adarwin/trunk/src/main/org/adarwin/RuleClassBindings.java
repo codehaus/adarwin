@@ -10,7 +10,6 @@
 
 package org.adarwin;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,23 +20,24 @@ public class RuleClassBindings {
     private final Map ruleToClass = new HashMap();
     private final Map classToRule = new HashMap();
 
-    public RuleClassBindings(String propertiesFileName) throws IOException, ClassNotFoundException {
-        Properties properties = new Properties();
-        properties.load(new FileInputStream(propertiesFileName));
+    public RuleClassBindings(String propertiesFileName, IFileAccessor fileAccessor)
+		throws ADarwinException {
+
+        Properties properties = loadProperties(propertiesFileName, fileAccessor);
         for (Iterator iterator = properties.entrySet().iterator(); iterator.hasNext();) {
             Map.Entry mapping = (Map.Entry) iterator.next();
-            addMapping((String) mapping.getKey(), Class.forName((String) mapping.getValue()));
+            addMapping((String) mapping.getKey(), (String) mapping.getValue());
         }
     }
 
-    public RuleClassBindings(String[] names, Class[] classes) {
+	public RuleClassBindings(String[] names, Class[] classes) {
         for (int mLoop = 0; mLoop < names.length; ++mLoop) {
             addMapping(names[mLoop], classes[mLoop]);
         }
     }
 
-    public RuleClassBindings(String name, Class classes) {
-        this(new String[] {name}, new Class[] {classes});
+    public RuleClassBindings(String name, Class clazz) {
+    	addMapping(name, clazz);
     }
 
     public Class getClass(String rule) {
@@ -47,9 +47,27 @@ public class RuleClassBindings {
     public String getRule(Class clazz) {
         return (String) classToRule.get(clazz);
     }
+    
+    private void addMapping(String rule, String clazz) throws ADarwinException {
+    	try {
+			addMapping(rule, Class.forName(clazz));
+		} catch (ClassNotFoundException e) {
+			throw new ADarwinException("Unable to find class: " + clazz, e);
+		}
+    }
 
 	private void addMapping(String rule, Class clazz) {
 		ruleToClass.put(rule, clazz);
 		classToRule.put(clazz, rule);
+	}
+
+    private Properties loadProperties(String propertiesFileName, IFileAccessor fileAccessor) throws ADarwinException {
+        try {
+			Properties properties = new Properties();
+			properties.load(fileAccessor.openFile(propertiesFileName));
+			return properties;
+		} catch (IOException e) {
+			throw new ADarwinException("Unable to loading bindings: " + propertiesFileName, e);
+		}
 	}
 }

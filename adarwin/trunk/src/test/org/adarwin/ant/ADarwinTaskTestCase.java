@@ -10,141 +10,104 @@
 
 package org.adarwin.ant;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+
+import org.adarwin.IRunner;
+import org.adarwin.IRunnerFactory;
+import org.adarwin.ADarwinException;
+import org.adarwin.Logger;
+import org.adarwin.RuleConsumer;
+import org.apache.tools.ant.BuildException;
+import org.easymock.MockControl;
 
 import junit.framework.TestCase;
 
-import org.adarwin.Logger;
-import org.adarwin.Runner;
-import org.adarwin.testmodel.a.InPackageA;
-import org.adarwin.testmodel.a.InPackageAUsesClassFromPackageB;
-import org.adarwin.testmodel.a.UsesPackageAAndPackageB;
-import org.apache.tools.ant.BuildException;
-
-import com.mockobjects.dynamic.OrderedMock;
-
 public class ADarwinTaskTestCase extends TestCase {
-	private static final String CLASSPATH = "target/test-classes";
-	private static final String RULE = "src(package(org.adarwin.testmodel.a))";
-	private static final String SECOND_RULE = "src(package(org.adarwin.testmodel.x))";
-	private static final String COMPOSITE_RULE = RULE + ", " + SECOND_RULE;
-	private OrderedMock mockLogger;
-	private ADarwinTask task;
+	private ADarwinTask aDarwinTask;
+	private MockControl runnerFactoryControl;
+	private IRunnerFactory runnerFactory;
+	private MockControl runnerControl;
+	private IRunner runner;
+
+	private boolean printDetail = false;
+	private boolean failFast = false;
+	private boolean failOnMatch = false;
+	private String binding = "binding";
+	private String classPath = "classPath";
+	private String ruleExpression = "ruleExpression";
+	private Logger logger;
 
 	protected void setUp() throws Exception {
-		super.setUp();
-		mockLogger = new OrderedMock(Logger.class);
-		task = new ADarwinTask();
-		task.setLogger(((Logger) mockLogger.proxy()));
-		task.setBinding("rules.properties");
-		task.setClassPath(CLASSPATH);
-		task.setFailOnMatch(true);
-		mockLogger.expect("log", "Evaluating rules against: " + CLASSPATH);
-	}
+		runnerFactoryControl = MockControl.createControl(IRunnerFactory.class);
+		runnerFactory = (IRunnerFactory) runnerFactoryControl.getMock();
 
-	public void testRuleInAntFile() {
-		mockLogger.expect("reset", "classes violated: " + RULE);
+		runnerControl = MockControl.createControl(IRunner.class);
+		runner = (IRunner) runnerControl.getMock();
 
-		task.setRuleExpression(RULE);
-		task.setFailOnMatch(true);
+		aDarwinTask = new ADarwinTask(runnerFactory);
 		
-		executeTask();
-
-		mockLogger.verify();
+		logger = aDarwinTask.getLogger();
 	}
 	
-	public void testRuleInFile() throws IOException {
-		task.setPrint(true);
-		mockLogger.expect("reset", "classes violated: " + RULE);
-		mockLogger.expect("log", "  " + InPackageA.class.getName());
-		mockLogger.expect("log", "  " + InPackageAUsesClassFromPackageB.class.getName());
-		mockLogger.expect("log", "  " + UsesPackageAAndPackageB.class.getName());
+	public void testRun() throws ADarwinException {
+		expectFactory();
 
-		task.setRuleFileName(createTempRuleFile(RULE));
-		
-		executeTask();		
+		runner.run();
 
-		mockLogger.verify();
-	}
+		replay();
 
-	public void testMultipleRulesOneRuleMatches() {
-		mockLogger.expect("reset", "classes violated: " + RULE);
-		mockLogger.expect("reset", "classes violated: " + SECOND_RULE);
-				
-		task.setRuleExpression(COMPOSITE_RULE);
-		
-		executeTask();
-		
-		mockLogger.verify();
+		setProperties();
+
+		aDarwinTask.execute();
+
+		verify();
 	}
 	
-	public void testMissingBinding() {
-		task.setBinding("");
-		
+	public void testExecuteTranslatesRuleExceptionIntoBuildException() throws ADarwinException {
+		expectFactory();
+
+		runner.run();
+		String message = "message";
+		Throwable throwable = new Throwable();
+		runnerControl.setThrowable(new ADarwinException(message, throwable));
+
+		replay();
+
+		setProperties();
+
 		try {
-			task.execute();
+			aDarwinTask.execute();
 			fail("BuildException expected");
 		}
-		catch (BuildException be) {
-			assertEquals(Runner.BINDING + Runner.MISSING_OR_EMPTY, be.getMessage());
+		catch (BuildException buildException) {
+			assertEquals(message, buildException.getMessage());
+			assertEquals(throwable, buildException.getCause());
 		}
-	}
-	
-	public void testMissingClassPath() {
-		task.setClassPath("");
-		
-		try {
-			task.execute();
-			fail("BuildException expected");
-		}
-		catch (BuildException be) {
-			assertEquals(Runner.CLASSPATH + Runner.MISSING_OR_EMPTY, be.getMessage());
-		}
+
+		verify();
 	}
 
-	public void testMissingRuleExpressionAndRuleFileName() {
-		task.setRuleExpression("");
-		task.setRuleFileName("");
-		
-		try {
-			task.execute();
-			fail("BuildException expected");
-		}
-		catch (BuildException be) {
-			assertEquals("both ruleExpression and ruleFileName parameters are missing or empty", be.getMessage());
-		}
+	private void expectFactory() throws ADarwinException {
+		runnerFactory.create(printDetail, binding, classPath, failFast, failOnMatch,
+			ruleExpression, logger, RuleConsumer.NULL);
+		runnerFactoryControl.setReturnValue(runner);
 	}
 
-	private void executeTask() {
-		try {
-			task.execute();
-			fail("BuildException expected");
-		}		
-		catch (BuildException be) {
-			assertEquals(Runner.RULE_VIOLATED, be.getMessage());
-		}
+	private void setProperties() {
+		aDarwinTask.setPrintDetail(printDetail);
+		aDarwinTask.setBinding(binding);
+		aDarwinTask.setClassPath(classPath);
+		aDarwinTask.setFailFast(failFast);
+		aDarwinTask.setFailOnMatch(failOnMatch);
+		aDarwinTask.setRuleExpression(ruleExpression);
 	}
 
-	private String createTempRuleFile(String contents) throws IOException {
-		File ruleFile = File.createTempFile("test-rule", "txt");
-		OutputStream outputStream = new FileOutputStream(ruleFile);
-		
-		try {
-			outputStream.write(contents.getBytes());
-		}
-		finally {
-			try {
-				if (outputStream != null) {
-					outputStream.close();
-				}
-			} catch (IOException e) {
-			}	
-		}
-		
-		return ruleFile.getAbsolutePath();
+	private void replay() {
+		runnerFactoryControl.replay();
+		runnerControl.replay();
 	}
 
+	private void verify() {
+		runnerFactoryControl.verify();
+		runnerControl.verify();
+	}
 }

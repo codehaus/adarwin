@@ -14,10 +14,8 @@ import org.adarwin.rule.Rule;
 import org.adarwin.rule.SourceRule;
 import org.adarwin.testmodel.a.InPackageA;
 
-import java.io.IOException;
-
 public class SourceTestCase extends RuleTestCase {
-    public void testMatchesMinimalClass() throws BuilderException, IOException {
+    public void testMatchesMinimalClass() throws ADarwinException {
         String expression = "src(true)";
 
         Rule rule = new RuleBuilder(new RuleClassBindings(new String[] {"src", "true"},

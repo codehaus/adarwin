@@ -28,4 +28,14 @@ public class NotRule implements Rule {
 	public String toString(RuleClassBindings ruleClassBindings) {
 		return ruleClassBindings.getRule(getClass()) + '(' + ruleToNegate.toString(ruleClassBindings) + ')';
 	}
+
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+
+	public boolean equals(Object object) {
+		return object != null &&
+			getClass().equals(object.getClass()) &&
+			ruleToNegate.equals(((NotRule) object).ruleToNegate);
+	}
 }

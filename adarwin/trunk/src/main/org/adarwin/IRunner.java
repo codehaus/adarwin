@@ -8,10 +8,8 @@
  * Idea and Original Code by Stacy Curl                                      *
  *****************************************************************************/
 
-package org.adarwin.testmodel;
+package org.adarwin;
 
-public class UsesClassInPackageBInThrow {
-	public void naughty() {
-		throw new org.adarwin.testmodel.b.ExceptionInPackageB();
-	}
+public interface IRunner {
+	void run() throws ADarwinException;
 }

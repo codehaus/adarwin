@@ -41,4 +41,14 @@ public class PackageRule implements Rule, Filter {
 	public String toString(RuleClassBindings ruleClassBindings) {
 		return ruleClassBindings.getRule(getClass()) + '(' + pattern + ')';
 	}
+
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+
+	public boolean equals(Object object) {
+		return object != null &&
+			getClass().equals(object.getClass()) &&
+			pattern.equals(((PackageRule) object).pattern);
+	}
 }

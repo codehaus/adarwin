@@ -14,19 +14,17 @@ import org.adarwin.rule.ClassRule;
 import org.adarwin.rule.Rule;
 import org.adarwin.testmodel.a.InPackageA;
 
-import java.io.IOException;
-
 public class ClassRuleTestCase extends RuleTestCase {
     private final RuleBuilder ruleBuilder =
     	new RuleBuilder(new RuleClassBindings("class", ClassRule.class));
 
-	public void testNonMatchingClass() throws BuilderException, IOException {
+	public void testNonMatchingClass() throws ADarwinException {
 		Rule rule = ruleBuilder.buildRule("class(Fred)");
 
 		assertNumMatches(0, rule, InPackageA.class);
     }
 
-    public void testMatchingClass() throws BuilderException, IOException {
+    public void testMatchingClass() throws ADarwinException {
         Rule rule = ruleBuilder.buildRule("class(In.*)");
 
         assertNumMatches(1, rule, InPackageA.class);

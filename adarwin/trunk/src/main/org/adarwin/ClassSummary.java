@@ -12,6 +12,7 @@ package org.adarwin;
 
 import org.adarwin.rule.Filter;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -77,9 +78,15 @@ public class ClassSummary {
 		return "ClassSummary(" + className + ", " + dependancies + ")";
 	}
 
-	public void log(Logger logger, boolean print) {
-		if (print && !isEmpty()) {
+	public void log(Logger logger, boolean printDetail) {
+		if (!isEmpty()) {
 			logger.log("  " + getClassName().getFullClassName());
+			
+			if (printDetail) {
+				for(Iterator iterator = dependancies.iterator(); iterator.hasNext();) {
+					logger.log("    " + iterator.next());
+				}
+			}
 		}
 	}
 
@@ -88,6 +95,10 @@ public class ClassSummary {
 	}
 
 	public ClassSummary negate(ClassSummary original) {
-		return isEmpty() ? original : new ClassSummary(getClassName(), new HashSet());
+		return isEmpty() ? original : empty();
+	}
+
+	public ClassSummary empty() {
+		return new ClassSummary(getClassName(), Collections.EMPTY_SET);
 	}
 }

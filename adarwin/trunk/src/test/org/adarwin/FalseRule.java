@@ -10,11 +10,7 @@
 
 package org.adarwin;
 
-import org.adarwin.ClassSummary;
-import org.adarwin.RuleClassBindings;
 import org.adarwin.rule.Rule;
-
-import java.util.HashSet;
 
 
 public class FalseRule implements Rule {
@@ -23,6 +19,6 @@ public class FalseRule implements Rule {
     }
 
 	public ClassSummary inspect(ClassSummary classSummary) {
-		return new ClassSummary(classSummary.getClassName(), new HashSet());
+		return classSummary.empty();
 	}
 }

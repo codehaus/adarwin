@@ -19,195 +19,139 @@ import org.adarwin.rule.ParentRule;
 import org.adarwin.rule.Rule;
 import org.adarwin.rule.SourceRule;
 import org.adarwin.rule.UsesRule;
-import org.adarwin.testmodel.a.InPackageA;
-
-import java.io.IOException;
+import org.easymock.MockControl;
 
 public class RuleBuilderTestCase extends RuleTestCase {
-    private final String INCORRECT_RULE_BUILT = "Incorrect rule built";
+	private final MockControl ruleBuilderListenerControl =
+		MockControl.createNiceControl(RuleConsumer.class);
+	private final RuleConsumer ruleBuilderListener =
+		(RuleConsumer) ruleBuilderListenerControl.getMock();
+	
+	private final RuleClassBindings ruleClassBindings = new RuleClassBindings(
+		new String[] {
+			"true", "and", "parent", "constructor", "src", "package", "method", "uses", "not"
+		},
+		new Class[] {
+			TrueRule.class, AndRule.class, ParentRule.class, ConstructorRule.class,
+			SourceRule.class, PackageRule.class, MethodRule.class, UsesRule.class,
+			NotRule.class
+		});
+	private final RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
 
-    public void testTrueRuleGrammer() throws BuilderException {
-		RuleClassBindings ruleClassBindings = new RuleClassBindings("true", TrueRule.class);
-
-        RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
-
-        String expression = "true";
-
-        Rule rule = ruleBuilder.buildRule(expression);
-        
-        assertEquals(expression, rule.toString(ruleClassBindings));
+    public void testTrueRuleGrammer() throws ADarwinException {
+    	assertEquals(new TrueRule(), "true");
     }
 
-    public void testInPackageRuleGrammer() throws BuilderException {
-		RuleClassBindings ruleClassBindings = new RuleClassBindings(new String[] {"src", "package"},
-            new Class[] {SourceRule.class, PackageRule.class});
-
-        RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
-
-        String expression = "src(package(x))";
-
-        Rule rule = ruleBuilder.buildRule(expression);
-
-        assertEquals(expression, rule.toString(ruleClassBindings));
+	public void testInPackageRuleGrammer() throws ADarwinException {
+		assertEquals(new SourceRule(new PackageRule("x")), "src(package(x))");
     }
 
-    public void testInPackageAndUsesPackage() throws BuilderException {
-		RuleClassBindings ruleClassBindings = new RuleClassBindings(
-            new String[] {"and", "src", "uses", "package"},
-            new Class[] {AndRule.class, SourceRule.class, UsesRule.class, PackageRule.class});
-
-        RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
-
-        String expression = "and(src(package(org.adarwin.testmodel.a)), uses(package(org.adarwin.testmodel.b)))";
-
-        Rule rule = ruleBuilder.buildRule(expression);
-
-        assertEquals(expression, rule.toString(ruleClassBindings));
+    public void testInPackageAndUsesPackage() throws ADarwinException {
+    	assertEquals(new AndRule(new Rule[] {
+        	new SourceRule(new PackageRule("package-a")),
+			new UsesRule(new PackageRule("package-b"))
+        }), "and(src(package(package-a)), uses(package(package-b)))");
     }
 
-    public void testTwoLevelsOfNesting() throws BuilderException {
-		RuleClassBindings ruleClassBindings = new RuleClassBindings(new String[] {"not", "and", "true"},
-            new Class[] {NotRule.class, AndRule.class, TrueRule.class});
-
-        RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
-
-        String expression = "not(and(true, true))";
-
-        Rule rule = ruleBuilder.buildRule(expression);
-
-        assertEquals(expression, rule.toString(ruleClassBindings));
+    public void testTwoLevelsOfNesting() throws ADarwinException {
+    	assertEquals(new NotRule(new AndRule(new Rule[] {new TrueRule(), new TrueRule()})),
+    		"not(and(true, true))");
     }
 
-    public void testInPackageRule() throws BuilderException, IOException {
-        RuleBuilder ruleBuilder = new RuleBuilder(new RuleClassBindings(
-            new String[] {"src", "package"},
-            new Class[] {SourceRule.class, PackageRule.class}));
-
-        String expression = "src(package(org.adarwin.testmodel.a))";
-
-        Rule rule = ruleBuilder.buildRule(expression);
-
-        assertNumMatches(1, rule, InPackageA.class);
+    public void testInPackageRule() throws ADarwinException, ADarwinException {
+    	assertEquals(new SourceRule(new PackageRule("package-a")), "src(package(package-a))");
     }
 
-    public void testAndRule() throws BuilderException, IOException {
-		RuleClassBindings ruleClassBindings = new RuleClassBindings(new String[] {"and", "true"},
-            new Class[] {AndRule.class, TrueRule.class});
-
-        RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
-
-        String expression = "and(true, true, true)";
-
-        Rule rule = ruleBuilder.buildRule(expression);
-
-        assertEquals(INCORRECT_RULE_BUILT, expression, rule.toString(ruleClassBindings));
-
-        assertNumMatches(1, rule, InPackageA.class);
+    public void testAndRule() throws ADarwinException, ADarwinException {
+    	assertEquals(new AndRule(new Rule[] {new TrueRule(), new TrueRule(), new TrueRule()}),
+    		"and(true, true, true)");
     }
 
-    public void testConstructorRule() throws BuilderException {
-    	RuleClassBindings bindings = new RuleClassBindings("constructor", ConstructorRule.class);
-		RuleBuilder ruleBuilder = new RuleBuilder(bindings);
-		
-		String expression = "constructor(className(param1, param2))";
-		Rule rule = ruleBuilder.buildRule(expression);
-		
-		assertEquals(expression, rule.toString(bindings));
+    public void testConstructorRule() throws ADarwinException {
+    	assertEquals(new ConstructorRule("className(param1, param2)"), 
+    		"constructor(className(param1, param2))");
 	}
-    
-    public void testMethodRule() throws BuilderException {
-    	RuleClassBindings bindings = new RuleClassBindings("method", MethodRule.class);
-    	RuleBuilder ruleBuilder = new RuleBuilder(bindings);
 
-    	String expression = "method(returnType methodName(param1, param2, param3))";
-    	Rule rule = ruleBuilder.buildRule(expression);
-
-    	assertEquals(expression, rule.toString(bindings));
+    public void testMethodRule() throws ADarwinException {
+    	assertEquals(new MethodRule("returnType methodName(param1, param2, param3)"),
+    		"method(returnType methodName(param1, param2, param3))");
     }
 
-	public void testParentRule() throws BuilderException {
-		RuleClassBindings bindings = new RuleClassBindings("parent", ParentRule.class);
-		RuleBuilder ruleBuilder = new RuleBuilder(bindings);
-		
-		String expression = "parent(someClass)";
-		Rule rule = ruleBuilder.buildRule(expression);
-		
-		assertEquals(expression, rule.toString(bindings));
+	public void testParentRule() throws ADarwinException {
+		assertEquals(new ParentRule("someClass"), "parent(someClass)");
+	}
+
+	public void testWhiteSpaceInRuleIsIrrelevant() throws ADarwinException {
+		assertEquals(new AndRule(new Rule[] {new TrueRule(), new TrueRule()}),
+			"  \t\nand \n\t(\n\n\t  true  \t\n\t , \t\t\n true  \t\t\n)  \n\n\t");
 	}
 
     public void testUnknownRule() {
-        RuleBuilder ruleBuilder = new RuleBuilder(new RuleClassBindings("true", TrueRule.class));
+		ruleBuilderListenerControl.replay();
 
 		try {
-        	ruleBuilder.buildRule("gobbledygook");
+        	ruleBuilder.buildRule("gobbledygook", ruleBuilderListener);
+
 			fail();
 		}
-		catch (BuilderException be) {
+		catch (ADarwinException be) {
 			assertEquals("No such rule: " + "gobbledygook", be.getMessage());
 		}
+
+		ruleBuilderListenerControl.verify();
     }
 
 	public void testUnbalancedBrackets() {
+		ruleBuilderListenerControl.replay();
+
 		String expression = "(";
 		try {
-			new RuleBuilder(null).buildRule(expression);
+			new RuleBuilder(null).buildRule(expression, ruleBuilderListener);
 			fail();
 		}
-		catch (BuilderException be) {
+		catch (ADarwinException be) {
 			assertEquals("Unbalanced expression: \"" + expression + "\"", be.getMessage());
 		}
+		ruleBuilderListenerControl.verify();
 	}
 
-	public void testMultipleRules() throws BuilderException {
-		RuleClassBindings ruleClassBindings = new RuleClassBindings("true", TrueRule.class);
+	public void testMultipleRules() throws ADarwinException {
+		expectRule(new TrueRule());
+		expectRule(new TrueRule());
 
-		RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
+		ruleBuilderListenerControl.replay();
 
-		String expression = "true, true";
+		ruleBuilder.produce("true, true", ruleBuilderListener);
 
-		Rule[] rules = ruleBuilder.buildRules(expression);
-	    
-		assertNotNull(rules);
-		assertEquals(2, rules.length);
-        
-        for (int rLoop = 0; rLoop < rules.length; ++rLoop) {
-			Rule rule = rules[rLoop];
-
-			assertEquals("true", rule.toString(ruleClassBindings));
-        }
+		ruleBuilderListenerControl.verify();
 	}
-	
-	public void testWhiteSpaceInRuleIsIrrelevant() throws BuilderException {
-		RuleClassBindings ruleClassBindings = new RuleClassBindings(new String[] {"and", "true"},
-			new Class[] {AndRule.class, TrueRule.class});
 
-		RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
+	public void testMultipleComplexRules() throws ADarwinException {
+		expectRule(new SourceRule(new PackageRule("package-a")));
+		expectRule(new SourceRule(new PackageRule("package-b")));
 
-		String expression = "  \t\nand \n\t(\n\n\t  true  \t\n\t , \t\t\n true  \t\t\n)  \n\n\t";
-		String SimplyfiedExpression = "and(true, true)";
+		ruleBuilderListenerControl.replay();
 
-		Rule rule = ruleBuilder.buildRule(expression);
+		ruleBuilder.produce("src(package(package-a)),src(package(package-b))",
+			ruleBuilderListener);
 
-		assertEquals(INCORRECT_RULE_BUILT, SimplyfiedExpression, rule.toString(ruleClassBindings));
+		ruleBuilderListenerControl.verify();
 	}
-	
-	public void testWhiteSpaceBetweenRulesIsIrrelevant() throws BuilderException {
-		RuleClassBindings ruleClassBindings = new RuleClassBindings(new String[] {"and", "true"},
-			new Class[] {AndRule.class, TrueRule.class});
 
-		RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
+	public void testWhiteSpaceBetweenRulesIsIrrelevant() throws ADarwinException {
+		AndRule expectedRule = new AndRule(new Rule[] {new TrueRule(), new TrueRule()});
+		expectRule(expectedRule);
+		expectRule(expectedRule);
 
-		String subExpression = "and(true, true)";
-		String expression = subExpression + " \t\n, \n\n\t " + subExpression;
+		ruleBuilderListenerControl.replay();
 
-		Rule[] rules = ruleBuilder.buildRules(expression);
-		
-		assertEquals(2, rules.length);
-		assertEquals(subExpression, rules[0].toString(ruleClassBindings));
-		assertEquals(subExpression, rules[1].toString(ruleClassBindings));
+		ruleBuilder.produce("and(true, true) \t\n, \n\n\t and(true, true)",
+			ruleBuilderListener);
+
+		ruleBuilderListenerControl.verify();
 	}
-	
-	public void testWhiteSpaceBetweenVariableAssignmentIsIrrelevant() throws BuilderException {
+
+	public void testWhiteSpaceBetweenVariableAssignmentIsIrrelevant() throws ADarwinException {
 		RuleClassBindings ruleClassBindings = new RuleClassBindings(new String[] {"and", "true"},
 			new Class[] {AndRule.class, TrueRule.class});
 
@@ -217,43 +161,58 @@ public class RuleBuilderTestCase extends RuleTestCase {
 		String expression = "var = " + variable;
 
 		Rule rule = ruleBuilder.buildRule(expression);
-		
-		assertNull(rule);
-		
+
+		assertEquals(Rule.NULL, rule);
+
 		Rule var = ruleBuilder.getVariable("var");
-		
+
 		assertEquals(variable, var.toString(ruleClassBindings));
 	}
+//	
+//	public void testVariableAssignment() {
+//		
+//	}
+//	
+//	public void testUseVariable() {
+//		
+//	}
 	
-	public void testVariableAssignment() {
-		
-	}
-	
-	public void testUseVariable() {
-		
-	}
-		
 	public void testParseSimpleExpression() {
 		String first = "a(b(c()))";
 		String second = "d()";
 		String expression = first + ", " + second;
-	
+
 		String[] parsed = RuleBuilder.parse(expression);
-		
+
 		assertEquals(2, parsed.length);
 		assertEquals(first, parsed[0]);
 		assertEquals(second, parsed[1]);
 	}
-	
+
 	public void testParseComplexExpression() {
 		String first = "a(,b,(c,,()))";
 		String second = "d(,)";
 		String expression = first + ", " + second;
-	
+
 		String[] parsed = RuleBuilder.parse(expression);
-		
+
 		assertEquals(2, parsed.length);
 		assertEquals(first, parsed[0]);
 		assertEquals(second, parsed[1]);
+	}
+
+	private void assertEquals(Rule expectedRule, String expression) throws ADarwinException {
+		expectRule(expectedRule);
+
+		ruleBuilderListenerControl.replay();
+
+		ruleBuilder.buildRule(expression, ruleBuilderListener);
+
+		ruleBuilderListenerControl.verify();
+	}
+
+	private void expectRule(Rule rule) throws ADarwinException {
+		ruleBuilderListener.consume(rule, ruleClassBindings);
+		ruleBuilderListenerControl.setReturnValue(true);
 	}
 }

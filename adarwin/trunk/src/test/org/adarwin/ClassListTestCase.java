@@ -14,16 +14,14 @@ import org.adarwin.rule.Rule;
 import org.adarwin.testmodel.a.InPackageA;
 import org.adarwin.testmodel.b.InPackageB;
 
-import java.io.IOException;
-
 public class ClassListTestCase extends RuleTestCase {
 	private final Rule rule = createPackageRule(InPackageB.class);
 
-	public void testNoMatch() throws IOException {
+	public void testNoMatch() throws ADarwinException {
 		assertNumMatches(0, rule, InPackageA.class);
 	}
 
-	public void testOneMatch() throws IOException {
+	public void testOneMatch() throws ADarwinException {
 		assertNumMatches(1, rule, InPackageB.class);
 	}
 }

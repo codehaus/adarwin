@@ -12,35 +12,39 @@ package org.adarwin;
 
 import org.adarwin.rule.ParentRule;
 import org.adarwin.rule.Rule;
-import org.adarwin.testmodel.IUsesClassForBaseInterface;
-import org.adarwin.testmodel.UsesClassForBaseClass;
-import org.adarwin.testmodel.UsesClassForBaseInterface;
 import org.adarwin.testmodel.a.InPackageA;
 import org.adarwin.testmodel.b.IInPackageB;
 import org.adarwin.testmodel.b.InPackageB;
 
-import java.io.IOException;
-
 public class ParentRuleTestCase extends RuleTestCase {
-	public void testNeitherExtendsNorImplements() throws IOException {
+	public void testNeitherExtendsNorImplements() throws ADarwinException {
 		Rule rule = new ParentRule(InPackageB.class);
 
 		assertNumMatches(0, rule, InPackageA.class);
 	}
 
-	public void testExtends() throws IOException {
+	public void testExtends() throws ADarwinException {
+		class UsesClassForBaseClass extends InPackageB {
+		}
+		
 		Rule rule = new ParentRule(InPackageB.class);
 
 		assertNumMatches(1, rule, UsesClassForBaseClass.class);
 	}
 
-	public void testImplements() throws IOException {
+	public void testImplements() throws ADarwinException {
+		class UsesClassForBaseInterface implements IInPackageB {
+		}
+		
 		Rule rule = new ParentRule(IInPackageB.class);
 
 		assertNumMatches(1, rule, UsesClassForBaseInterface.class);
 	}
 
-	public void testExtendsInterface() throws IOException {
+	static interface IUsesClassForBaseInterface extends IInPackageB {
+	}
+
+	public void testExtendsInterface() throws ADarwinException {
 		Rule rule = new ParentRule(IInPackageB.class);
 
 		assertNumMatches(1, rule, IUsesClassForBaseInterface.class);

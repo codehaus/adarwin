@@ -14,73 +14,108 @@ import org.adarwin.rule.ConstructorRule;
 import org.adarwin.rule.Rule;
 import org.adarwin.rule.SourceRule;
 import org.adarwin.rule.UsesRule;
-import org.adarwin.testmodel.CallsSimple;
-import org.adarwin.testmodel.HasSingleArgConstructor;
-import org.adarwin.testmodel.HasTwoArgConstructor;
-import org.adarwin.testmodel.HasZeroArgConstructor;
-import org.adarwin.testmodel.Simple;
 
-import java.io.IOException;
+import java.util.Date;
 
 public class ConstructorRuleTestCase extends RuleTestCase {
-	public void testZeroArgMatchingConstructor() throws IOException {
-		Rule rule = createConstructorRule(new String[0]);
-		
-		assertNumMatches(1, rule, HasZeroArgConstructor.class);
-	}
-	
-	public void testZeroArgNonMatchingConstructor() throws IOException {
-		Rule rule = createConstructorRule(new String[0]);
-		
-		assertNumMatches(0, rule, HasSingleArgConstructor.class);
-	}
-	
-	public void testSingleArgMatchingConstructor() throws IOException {
-		Rule rule = createConstructorRule(new String[] {Integer.class.getName()});
-		
-		assertNumMatches(1, rule, HasSingleArgConstructor.class);
-	}
-	
-	public void testSingleArgNonMatchingConstructor() throws IOException {
-		Rule rule = createConstructorRule(new String[] {Integer.class.getName()});
-		
-		assertNumMatches(0, rule, HasTwoArgConstructor.class);
+	static class HasZeroArgConstructor {
+		public HasZeroArgConstructor() {
+		}
 	}
 
-	public void testTwoArgMatchingConstructor() throws IOException {
-		Rule rule = createConstructorRule(new String[] {
-			Integer.class.getName(), String.class.getName()});
-
-		assertNumMatches(1, rule, HasTwoArgConstructor.class);		
-	}
-	
-	public void testTwoArgNonMatchingConstructor() throws IOException {
-		Rule rule = createConstructorRule(new String[] {
-			Integer.class.getName(), String.class.getName()});
-
-		assertNumMatches(0, rule, HasSingleArgConstructor.class);		
+	public void testZeroArgMatchingConstructor() throws ADarwinException {
+		assertNumMatches(1, createConstructorRule(new Class[0]), HasZeroArgConstructor.class);
 	}
 
-	public void testInvokingConstructor() throws IOException {
-		Rule rule = new UsesRule(ConstructorRule.create(Simple.class.getName(), (new String[0])));
-
-		assertNumMatches(1, rule, CallsSimple.class);
+	static class DoesNotHaveZeroArgConstructor {
+		public DoesNotHaveZeroArgConstructor(Integer integer) {
+		}
 	}
 
-	public void testInvokingConstructorNotRegardedAsHavingConstructor() throws IOException {
-		Rule rule = new SourceRule(createConstructorRule(new String[] {String.class.getName()}));
-		
-		assertNumMatches(0, rule, CallsSimple.class);
+	public void testZeroArgNonMatchingConstructor() throws ADarwinException {
+		assertNumMatches(0, createConstructorRule(new Class[0]),
+			DoesNotHaveZeroArgConstructor.class);
 	}
 
-	public void testHavingConstructorNotRegardedAsInvokingConstructor() throws IOException {
+	static class HasSingleArgConstructor {
+		public HasSingleArgConstructor(Integer integer) {
+		}
+	}
+
+	public void testSingleArgMatchingConstructor() throws ADarwinException {
+		assertNumMatches(1, createConstructorRule(Integer.class), HasSingleArgConstructor.class);
+	}
+
+	static class DoesNotHaveSingleArgConstructor {
+		public DoesNotHaveSingleArgConstructor(Integer integer, String string) {
+		}
+	}
+
+	public void testSingleArgNonMatchingConstructor() throws ADarwinException {
+		assertNumMatches(0, createConstructorRule(Integer.class),
+			DoesNotHaveSingleArgConstructor.class);
+	}
+
+	static class HasTwoArgConstructor {
+		public HasTwoArgConstructor(Integer integer, String string) {
+		}
+	}
+
+	public void testTwoArgMatchingConstructor() throws ADarwinException {
+		assertNumMatches(1, createConstructorRule(new Class[] {Integer.class, String.class}),
+			HasTwoArgConstructor.class);		
+	}
+
+	static class DoesNotHaveTwoArgConstructor {
+		public DoesNotHaveTwoArgConstructor(Integer integer) {
+		}
+	}
+
+	public void testTwoArgNonMatchingConstructor() throws ADarwinException {
+		assertNumMatches(0, createConstructorRule(new Class[] {Integer.class, String.class}),
+			DoesNotHaveTwoArgConstructor.class);		
+	}
+
+	static class InvokesZeroArgConstructor {
+		public void method() {
+			new Date();
+		}
+	}
+
+	public void testInvokingConstructor() throws ADarwinException {
+		Rule rule = new UsesRule(ConstructorRule.create(Date.class.getName(), (new String[0])));
+
+		assertNumMatches(1, rule, InvokesZeroArgConstructor.class);
+	}
+
+	class InvokesButDoesNotHaveAConstructorWithAStringParameter {
+		public void method() {
+			new StringBuffer("");
+		}
+	}
+
+	public void testInvokingConstructorNotRegardedAsHavingConstructor() throws ADarwinException {
+		assertNumMatches(0, new SourceRule(createConstructorRule(String.class)),
+			InvokesButDoesNotHaveAConstructorWithAStringParameter.class);
+	}
+
+	static class HasButDoesNotInvokeConstructorWithStringParameter {
+		public HasButDoesNotInvokeConstructorWithStringParameter(String param) {
+		}
+	}
+
+	public void testHavingConstructorNotRegardedAsInvokingConstructor() throws ADarwinException {
 		Rule rule = new UsesRule(ConstructorRule.create(
-			Simple.class.getName(), (new String[] {String.class.getName()})));
-		
-		assertNumMatches(0, rule, Simple.class);
+			Class.class.getName(), (new String[] {String.class.getName()})));
+
+		assertNumMatches(0, rule, HasButDoesNotInvokeConstructorWithStringParameter.class);
 	}
 
-	private Rule createConstructorRule(String[] parameterTypes) {
-		return ConstructorRule.create(".*", parameterTypes);
+	private Rule createConstructorRule(Class parameterType) {
+		return createConstructorRule(new Class[] {parameterType});
+	}
+	
+	private Rule createConstructorRule(Class[] parameterTypes) {
+		return ConstructorRule.create(".*", Util.convertClassArrayToStringArray(parameterTypes));
 	}
 }

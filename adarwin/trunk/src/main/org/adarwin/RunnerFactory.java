@@ -8,10 +8,18 @@
  * Idea and Original Code by Stacy Curl                                      *
  *****************************************************************************/
 
-package org.adarwin.testmodel;
+package org.adarwin;
 
-public class CallsSimple {
-	public void method() {
-		new Simple().noArgMethod();
+public class RunnerFactory implements IRunnerFactory {
+	public IRunner create(boolean printDetail, String binding, String classPath, boolean failFast,
+		boolean failOnMatch, String ruleExpression, Logger logger, RuleConsumer ruleBuilderListener)
+			throws ADarwinException {
+
+		IFileAccessor fileAccessor = new FileAccessor();
+
+		RuleProducer ruleBuilder = new RuleBuilder(new RuleClassBindings(binding, fileAccessor));
+
+		return new Runner(printDetail, failOnMatch, failFast, binding, classPath, ruleExpression,
+			logger, ruleBuilderListener, ruleBuilder, new CodeProducer(classPath));
 	}
 }

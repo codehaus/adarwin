@@ -8,10 +8,18 @@
  * Idea and Original Code by Stacy Curl                                      *
  *****************************************************************************/
 
-package org.adarwin.testmodel;
+package org.adarwin;
 
-public class UsesClassInPackageBInMethodParameters {
-	public void method(org.adarwin.testmodel.b.InPackageB naughty) {
-		
+public class ADarwinException extends Exception {
+	public ADarwinException(String message) {
+		super(message);
+	}
+	
+	public ADarwinException(Throwable throwable) {
+		super(throwable);
+	}
+
+	public ADarwinException(String message, Throwable throwable) {
+		super(message, throwable);
 	}
 }

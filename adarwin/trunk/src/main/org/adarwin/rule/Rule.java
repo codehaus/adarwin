@@ -14,6 +14,16 @@ import org.adarwin.ClassSummary;
 import org.adarwin.RuleClassBindings;
 
 public interface Rule {
+	Rule NULL = new Rule() {
+		public ClassSummary inspect(ClassSummary classSummary) {
+			return classSummary.empty();
+		}
+
+		public String toString(RuleClassBindings ruleClassBindings) {
+			return "NullRule";
+		}
+	};
+
 	ClassSummary inspect(ClassSummary classSummary);
 	String toString(RuleClassBindings ruleClassBindings);
 }
