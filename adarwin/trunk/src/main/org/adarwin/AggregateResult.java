@@ -11,6 +11,7 @@
 package org.adarwin;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 public class AggregateResult extends Result {
@@ -22,15 +23,17 @@ public class AggregateResult extends Result {
 
 	public void append(Result result) {
 		if (result != null) {
-			matchingClasses.addAll(result.getMatchingClasses());
+			for(Iterator iterator = result.iterator(); iterator.hasNext();) {
+				matchingClasses.add(iterator.next());
+			}
 		}
 	}
 
 	public int getCount() {
 		return super.getCount() + matchingClasses.size();
 	}
-
-	public Set getMatchingClasses() {
-		return matchingClasses;
+	
+	public Iterator iterator() {
+		return matchingClasses.iterator();
 	}
 }
