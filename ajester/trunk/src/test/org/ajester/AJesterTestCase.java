@@ -66,7 +66,6 @@ public class AJesterTestCase extends TestCase {
 	
 	public void testReport() throws Exception {
 		AJester ajester = new AJester(BooleanReturnTestCase.class,
-			new BooleanReturnMatcher(new CodeLocationMatcher(BooleanReturn.LOCATION)),
 			new BooleanReturnInstructionMutator(new CodeLocationMatcher(BooleanReturn.LOCATION)));
 
 		assertEquals(Report.NO_PROBLEMS, ajester.run().getReport());
@@ -74,7 +73,6 @@ public class AJesterTestCase extends TestCase {
 	
 	public void testReportWithAnotherClass() throws Exception {
 		AJester ajester = new AJester(IfEqualsStatementTestCase.class,
-			new BooleanReturnMatcher(new CodeLocationMatcher(IfEqualsStatement.LOCATION)),
 			new BooleanReturnInstructionMutator(new CodeLocationMatcher(IfEqualsStatement.LOCATION)));
 
 		assertEquals(Report.NO_PROBLEMS, ajester.run().getReport());
@@ -82,8 +80,6 @@ public class AJesterTestCase extends TestCase {
 
 	public void testReportWithProblematicIfStatement() throws Exception {
 		AJester ajester = new AJester(ProblematicIfStatementTestCase.class,
-			new IfStatementMatcher(
-				new CodeLocationMatcher(ProblematicIfEqualsStatement.IF_EQUAL_LOCATION)),
 			new IfStatementInstructionMutator(new CodeLocationMatcher(ProblematicIfEqualsStatement.IF_EQUAL_LOCATION)));
 
 		String expectedReport = Report.SOME_PROBLEMS + ":\n" +
@@ -95,7 +91,6 @@ public class AJesterTestCase extends TestCase {
 	
 	public void testGetCoverage() throws Exception {
 		Report report = new AJester(BooleanReturnTestCase.class,
-			new BooleanReturnMatcher(new CodeLocationMatcher(BooleanReturn.LOCATION)),
 			new BooleanReturnInstructionMutator(new CodeLocationMatcher(BooleanReturn.LOCATION))).run();
 
 		assertTrue(report.getCoverage().contains(BooleanReturn.LOCATION));
@@ -107,7 +102,6 @@ public class AJesterTestCase extends TestCase {
 		CodeLocation codeLocation = new CodeLocation(ProblematicIfEqualsStatement.class,
 			"nonExistantMethod");
 		AJester ajester = new AJester(ProblematicIfStatementTestCase.class,
-			new IfStatementMatcher(new CodeLocationMatcher(codeLocation)),
 			new IfStatementInstructionMutator(new CodeLocationMatcher(codeLocation)));
 		assertEquals(Report.NO_PROBLEMS, ajester.run().getReport());
 	}

@@ -61,7 +61,7 @@ public class AJester {
 		}
 	}
 
-	public AJester(Class testCaseClass, InstructionMatcher matcher, InstructionMutator mutator) {
+	public AJester(Class testCaseClass, InstructionMutator mutator) {
 		this(testCaseClass, new BaseMutator(mutator));
 	}
 
