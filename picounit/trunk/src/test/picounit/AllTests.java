@@ -1,6 +1,7 @@
 package picounit;
 
 import picounit.around.AroundTests;
+import picounit.junit.JUnitSuite;
 import picounit.runner.RunnerTests;
 import picounit.test.TestTests;
 
@@ -17,5 +18,6 @@ public class AllTests implements Suite {
 		runner.run(AroundTests.class);
 		runner.run(RunnerTests.class);
 		runner.run(TestTests.class);
+		runner.run(JUnitSuite.class);
 	}
 }
