@@ -1,3 +1,5 @@
+
+
 Change RuleClassVisitor to ClassSummaryClassVisitor
 
 Fail fast (first rule passes stops further introspection of the whole path)
@@ -15,3 +17,5 @@ Rename Grammar to Bindings
 Write tests for rules file (white-space, parathesis, extra-parameters, variables)
 
 Write tests for ant task (missing parameters, conflicting parameters)
+
+Write interface for RuleBuilder
