@@ -16,7 +16,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
 import org.adarwin.rule.NameRule;
 import org.adarwin.rule.Rule;
@@ -46,31 +45,27 @@ public class RuleBuilder implements RuleProducer {
 
     	for (int rLoop = 0; rLoop < subExpressions.length; rLoop++) {
     		String subExpression = subExpressions[rLoop].trim();
-			Rule rule = buildRule(subExpression);
-			if (rule instanceof NameRule) {
-				logger.reset(CLASSES_VIOLATED + ((NameRule) rule).getName());
+			String ruleName = getRuleName(subExpression);
+
+			if (subExpression.indexOf('=') == -1) {
+				Rule rule = getRuleOrVariable(subExpression);
+
+				if (rule instanceof NameRule) {
+					logger.reset(CLASSES_VIOLATED + ((NameRule) rule).getName());
+				}
+				else {
+					logger.reset(CLASSES_VIOLATED + subExpression);
+				}
+
+				ruleConsumer.consume(rule, logger);
+			}
+			else if (getClass(ruleName) == null) {
+				throw new ADarwinException("No such rule: " + ruleName);
 			}
 			else {
-				logger.reset(CLASSES_VIOLATED + subExpression);
+				variables.put(getVariableName(subExpression), buildRule(ruleName, subExpression));
 			}
-
-			ruleConsumer.consume(rule, logger);
     	}
-    }
-
-    private Rule buildRule(String expression) {
-		String ruleName = getRuleName(expression);
-
-		if (expression.indexOf('=') == -1) {
-        	return getRuleOrVariable(expression);
-		}
-        else if (getClass(ruleName) == null) {
-    		throw new ADarwinException("No such rule: " + ruleName);
-    	}
-
-		variables.put(getVariableName(expression), buildRule(ruleName, expression));
-
-    	return Rule.NULL;
     }
 
 	private Rule getRuleOrVariable(String expression) {
@@ -266,19 +261,6 @@ public class RuleBuilder implements RuleProducer {
 			}
 		}
 
-		return simpleParse(buffer.toString(), ";");
-	}
-
-	private static String[] simpleParse(String expression, String separator) {
-		List things = new LinkedList();
-
-		StringTokenizer stringTokenizer = new StringTokenizer(expression, separator);
-
-		while (stringTokenizer.hasMoreTokens()) {
-			String token = stringTokenizer.nextToken();
-			things.add(token.trim());
-		}
-
-		return (String[]) things.toArray(new String[0]);
+		return Util.getTokens(0, buffer.toString(), ";"); 
 	}
 }

@@ -11,9 +11,6 @@
 package org.adarwin;
 
 import org.adarwin.testmodel.b.ExceptionInPackageB;
-import org.objectweb.asm.ClassReader;
-
-import java.io.IOException;
 
 public class RuleClassVisitorTestCase extends RuleTestCase {
 	static class HasZeroArgConstructor {
@@ -21,12 +18,12 @@ public class RuleClassVisitorTestCase extends RuleTestCase {
 		}
 	}
 
-	public void testConstructor() throws IOException {
+	public void testConstructor() {
 		assertContains(HasZeroArgConstructor.class, new ConstructorDeclaration(
 			HasZeroArgConstructor.class.getName(), new String[0]));
 	}
 
-	public void testVoidReturnMethod() throws IOException {
+	public void testVoidReturnMethod() {
 		class ClassWithVoidReturnMethod {
 			public void voidReturnMethod() {
 			}
@@ -36,7 +33,7 @@ public class RuleClassVisitorTestCase extends RuleTestCase {
 			"voidReturnMethod", Void.TYPE));
 	}
 
-	public void testNoArgMethod() throws IOException {
+	public void testNoArgMethod() {
 		class ClassWithNoArgMethod {
 			public Integer noArgMethod() {
 				return null;
@@ -47,7 +44,7 @@ public class RuleClassVisitorTestCase extends RuleTestCase {
 			"noArgMethod", Integer.class));
 	}
 
-	public void testSingleArgMethod() throws IOException {
+	public void testSingleArgMethod() {
 		class ClassWithSingleArgMethod {
 			public Integer singleArgMethod(String string) {
 				return null;
@@ -58,7 +55,7 @@ public class RuleClassVisitorTestCase extends RuleTestCase {
 			createMethodDeclaration("singleArgMethod", Integer.class, new Class[] {String.class}));
 	}
 
-	public void testTwoArgMethod() throws IOException {
+	public void testTwoArgMethod() {
 		class ClassWithTwoArgMethod {
 			public Integer twoArgMethod(Integer integer, String string) {
 				return null;
@@ -69,7 +66,7 @@ public class RuleClassVisitorTestCase extends RuleTestCase {
 			"twoArgMethod", Integer.class, new Class[] {Integer.class, String.class}));
 	}
 
-	public void testThrowsClause() throws IOException {
+	public void testThrowsClause() {
 		class UsesClassInPackageBInMethodThrowsClause {
 			public void naughty() throws ExceptionInPackageB {
 			}
@@ -79,9 +76,8 @@ public class RuleClassVisitorTestCase extends RuleTestCase {
 			CodeElement.createUses(ExceptionInPackageB.class.getName()));
 	}
 
-	private void assertContains(Class clazz, CodeElement codeElement) throws IOException {
-		assertTrue(new RuleClassVisitor().visit(new ClassReader(getInputStream(clazz)))
-			.contains(codeElement));
+	private void assertContains(Class clazz, CodeElement codeElement) {
+		assertTrue(RuleClassVisitor.visit(getInputStream(clazz)).contains(codeElement));
 	}
 }
 

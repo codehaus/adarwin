@@ -30,14 +30,6 @@ public class TypeParser {
 		addObjectWebType(void.class, Type.VOID_TYPE);
 	}
 
-	public boolean isPrimative(String desc) {
-		return isPrimative(Type.getType(desc));
-	}
-
-	public boolean isMethodReturnPrimative(String desc) {
-		return isPrimative(Type.getReturnType(desc));
-	}
-
 	public String typeName(String desc) {
 		return typeName(descendArray(Type.getType(desc)));
 	}
@@ -45,21 +37,17 @@ public class TypeParser {
 	public String returnType(String desc) {
 		return typeName(Type.getReturnType(desc));
 	}
-	
+
 	public String[] parameterTypes(String desc) {
 		Type[] types = Type.getArgumentTypes(desc);
-		
+
 		String[] methodParameters = new String[types.length];
-		
+
 		for (int tLoop = 0; tLoop < types.length; tLoop++) {
 			methodParameters[tLoop] = typeName(types[tLoop]);
 		}
-		
-		return methodParameters;
-	}
 
-	private boolean isPrimative(Type type) {
-		return primativeTypeName(type) != null;
+		return methodParameters;
 	}
 
 	private String typeName(Type type) {
@@ -69,6 +57,10 @@ public class TypeParser {
 		else {
 			return descendArray(type).getClassName();
 		}
+	}
+
+	private boolean isPrimative(Type type) {
+		return primativeTypeName(type) != null;
 	}
 
 	private String primativeTypeName(Type type) {
