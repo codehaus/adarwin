@@ -1,6 +1,6 @@
 package picounit.util;
 
-abstract public class Equals {
+public class Equals {
 	public final boolean equals(Object lhs, Object rhs) {
 		if (lhs == null || rhs == null || !lhs.getClass().equals(rhs.getClass())) {
 			return false;
@@ -13,5 +13,7 @@ abstract public class Equals {
 		return equalsImpl(lhs, rhs);
 	}
 
-	abstract protected boolean equalsImpl(Object lhs, Object rhs);
+	protected boolean equalsImpl(Object lhs, Object rhs) {
+		return true;
+	}
 }

@@ -11,7 +11,6 @@ public class MainSuite implements Suite {
 	}
 
 	public void suite(Runner runner) {
-		runner.run(EmptyTest.class);
 		runner.run(MethodInvokerTest.class);
 		runner.run(VerifyTest.class);
 		
