@@ -11,6 +11,9 @@
 package org.adarwin;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import junit.framework.TestCase;
 
@@ -35,7 +38,7 @@ public class RuleBuilderTestCase extends TestCase {
         String expression = "true";
 
         Rule rule = ruleBuilder.buildRule(expression);
-
+        
         assertEquals(expression, rule.getExpression(grammar));
     }
 
@@ -133,8 +136,49 @@ public class RuleBuilderTestCase extends TestCase {
 		catch (BuilderException be) {
 			assertEquals("Unbalanced expression: \"" + expression + "\"", be.getMessage());
 		}
-
 	}
 
+	public void testMultipleRules() throws BuilderException, ClassNotFoundException {
+		Grammar grammar = createGrammar("true", TrueRule.class);
 
+		RuleBuilder ruleBuilder = new RuleBuilder(grammar);
+
+		String expression = "true, true";
+
+		Rule[] rules = ruleBuilder.buildRules(expression);
+	    
+		assertNotNull(rules);
+		assertEquals(2, rules.length);
+        
+        for (int rLoop = 0; rLoop < rules.length; ++rLoop) {
+			Rule rule = rules[rLoop];
+
+			assertEquals("true", rule.getExpression(grammar));
+        }
+	}
+	
+	public void testParseSimpleExpression() {
+		String first = "a(b(c()))";
+		String second = "d()";
+		String expression = first + ", " + second;
+	
+		String[] parsed = RuleBuilder.parse(expression);
+		
+		assertEquals(2, parsed.length);
+		assertEquals(first, parsed[0]);
+		assertEquals(second, parsed[1]);
+	}
+	
+	public void testParseComplexExpression() {
+		String first = "a(,b,(c,,()))";
+		String second = "d(,)";
+		String expression = first + ", " + second;
+	
+		String[] parsed = RuleBuilder.parse(expression);
+		
+		assertEquals(2, parsed.length);
+		assertEquals(first, parsed[0]);
+		assertEquals(second, parsed[1]);
+	}
+	
 }

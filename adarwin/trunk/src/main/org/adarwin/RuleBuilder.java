@@ -14,6 +14,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.adarwin.rule.Rule;
 
@@ -23,6 +24,18 @@ public class RuleBuilder {
     public RuleBuilder(Grammar grammar) {
         this.grammar = grammar;
     }
+    
+	public Rule[] buildRules(String expression) throws BuilderException {
+		String[] subExpression = parse(expression);
+		
+		Rule[] rules = new Rule[subExpression.length];
+		
+		for (int rLoop = 0; rLoop < rules.length; rLoop++) {
+			rules[rLoop] = buildRule(subExpression[rLoop]);
+		}
+		
+		return rules;
+	}
 
     public Rule buildRule(String expression) throws BuilderException {
 		checkBalancedParathesis(expression);
@@ -195,4 +208,41 @@ public class RuleBuilder {
 	private Class getRuleClass(String name) {
         return grammar.getClass(name);
     }
+    
+	public static String[] parse(String expression) {
+		StringBuffer buffer = new StringBuffer(expression);
+		
+		int depth = 0;
+		for (int bLoop = 0; bLoop < buffer.length(); ++bLoop) {
+			switch (buffer.charAt(bLoop)) {
+				case '(' : 
+					depth++;
+					break;
+				case ')':
+					depth--;
+					break;
+				case ',':
+					if (depth == 0) {
+						buffer.setCharAt(bLoop, ';');
+					}
+					break;
+			}
+		}
+		
+		return simpleParse(buffer.toString(), ";");
+	}
+
+	private static String[] simpleParse(String expression, String separator) {
+		List things = new LinkedList();
+		
+		StringTokenizer stringTokenizer = new StringTokenizer(expression, separator);
+		
+		while (stringTokenizer.hasMoreTokens()) {
+			String token = stringTokenizer.nextToken();
+			things.add(token.trim());
+		}
+		
+		return (String[]) things.toArray(new String[0]);
+	}
+    
 }

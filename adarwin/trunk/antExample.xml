@@ -16,32 +16,43 @@
   <taskdef name="adarwin" classname="org.adarwin.ant.ADarwinTask"/>
 
   <target name="main" depends="good, bad, ant"/>
-
+  
+  <property name="ruleUsingB" value="name(package a using package b, and(src(package(org.adarwin.testmodel.a)), uses(package(org.adarwin.testmodel.b))))"/>
+  <property name="ruleUsingC" value="name(package a using package c, and(src(package(org.adarwin.testmodel.a)), uses(package(org.adarwin.testmodel.c))))"/>
+  
   <target name="bad">
-    <adarwin rulesFileName="rules.properties"
-             classPath="target/idea"
-             rule="name(package a using package b, and(src(package(org.adarwin.testmodel.a)), uses(package(org.adarwin.testmodel.b))))"/>
+    <adarwin binding="rules.properties"
+             classPath="${basedir}/target/classes"
+             print="true"
+             ruleExpression="${ruleUsingB}"/>
+  </target>
+
+  <target name="multi">
+    <adarwin binding="rules.properties"
+             classPath="${basedir}/target/classes"
+             print="true"
+             ruleExpression="${ruleUsingB}, ${ruleUsingC}"/>
   </target>
 
   <target name="good">
-    <adarwin rulesFileName="rules.properties"
+    <adarwin binding="rules.properties"
              classPath="target/idea"
-             rule="src(package(org.adarwin.testmodel.b))"/>
+             ruleExpression="src(package(org.adarwin.testmodel.b))"/>
   </target>
 
   <target name="ant">
-    <adarwin rulesFileName="rules.properties"
+    <adarwin binding="rules.properties"
              classPath="C:\Documents and Settings\scurl\.maven\repository\ant\jars\ant-1.5.2.jar"
-             rule="uses(package(org.apache.tools.ant))"/>
+             ruleExpression="uses(package(org.apache.tools.ant))"/>
 
-    <adarwin rulesFileName="rules.properties"
+    <adarwin binding="rules.properties"
              classPath="C:\Documents and Settings\scurl\.maven\repository\ant\jars\ant-1.5.2.jar"
-             rule="parent(org.apache.tools.ant, Task)"/>
+             ruleExpression="parent(org.apache.tools.ant, Task)"/>
 
-    <adarwin rulesFileName="rules.properties"
+    <adarwin binding="rules.properties"
              classPath="C:\Documents and Settings\scurl\.maven\repository\ant\jars\ant-1.5.2.jar"
              print="true"
-             rule="uses(class(.*Task))"/>
+             ruleExpression="uses(class(.*Task))"/>
 
   </target>
 </project>
