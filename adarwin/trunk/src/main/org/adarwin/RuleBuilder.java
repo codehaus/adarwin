@@ -48,11 +48,11 @@ public class RuleBuilder {
     public Rule buildRule(String expression) throws BuilderException {
 		checkBalancedParathesis(expression);
         try {
-        	String variable = getVariable(expression);
+        	String variable = getVariableValue(expression);
 			String name = getName(expression);
 			
 			if (variables.get(name) != null) {
-				return (Rule) variables.get(name);
+				return getVariable(name);
 			}
 			
             Rule rule = buildRule(name, getParameters(expression));
@@ -68,15 +68,19 @@ public class RuleBuilder {
         }
     }
 
-	private String getVariable(String expression) {
+	public Rule getVariable(String name) {
+		return (Rule) variables.get(name);
+	}
+
+	private String getVariableValue(String expression) {
 		expression = expression.replaceAll("\\s++", "");
 		
 		if (expression.indexOf('=') != -1) {
 			return expression.substring(0, expression.indexOf('='));
 		}
 		return "";
-	}
 
+	}
 	private void checkBalancedParathesis(String expression) throws BuilderException {
 		if (countNumberOf(expression, "(") != countNumberOf(expression, ")")) {
 			throw new BuilderException("Unbalanced expression: \"" + expression + "\"");
