@@ -1,8 +1,6 @@
-package picounit.runner;
+package picounit.impl;
 
 import picounit.Runner;
-import picounit.impl.Filter;
-import picounit.impl.Registry;
 
 public class RunnerImpl implements Runner {
 	private final Registry registry;

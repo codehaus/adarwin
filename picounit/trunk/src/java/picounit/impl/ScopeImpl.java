@@ -1,4 +1,4 @@
-package picounit.runner;
+package picounit.impl;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

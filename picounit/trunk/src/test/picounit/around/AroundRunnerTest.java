@@ -8,7 +8,7 @@ import picounit.around.mock.MockAround;
 import picounit.around.setup.SetUpAround;
 import picounit.impl.PicoResolver;
 import picounit.impl.ResultListener;
-import picounit.runner.ScopeImpl;
+import picounit.impl.ScopeImpl;
 
 import java.lang.reflect.Method;
 

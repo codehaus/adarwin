@@ -1,7 +1,6 @@
 package picounit.impl;
 
 
-import picounit.runner.Scope;
 
 import java.lang.reflect.Method;
 
