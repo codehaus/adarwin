@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+
+<!-- 
+/*****************************************************************************
+ * Copyright (C) aDarwin Organisation. All rights reserved.                  *
+ * ************************************************************************* *
+ * The software in this package is published under the terms of the BSD      *
+ * style license a copy of which has been included with this distribution in *
+ * the LICENSE.txt file.                                                     *
+ *                                                                           *
+ * Idea and Original Code by Stacy Curl                                      *
+ *****************************************************************************/
+-->
+
+<project name="Example" default="main" basedir=".">
+  <taskdef name="adarwin" classname="org.adarwin.ant.ADarwinTask"/>
+
+  <target name="main" depends="good, bad, ant"/>
+
+  <target name="bad">
+    <adarwin rulesFileName="rules.properties"
+             classPath="target/idea"
+             rule="and(src(package(org.adarwin.testmodel.a)), uses(package(org.adarwin.testmodel.b)))"/>
+  </target>
+
+  <target name="good">
+    <adarwin rulesFileName="rules.properties"
+             classPath="target/idea"
+             rule="src(package(org.adarwin.testmodel.b))"/>
+  </target>
+
+  <target name="ant">
+    <adarwin rulesFileName="rules.properties"
+             classPath="C:\Documents and Settings\scurl\.maven\repository\ant\jars\ant-1.5.2.jar"
+             rule="uses(package(org.apache.tools.ant))"/>
+
+    <adarwin rulesFileName="rules.properties"
+             classPath="C:\Documents and Settings\scurl\.maven\repository\ant\jars\ant-1.5.2.jar"
+             rule="parent(org.apache.tools.ant, Task)"/>
+
+    <adarwin rulesFileName="rules.properties"
+             classPath="C:\Documents and Settings\scurl\.maven\repository\ant\jars\ant-1.5.2.jar"
+             print="true"
+             rule="uses(class(.*Task))"/>
+
+  </target>
+</project>
