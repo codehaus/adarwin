@@ -36,15 +36,18 @@ public class TestOperatorImpl implements TestOperator {
 	}
 
 	public boolean equals(Object object) {
-		return new Equals(this) {
-			public boolean equalsImpl(Object object) {
-				TestOperatorImpl other = (TestOperatorImpl) object;
-
-				return other.resultListener.equals(resultListener) &&
-					other.methodRunner.equals(methodRunner) &&
-					other.scopeFactory.equals(scopeFactory);
-			}
-		}.equals(object);
+		return equals.equals(this, object);
 	}
+
+	private static final Equals equals = new Equals() {
+		protected boolean equalsImpl(Object lhs, Object rhs) {
+			TestOperatorImpl left = (TestOperatorImpl) lhs;
+			TestOperatorImpl right = (TestOperatorImpl) rhs;
+
+			return left.resultListener.equals(right.resultListener) &&
+				left.methodRunner.equals(right.methodRunner) &&
+				left.scopeFactory.equals(right.scopeFactory);
+		}
+	};
 }
 

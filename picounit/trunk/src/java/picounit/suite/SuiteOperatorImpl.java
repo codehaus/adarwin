@@ -37,13 +37,16 @@ public class SuiteOperatorImpl implements SuiteOperator {
 	}
 
 	public boolean equals(Object object) {
-		return new Equals(this) {
-			protected boolean equalsImpl(Object object) {
-				SuiteOperatorImpl other = (SuiteOperatorImpl) object;
-
-				return resultListener.equals(other.resultListener) &&
-					methodRunner.equals(other.methodRunner);
-			}
-		}.equals(object);
+		return equals.equals(this, object);
 	}
+
+	private static final Equals equals = new Equals() {
+		protected boolean equalsImpl(Object lhs, Object rhs) {
+			SuiteOperatorImpl left = (SuiteOperatorImpl) lhs;
+			SuiteOperatorImpl right = (SuiteOperatorImpl) rhs;
+
+			return left.resultListener.equals(right.resultListener) &&
+				left.methodRunner.equals(right.methodRunner);
+		}
+	};
 }
