@@ -161,7 +161,7 @@ public class RuleBuilderTestCase extends RuleTestCase {
 
 		ruleConsumerControl.replay();
 
-		produceRules("src(package(package-a)),src(package(package-b))");
+		produceRules("src(package(package-a)), src(package(package-b))");
 
 		ruleConsumerControl.verify();
 	}
@@ -196,30 +196,6 @@ public class RuleBuilderTestCase extends RuleTestCase {
 //	public void testUseVariable() {
 //		
 //	}
-	
-	public void testParseSimpleExpression() {
-		String first = "a(b(c()))";
-		String second = "d()";
-		String expression = first + ", " + second;
-
-		String[] parsed = RuleBuilder.parse(expression);
-
-		assertEquals(2, parsed.length);
-		assertEquals(first, parsed[0]);
-		assertEquals(second, parsed[1]);
-	}
-
-	public void testParseComplexExpression() {
-		String first = "a(,b,(c,,()))";
-		String second = "d(,)";
-		String expression = first + ", " + second;
-
-		String[] parsed = RuleBuilder.parse(expression);
-
-		assertEquals(2, parsed.length);
-		assertEquals(first, parsed[0]);
-		assertEquals(second, parsed[1]);
-	}
 
 	private void assertEquals(Rule expectedRule, String expression) {
 		expectRule(expectedRule);

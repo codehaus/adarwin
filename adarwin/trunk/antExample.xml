@@ -31,6 +31,13 @@
              ruleExpression="${ruleUsingB}, ${ruleUsingB}"/>
   </target>
 
+  <target name="multi-fail-fast">
+    <adarwin binding="rules.properties"
+             failFast="true"
+             classPath="${basedir}/target/test-classes"
+             ruleExpression="${ruleUsingB}, ${ruleUsingB}"/>
+  </target>
+
   <target name="date">
     <adarwin binding="rules.properties"
              classPath="${basedir}/target/test-classes"

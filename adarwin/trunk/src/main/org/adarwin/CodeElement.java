@@ -22,18 +22,18 @@ public class CodeElement {
 		return new CodeElement(usesClassName, EXTENDS_OR_IMPLEMENTS);
 	}
 
-	protected static final Object SOURCE = new Object();
-	protected static final Object USES = new Object();
-	protected static final Object EXTENDS_OR_IMPLEMENTS = new Object();
+	protected static final int SOURCE = 0;
+	protected static final int USES = 1;
+	protected static final int EXTENDS_OR_IMPLEMENTS = 2;
 
 	private final String className;
-	private final Object type;
+	private final int type;
 
 	protected CodeElement(String className) {
 		this(className, SOURCE);
 	}
 	
-	protected CodeElement(String className, Object codeType) {
+	protected CodeElement(String className, int codeType) {
 		this.className = className;
 		this.type = codeType;
 	}
@@ -57,11 +57,11 @@ public class CodeElement {
 
 		CodeElement other = (CodeElement) object;
 
-		return type.equals(other.type) && className.equals(other.className);
+		return type == other.type && className.equals(other.className);
 	}
 
 	public int hashCode() {
-		return className.hashCode() ^ type.hashCode();
+		return className.hashCode() ^ type;
 	}
 
 	public boolean involvesObject() {

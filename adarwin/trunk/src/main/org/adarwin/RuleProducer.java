@@ -1,5 +1,5 @@
 package org.adarwin;
 
 public interface RuleProducer {
-	void produce(RuleConsumer ruleBuilderListener);
+	void produce(RuleConsumer ruleConsumer);
 }

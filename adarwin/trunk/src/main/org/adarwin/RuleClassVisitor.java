@@ -44,13 +44,15 @@ class RuleClassVisitor implements ClassVisitor {
 		}
 	}
 
-    public ClassSummary visit(ClassReader reader) {
+    private ClassSummary visit(ClassReader reader) {
 		reader.accept(this, false);
 
-        return new ClassSummary(className, dependancies);
+		return new ClassSummary(className, dependancies);
     }
 
-	public void visit(int access, String sourceClassPath, String baseClassPath, String[] interfaces, String fileName) {
+	public void visit(int access, String sourceClassPath, String baseClassPath, String[] interfaces,
+		String fileName) {
+
 		className = getFullClassName(sourceClassPath); 
 
 		inspect(CodeElement.createExtends(getFullClassName(baseClassPath)));
@@ -70,9 +72,7 @@ class RuleClassVisitor implements ClassVisitor {
     }
 
     public void visitField(int access, String name, String desc, Object value) {
-		if (!typeParser.isPrimative(desc)) {
-			inspect(CodeElement.createUses(typeParser.typeName(desc)));
-		}
+		inspect(CodeElement.createUses(typeParser.typeName(desc)));
     }
 
 	public CodeVisitor visitMethod(int access, String methodName, String desc, String[] exceptions) {
@@ -82,9 +82,7 @@ class RuleClassVisitor implements ClassVisitor {
 			dependancies.add(new ConstructorDeclaration(className, parameterNames));
 		}
 		else {
-			if (!typeParser.isMethodReturnPrimative(desc)) {
-				inspect(CodeElement.createUses(typeParser.returnType(desc)));
-			}
+			inspect(CodeElement.createUses(typeParser.returnType(desc)));
 
 			dependancies.add(new MethodDeclaration(className, methodName,
 				typeParser.returnType(desc), parameterNames));
@@ -144,9 +142,7 @@ class RuleClassVisitor implements ClassVisitor {
         			inspect(CodeElement.createUses((String) lastLoaded)); 
         		}
 
-            	if (!typeParser.isMethodReturnPrimative(desc)) {
-            		inspect(CodeElement.createUses(typeParser.returnType(desc)));
-            	}
+            	inspect(CodeElement.createUses(typeParser.returnType(desc)));
 
         		inspect(MethodInvocation.create(className, typeParser.returnType(desc), methodName,
         			parameterTypes));
@@ -182,7 +178,7 @@ class RuleClassVisitor implements ClassVisitor {
         }
 
         public void visitLocalVariable(String name, String desc, Label start, Label end, int index) {
-			if (!("this".equals(name) || typeParser.isPrimative(desc))) {
+			if (!"this".equals(name)) {
 				inspect(CodeElement.createUses(typeParser.typeName(desc)));
 			}
         }

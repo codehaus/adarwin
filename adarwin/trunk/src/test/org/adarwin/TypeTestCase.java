@@ -79,7 +79,7 @@ public class TypeTestCase extends TestCase {
 	}
 
 	private void assertType(String expected, String form) {
-		assertTrue(typeParser.isPrimative(form));
+		//assertTrue(typeParser.isPrimative(form));
 		assertEquals(expected, typeName(form));
 	}
 

@@ -212,7 +212,7 @@ public class RunnerTestCase extends TestCase {
 	private void runAndExpectException(String expectedMessage)  {
 		try {
 			runner.run();
-			fail("RuleException expected");
+			fail("ADarwinException expected");
 		}		
 		catch (ADarwinException e) {
 			if (!expectedMessage.equals(e.getMessage())) {
