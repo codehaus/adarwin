@@ -17,7 +17,6 @@ import org.adarwin.Filter;
 import org.adarwin.Util;
 
 import java.util.Arrays;
-import java.util.regex.Pattern;
 
 public class ConstructorRule implements Rule, Filter {
 	private final String[] parameterTypes;
@@ -43,20 +42,15 @@ public class ConstructorRule implements Rule, Filter {
 
 	public boolean matches(CodeElement codeElement) {
 		return codeElement instanceof Constructor &&
-			matchesConstructor(((Constructor) codeElement));
+			((Constructor) codeElement).matches(className, parameterTypes);
 	}
-	
+
 	private static String getClassName(String signature) {
 		return Util.getToken(0, signature, " (,)");
 	}
 
 	private static String[] getParameterTypes(String signature) {
 		return Util.getTokens(1, signature, " (,)");
-	}
-
-	private boolean matchesConstructor(Constructor constructor) {
-		return Pattern.matches(className, constructor.getClassName().getFullClassName()) && 
-			Util.matchesPatterns(parameterTypes, constructor.getParameterTypes());
 	}
 
 	public int hashCode() {

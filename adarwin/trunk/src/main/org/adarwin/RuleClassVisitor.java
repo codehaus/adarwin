@@ -24,7 +24,7 @@ class RuleClassVisitor implements ClassVisitor {
     private final CodeVisitor codeVisitor = new RuleCodeVisitor();
 	private final TypeParser typeParser = new TypeParser();
 	private final Set dependancies = new HashSet();
-	private ClassName className;
+	private String className;
 
 	public static ClassSummary visit(InputStream inputStream) {
 		try {
@@ -35,75 +35,64 @@ class RuleClassVisitor implements ClassVisitor {
 		}
 		finally {
 			try {
-				inputStream.close();
+				if (inputStream != null) {
+					inputStream.close();
+				}
 			}
 			catch (IOException e) {
 			}
 		}
 	}
 
-    private ClassSummary visit(ClassReader reader) {
+    public ClassSummary visit(ClassReader reader) {
 		reader.accept(this, false);
 
         return new ClassSummary(className, dependancies);
     }
 
 	public void visit(int access, String sourceClassPath, String baseClassPath, String[] interfaces, String fileName) {
-		className = getFullClassName(sourceClassPath);
+		className = getFullClassName(sourceClassPath); 
 
-		inspect(UsesCodeElement.create(getFullClassName(baseClassPath),
-			ElementType.EXTENDS_OR_IMPLEMENTS));
+		inspect(CodeElement.createExtends(getFullClassName(baseClassPath)));
 
 		for (int iLoop = 0; iLoop < interfaces.length; ++iLoop) {
-			inspect(UsesCodeElement.create(getFullClassName(interfaces[iLoop]),
-				ElementType.EXTENDS_OR_IMPLEMENTS));
+			inspect(CodeElement.createExtends(getFullClassName(interfaces[iLoop])));
 		}
     }
 
 	private void inspect(CodeElement codeElement) {
-		if (!isObject(codeElement)) {
+		if (!codeElement.involvesObject()) {
 			dependancies.add(codeElement);
 		}
-	}
-
-	private boolean isObject(CodeElement codeElement) {
-		return codeElement.getClassName().isObject();
 	}
 
 	public void visitInnerClass(String name, String outerName, String innerName, int access) {
     }
 
     public void visitField(int access, String name, String desc, Object value) {
-		IType type = typeParser.parse(desc);
-		if (!type.isPrimative()) {
-			inspect(UsesCodeElement.create(new ClassName(type.getTypeName()), ElementType.USES));
+		if (!typeParser.isPrimative(desc)) {
+			inspect(CodeElement.createUses(typeParser.typeName(desc)));
 		}
     }
 
 	public CodeVisitor visitMethod(int access, String methodName, String desc, String[] exceptions) {
+		String[] parameterNames = typeParser.parameterTypes(desc);
+
 		if (isConstructor(methodName)) {
-			dependancies.add(new ConstructorDeclaration(className,
-				convertToStringArray(typeParser.parseMethodParameters(desc))));
+			dependancies.add(new ConstructorDeclaration(className, parameterNames));
 		}
 		else {
-			IType returnType = typeParser.parseMethodReturn(desc); 
-			
-			if (!returnType.isPrimative()) {
-				inspect(UsesCodeElement.create(new ClassName(returnType.getTypeName()), ElementType.USES));
-			}
-			
-			IType[] argumentTypes = typeParser.parseMethodParameters(desc);
-			String[] parameterNames = new String[argumentTypes.length];
-			for (int aLoop = 0; aLoop < argumentTypes.length; aLoop++) {
-				parameterNames[aLoop] = argumentTypes[aLoop].getTypeName();
+			if (!typeParser.isMethodReturnPrimative(desc)) {
+				inspect(CodeElement.createUses(typeParser.returnType(desc)));
 			}
 
-			dependancies.add(new MethodDeclaration(className, methodName, returnType.getTypeName(), parameterNames));
+			dependancies.add(new MethodDeclaration(className, methodName,
+				typeParser.returnType(desc), parameterNames));
 		}
 
 		if (exceptions != null) {
 			for (int eLoop = 0; eLoop < exceptions.length; eLoop++) {
-				inspect(UsesCodeElement.create(getFullClassName(exceptions[eLoop]), ElementType.USES));
+				inspect(CodeElement.createUses(getFullClassName(exceptions[eLoop])));
 			}
 		}
 
@@ -112,15 +101,6 @@ class RuleClassVisitor implements ClassVisitor {
 
 	private boolean isConstructor(String name) {
 		return "<init>".equals(name);
-	}
-
-	private String[] convertToStringArray(IType[] parameterTypes) {
-		String[] parameters;
-		parameters = new String[parameterTypes.length];
-		for (int pLoop = 0; pLoop < parameters.length; pLoop++) {
-			parameters[pLoop] = parameterTypes[pLoop].getTypeName();
-		}
-		return parameters;
 	}
 
 	public void visitEnd() {
@@ -141,34 +121,34 @@ class RuleClassVisitor implements ClassVisitor {
         }
 
         public void visitTypeInsn(int opcode, String desc) {
-			inspect(UsesCodeElement.create(getFullClassName(desc), ElementType.USES));
+			inspect(CodeElement.createUses(getFullClassName(desc)));
         }
 
         public void visitFieldInsn(int opcode, String owner, String name, String desc) {
             if (name.startsWith(STATIC_CLASS_PREFIX)) {
             	String text = name.substring(STATIC_CLASS_PREFIX.length());
             	
-            	ClassName className = new ClassName(text.replace(STATIC_CLASS_SEPARATOR, '.'));
-				inspect(UsesCodeElement.create(className, ElementType.USES));
+				inspect(CodeElement.createUses(text.replace(STATIC_CLASS_SEPARATOR, '.')));
             }
         }
 
         public void visitMethodInsn(int opcode, String owner, String methodName, String desc) {
-        	String returnType = typeParser.parseMethodReturn(desc).getTypeName();
-        	String[] parameterTypes = convertToStringArray(typeParser.parseMethodParameters(desc));
+        	String className = getFullClassName(owner);
+        	String[] parameterTypes = typeParser.parameterTypes(desc);
 
-        	ClassName fullClassName = getFullClassName(owner);
 			if (isConstructor(methodName)) {
-        		inspect(ConstructorInvocation.create(fullClassName, parameterTypes));
+        		inspect(ConstructorInvocation.create(className, parameterTypes));
         	}
         	else {
-        		if (Class.class.getName().equals(fullClassName.getFullClassName()) &&
-        			"forName".equals(methodName)) {
-        			
-        			inspect(UsesCodeElement.create(new ClassName((String) lastLoaded))); 
+        		if (Class.class.getName().equals(className) && "forName".equals(methodName)) {
+        			inspect(CodeElement.createUses((String) lastLoaded)); 
         		}
 
-        		inspect(MethodInvocation.create(fullClassName, returnType, methodName,
+            	if (!typeParser.isMethodReturnPrimative(desc)) {
+            		inspect(CodeElement.createUses(typeParser.returnType(desc)));
+            	}
+
+        		inspect(MethodInvocation.create(className, typeParser.returnType(desc), methodName,
         			parameterTypes));
         	}
         }
@@ -202,12 +182,8 @@ class RuleClassVisitor implements ClassVisitor {
         }
 
         public void visitLocalVariable(String name, String desc, Label start, Label end, int index) {
-			if (!"this".equals(name)) {
-				IType type = typeParser.parse(desc);
-				if (!type.isPrimative()) {
-					inspect(UsesCodeElement.create(
-						new ClassName(type.getTypeName()), ElementType.USES));
-				}
+			if (!("this".equals(name) || typeParser.isPrimative(desc))) {
+				inspect(CodeElement.createUses(typeParser.typeName(desc)));
 			}
         }
 
@@ -215,11 +191,7 @@ class RuleClassVisitor implements ClassVisitor {
         }
     }
 
-	private ClassName getFullClassName(String packagePath) {
-		return new ClassName(packagePath.replace('/', '.'));
-	}
-	
-	public ClassSummary visit(Class clazz) throws IOException {
-		return visit(new ClassReader(Util.getInputStream(clazz)));
+	private String getFullClassName(String packagePath) {
+		return packagePath.replace('/', '.');
 	}
 }

@@ -116,6 +116,6 @@ public class ConstructorRuleTestCase extends RuleTestCase {
 	}
 	
 	private Rule createConstructorRule(Class[] parameterTypes) {
-		return ConstructorRule.create(".*", Util.convertClassArrayToStringArray(parameterTypes));
+		return ConstructorRule.create(".*", RuleTestCase.convertClassArrayToStringArray(parameterTypes));
 	}
 }

@@ -16,7 +16,7 @@ import java.util.Date;
 
 public class PackageRuleTestCase extends RuleTestCase {
 	public void testMatchingUsingClass() {
-		assertNumMatches(1, new PackageRule(Util.packageName(Date.class)), Date.class);
+		assertNumMatches(1, new PackageRule(RuleTestCase.packageName(Date.class)), Date.class);
     }
 
 	public void testMatchingUsingRegularExpression() {

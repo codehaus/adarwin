@@ -12,14 +12,12 @@ package org.adarwin;
 
 import junit.framework.TestCase;
 
-import org.adarwin.testmodel.a.InPackageA;
-
 public class UtilTestCase extends TestCase {
 	public void testPackageParsing() {
-		assertEquals("org.adarwin.testmodel.a", Util.packageName(InPackageA.class));
+		assertEquals("abc.def", Util.packageName("abc.def.Class"));
 	}
 
 	public void testPackageParsingForDefaultPackage() {
-		assertEquals("", Util.packageName("ClassName"));
+		assertEquals("", Util.packageName("Class"));
 	}
 }

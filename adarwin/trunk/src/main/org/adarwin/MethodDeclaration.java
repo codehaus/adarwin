@@ -18,8 +18,10 @@ public class MethodDeclaration extends CodeElement implements Method {
 	private final String returnType;
 	private final String[] parameterTypes;
 
-	public MethodDeclaration(ClassName className, String methodName, String returnType, String[] parameterTypes)  {
-		super(className, ElementType.SOURCE);
+	public MethodDeclaration(String className, String methodName, String returnType,
+		String[] parameterTypes)  {
+
+		super(className);
 		this.methodName = methodName;
 		this.parameterTypes = parameterTypes;
 		this.returnType = returnType;

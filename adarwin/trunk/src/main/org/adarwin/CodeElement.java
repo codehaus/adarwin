@@ -10,32 +10,44 @@
 
 package org.adarwin;
 
+import java.util.regex.Pattern;
+
 
 public class CodeElement {
-	public static final CodeElement[] EMPTY_ARRAY = new CodeElement[0];
-
-	private final ClassName className;
-	private final ElementType elementType;
-
-	public static CodeElement create(ClassName className, ElementType codeType) {
-//		if (ElementType.USES.equals(codeType)) {
-//			return UsesCodeElement.create(className);
-//		}
-
-		return new CodeElement(className, codeType);
+	public static CodeElement createUses(String usesClassName) {
+		return new CodeElement(usesClassName, USES);
 	}
 
-	protected CodeElement(ClassName className, ElementType codeType) {
+	public static CodeElement createExtends(String usesClassName) {
+		return new CodeElement(usesClassName, EXTENDS_OR_IMPLEMENTS);
+	}
+
+	protected static final Object SOURCE = new Object();
+	protected static final Object USES = new Object();
+	protected static final Object EXTENDS_OR_IMPLEMENTS = new Object();
+
+	private final String className;
+	private final Object type;
+
+	protected CodeElement(String className) {
+		this(className, SOURCE);
+	}
+	
+	protected CodeElement(String className, Object codeType) {
 		this.className = className;
-		this.elementType = codeType;
+		this.type = codeType;
 	}
 
-	public ClassName getClassName() {
-		return className;
+	public boolean isUses() {
+		return USES == type || EXTENDS_OR_IMPLEMENTS == type;
 	}
 
-	public ElementType getType() {
-		return elementType;
+	public boolean isSource() {
+		return SOURCE == type;
+	}
+
+	public boolean isExtends() {
+		return EXTENDS_OR_IMPLEMENTS == type;
 	}
 
 	public boolean equals(Object object) {
@@ -45,15 +57,26 @@ public class CodeElement {
 
 		CodeElement other = (CodeElement) object;
 
-		return getType().equals(other.getType()) &&
-			getClassName().equals(other.getClassName());
+		return type.equals(other.type) && className.equals(other.className);
 	}
 
 	public int hashCode() {
-		return toString().hashCode();
+		return className.hashCode() ^ type.hashCode();
 	}
 
-	public String toString() {
-		return Util.className(getClass()) + "(" + getClassName() + ", " + elementType + ")";
+	public boolean involvesObject() {
+		return Object.class.getName().equals(className);
+	}
+	
+	public boolean matches(String pattern) {
+		return Pattern.matches(pattern, className);
+	}
+
+	public boolean classMatches(String pattern) {
+		return Util.classMatches(pattern, className);
+	}
+
+	public boolean packageMatches(String pattern) {
+		return Util.packageMatches(pattern, className);
 	}
 }

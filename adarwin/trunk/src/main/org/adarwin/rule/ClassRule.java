@@ -13,9 +13,6 @@ package org.adarwin.rule;
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
 import org.adarwin.Filter;
-import org.adarwin.UsesCodeElement;
-
-import java.util.regex.Pattern;
 
 public class ClassRule implements Rule, Filter {
 	private final String pattern;
@@ -25,16 +22,15 @@ public class ClassRule implements Rule, Filter {
     }
 
 	public ClassSummary inspect(ClassSummary classSummary) {
-		if (Pattern.matches(pattern, classSummary.getClassName().getClassName())) {
+		if (classSummary.classMatches(pattern)) {
 			return classSummary;
 		}
 		else {
 			return classSummary.filter(this);
 		}
 	}
-	
+
 	public boolean matches(CodeElement codeElement) {
-		return codeElement instanceof UsesCodeElement && 
-			Pattern.matches(pattern, codeElement.getClassName().getClassName());
+		return codeElement.isUses() && codeElement.classMatches(pattern);
 	}
 }

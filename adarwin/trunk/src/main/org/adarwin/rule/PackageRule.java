@@ -13,9 +13,6 @@ package org.adarwin.rule;
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
 import org.adarwin.Filter;
-import org.adarwin.UsesCodeElement;
-
-import java.util.regex.Pattern;
 
 public class PackageRule implements Rule, Filter {
 	private final String pattern;
@@ -25,7 +22,7 @@ public class PackageRule implements Rule, Filter {
 	}
 
 	public ClassSummary inspect(ClassSummary classSummary) {
-		if (Pattern.matches(pattern, classSummary.getClassName().getPackageName())) {
+		if (classSummary.packageMatches(pattern)) {
 			return classSummary;
 		}
 		else {
@@ -34,8 +31,7 @@ public class PackageRule implements Rule, Filter {
 	}
 
 	public boolean matches(CodeElement codeElement) {
-		return codeElement instanceof UsesCodeElement && 
-			Pattern.matches(pattern, codeElement.getClassName().getPackageName());
+		return codeElement.isUses() && codeElement.packageMatches(pattern);
 	}
 
 	public int hashCode() {

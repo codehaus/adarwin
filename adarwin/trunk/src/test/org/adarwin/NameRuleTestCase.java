@@ -23,10 +23,9 @@ public class NameRuleTestCase extends TestCase {
 		MockControl ruleControl = MockControl.createNiceControl(Rule.class);
 		Rule rule = (Rule) ruleControl.getMock();
 
-		ClassSummary classSummary = new ClassSummary(
-			new ClassName("className"), Collections.EMPTY_SET);
-		ClassSummary inspectedClassSummary = new ClassSummary(
-				new ClassName("inspectedClassName"), Collections.EMPTY_SET);
+		ClassSummary classSummary = new ClassSummary("className", Collections.EMPTY_SET);
+		ClassSummary inspectedClassSummary = new ClassSummary("inspectedClassName",
+			Collections.EMPTY_SET);
 
 		rule.inspect(classSummary);
 		ruleControl.setReturnValue(inspectedClassSummary);

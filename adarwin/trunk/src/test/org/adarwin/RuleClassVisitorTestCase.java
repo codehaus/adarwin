@@ -11,6 +11,7 @@
 package org.adarwin;
 
 import org.adarwin.testmodel.b.ExceptionInPackageB;
+import org.objectweb.asm.ClassReader;
 
 import java.io.IOException;
 
@@ -22,7 +23,7 @@ public class RuleClassVisitorTestCase extends RuleTestCase {
 
 	public void testConstructor() throws IOException {
 		assertContains(HasZeroArgConstructor.class, new ConstructorDeclaration(
-			new ClassName(HasZeroArgConstructor.class.getName()), new String[0]));
+			HasZeroArgConstructor.class.getName(), new String[0]));
 	}
 
 	public void testVoidReturnMethod() throws IOException {
@@ -75,15 +76,12 @@ public class RuleClassVisitorTestCase extends RuleTestCase {
 		}
 
 		assertContains(UsesClassInPackageBInMethodThrowsClause.class,
-			create(ExceptionInPackageB.class, ElementType.USES));
+			CodeElement.createUses(ExceptionInPackageB.class.getName()));
 	}
 
 	private void assertContains(Class clazz, CodeElement codeElement) throws IOException {
-		assertTrue(new RuleClassVisitor().visit(clazz).contains(codeElement));
-	}
-
-	private CodeElement create(Class clazz, ElementType codeType) {
-		return UsesCodeElement.create(new ClassName(clazz.getName()), codeType);
+		assertTrue(new RuleClassVisitor().visit(new ClassReader(getInputStream(clazz)))
+			.contains(codeElement));
 	}
 }
 
