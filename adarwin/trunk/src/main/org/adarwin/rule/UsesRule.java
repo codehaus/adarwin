@@ -34,8 +34,8 @@ public class UsesRule implements Rule {
 				uses.add(dependancy);
 			}
 		}
-
-		return wrappedRule.inspect(new ClassSummary(uses));
+		
+		return wrappedRule.inspect(classSummary.updateDependancies(uses));
 	}
 
 	public String toString(RuleClassBindings ruleClassBindings) {

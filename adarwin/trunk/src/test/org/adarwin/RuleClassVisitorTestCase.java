@@ -11,32 +11,50 @@
 package org.adarwin;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import junit.framework.TestCase;
 
 import org.adarwin.rule.ElementType;
+import org.adarwin.testmodel.HasZeroArgConstructor;
+import org.adarwin.testmodel.UsesClassInPackageBInMethodThrowsClause;
 import org.adarwin.testmodel.a.InPackageA;
+import org.adarwin.testmodel.b.ExceptionInPackageB;
 
 public class RuleClassVisitorTestCase extends TestCase{
 	public void testSendsSummaryToRule() throws IOException {
-        ClassSummary expected = new ClassSummary(
-			createSet(new CodeElement[] {
-					new CodeElement(InPackageA.class.getName(), ElementType.SOURCE),
-					new CodeElement(Object.class.getName(), ElementType.EXTENDS_OR_IMPLEMENTS),
-					new CodeElement(Object.class.getName(), ElementType.USES)
-				}));
+        ClassSummary expected = new ClassSummary(InPackageA.class.getName(),
+        	Constructor.EMPTY_CONSTRUCTOR, null,
+        	new CodeElement(InPackageA.class.getName(), ElementType.SOURCE));
 
-        assertEquals(expected, new RuleClassVisitor().visit(new ClassFile(InPackageA.class)));
+		assertEquals(expected, new RuleClassVisitor().visit(new ClassFile(InPackageA.class)));
 	}
+	
+	public void testConstructor() throws IOException {
+		ClassSummary expected = new ClassSummary(HasZeroArgConstructor.class.getName(),
+			Constructor.EMPTY_CONSTRUCTOR, null,
+			new CodeElement(HasZeroArgConstructor.class.getName(), ElementType.SOURCE));
+			
+		assertEquals(expected,
+			new RuleClassVisitor().visit(new ClassFile(HasZeroArgConstructor.class)));
+	}
+	
+	public void testThrowsClause() throws IOException {
+		Set dependancies = new HashSet();
 
-	private Set createSet(CodeElement[] codeElements) {
-		Set set = new HashSet();
+		dependancies.add(new CodeElement(ExceptionInPackageB.class.getName(), ElementType.USES));
+		dependancies.add(new CodeElement(
+			UsesClassInPackageBInMethodThrowsClause.class.getName(), ElementType.SOURCE));
+		
+		ClassSummary expected = new ClassSummary(
+			UsesClassInPackageBInMethodThrowsClause.class.getName(),
+			ClassSummary.createSet(Constructor.EMPTY_CONSTRUCTOR),
+				Collections.EMPTY_SET, dependancies);
 
-		set.addAll(Arrays.asList(codeElements));
-
-		return set;
+		assertEquals(expected, new RuleClassVisitor().visit(
+			new ClassFile(UsesClassInPackageBInMethodThrowsClause.class)));
 	}
 }
+

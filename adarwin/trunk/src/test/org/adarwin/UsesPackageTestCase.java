@@ -11,6 +11,7 @@
 package org.adarwin;
 
 import java.io.IOException;
+import java.util.Calendar;
 
 import junit.framework.TestCase;
 
@@ -25,6 +26,11 @@ import org.adarwin.testmodel.UsesClassInPackageBAsField;
 import org.adarwin.testmodel.UsesClassInPackageBAsLocalVariable;
 import org.adarwin.testmodel.UsesClassInPackageBForInvocation;
 import org.adarwin.testmodel.UsesClassInPackageBForStaticInvocation;
+import org.adarwin.testmodel.UsesClassInPackageBInConstructorParameters;
+import org.adarwin.testmodel.UsesClassInPackageBInMethodParameters;
+import org.adarwin.testmodel.UsesClassInPackageBInMethodReturn;
+import org.adarwin.testmodel.UsesClassInPackageBInMethodThrowsClause;
+import org.adarwin.testmodel.UsesClassInPackageBInThrow;
 import org.adarwin.testmodel.a.InPackageA;
 import org.adarwin.testmodel.b.InPackageB;
 
@@ -78,6 +84,33 @@ public class UsesPackageTestCase extends TestCase {
 
 	public void testUsesForInterfaceImplementation() throws IOException {
 		assertEquals(1, new ClassFile(UsesClassForBaseInterface.class).evaluate(rule).getCount());
+	}
+	
+	public void testUsesAsUnusedImport() throws IOException {
+		if (Calendar.getInstance().get(Calendar.DAY_OF_YEAR) > 288) {
+			throw new RuntimeException("Feature not implemented in time");
+		}
+		//assertEquals(1, new ClassFile(UsesClassInPackageBAsUnusedImport.class).evaluate(rule).getCount());
+	}
+
+	public void testUsesInMethodReturn() throws IOException {
+		assertEquals(1, new ClassFile(UsesClassInPackageBInMethodReturn.class).evaluate(rule).getCount());
+	}
+
+	public void testUsesInMethodParameters() throws IOException {
+		assertEquals(1, new ClassFile(UsesClassInPackageBInMethodParameters.class).evaluate(rule).getCount());
+	}
+	
+	public void testUsesInConstructorParameters() throws IOException {
+		assertEquals(1, new ClassFile(UsesClassInPackageBInConstructorParameters.class).evaluate(rule).getCount());
+	}
+	
+	public void testUsesInMethodThrowsClause() throws IOException {
+		assertEquals(1, new ClassFile(UsesClassInPackageBInMethodThrowsClause.class).evaluate(rule).getCount());
+	}
+	
+	public void testUsesInThrow() throws IOException {
+		assertEquals(1, new ClassFile(UsesClassInPackageBInThrow.class).evaluate(rule).getCount());
 	}
 
 	public void testTwoClassesUsing() throws IOException {

@@ -11,6 +11,7 @@
 package org.adarwin;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,13 +20,16 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Label;
+import org.objectweb.asm.Type;
 
 class RuleClassVisitor implements ClassVisitor {
     private CodeVisitor codeVisitor;
 	private String fullyQualifiedClassName;
 	private Set dependancies;
+	private Set constructors;
 
 	public RuleClassVisitor() {
+		constructors = new HashSet();
 		dependancies = new HashSet();
         codeVisitor = new RuleCodeVisitor();
     }
@@ -33,7 +37,8 @@ class RuleClassVisitor implements ClassVisitor {
     public ClassSummary visit(ClassReader reader) {
 		reader.accept(this, false);
 
-        return new ClassSummary(dependancies, fullyQualifiedClassName);
+        return new ClassSummary(fullyQualifiedClassName, constructors, Collections.EMPTY_SET,
+        	dependancies);
     }
 
 	public void visit(int access, String sourceClassPath, String baseClassPath, String[] interfaces, String fileName) {
@@ -52,7 +57,9 @@ class RuleClassVisitor implements ClassVisitor {
     }
 
 	private void inspect(CodeElement codeElement) {
-		dependancies.add(codeElement);
+		if (!Object.class.getName().equals(codeElement.getFullyQualifiedClassName())) {
+			dependancies.add(codeElement);
+		}
 	}
 
 	public void visitInnerClass(String string, String string1, String string2, int i) {
@@ -69,12 +76,54 @@ class RuleClassVisitor implements ClassVisitor {
 		inspect(new CodeElement(fullyQualifiedClassName, ElementType.USES));
     }
 
-	public CodeVisitor visitMethod(int i, String string, String string1, String[] strings) {
-		logln("visitMethod: " + string + ", " + string1 + ", " + strings);
+	public CodeVisitor visitMethod(int access, String name, String desc, String[] exceptions) {
+		logln("visitMethod: " + name + ", " + desc + ", " + exceptions);
+		
+		if ("<init>".equals(name)) {
+			
+			Type[] parameterTypes = Type.getArgumentTypes(desc);
+			String[] parameters = new String[parameterTypes.length];
+			for (int pLoop = 0; pLoop < parameters.length; pLoop++) {
+				if (!isPrimative(parameterTypes[pLoop])) {
+					parameters[pLoop] = parameterTypes[pLoop].getClassName();
+				}
+				else {
+					parameters[pLoop] = parameterTypes[pLoop].getDescriptor();
+				}
+			}
+			
+			Constructor constructor = new Constructor(parameters);
+			constructors.add(constructor);
+		}
+		else {
+			Type returnType = Type.getReturnType(desc);
+			if (desc.indexOf(")L") != -1) {
+				inspect(new CodeElement(returnType.getClassName(), ElementType.USES));
+			}
+		}
+
+		if (exceptions != null) {
+			for (int eLoop = 0; eLoop < exceptions.length; eLoop++) {
+				String exceptionName = exceptions[eLoop].replace('/', '.');
+				inspect(new CodeElement(exceptionName, ElementType.USES));
+			}
+		}
+
         return codeVisitor;
     }
 
-    public void visitEnd() {
+	private boolean isPrimative(Type type) {
+		return Type.BOOLEAN_TYPE == type ||
+			Type.BYTE_TYPE == type ||
+			Type.CHAR_TYPE == type ||
+			Type.DOUBLE_TYPE == type ||
+			Type.FLOAT_TYPE == type ||
+			Type.INT_TYPE == type ||
+			Type.LONG_TYPE == type ||
+			Type.SHORT_TYPE == type;
+	}
+
+	public void visitEnd() {
 	}
 
 	public class RuleCodeVisitor implements CodeVisitor {
