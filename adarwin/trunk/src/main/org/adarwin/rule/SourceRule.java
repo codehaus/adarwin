@@ -33,7 +33,9 @@ public class SourceRule implements Rule {
 				sourceSet.add(codeElement);
 			}
 		}
-		return wrappedRule.inspect(new ClassSummary(sourceSet));
+		ClassSummary newSummary = classSummary.updateDependancies(sourceSet);
+		
+		return wrappedRule.inspect(newSummary);
 	}
 
 	public String toString(RuleClassBindings ruleClassBindings) {

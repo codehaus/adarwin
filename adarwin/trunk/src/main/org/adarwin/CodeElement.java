@@ -13,6 +13,8 @@ package org.adarwin;
 import org.adarwin.rule.ElementType;
 
 public class CodeElement {
+	public static final CodeElement[] EMPTY_ARRAY = new CodeElement[0];
+
 	private final String packageName;
 	private final String className;
 	private final String fullyQualifiedClassName;

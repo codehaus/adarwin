@@ -22,21 +22,21 @@
   
   <target name="bad">
     <adarwin binding="rules.properties"
-             classPath="${basedir}/target/classes"
+             classPath="${basedir}/target/test-classes"
              print="true"
              ruleExpression="${ruleUsingB}"/>
   </target>
 
   <target name="multi">
     <adarwin binding="rules.properties"
-             classPath="${basedir}/target/classes"
+             classPath="${basedir}/target/test-classes"
              print="true"
              ruleExpression="${ruleUsingB}, ${ruleUsingC}"/>
   </target>
 
   <target name="file">
     <adarwin binding="rules.properties"
-             classPath="${basedir}/target/classes"
+             classPath="${basedir}/target/test-classes"
              print="true"
              ruleFileName="rules.txt"/>
   </target>
