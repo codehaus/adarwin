@@ -154,6 +154,62 @@ public class RuleBuilderTestCase extends TestCase {
         }
 	}
 	
+	public void testWhiteSpaceInRuleIsIrrelevant() throws BuilderException {
+		RuleClassBindings ruleClassBindings = new RuleClassBindings(new String[] {"and", "true"},
+			new Class[] {AndRule.class, TrueRule.class});
+
+		RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
+
+		String expression = "  \t\nand \n\t(\n\n\t  true  \t\n\t , \t\t\n true  \t\t\n)  \n\n\t";
+		String SimplyfiedExpression = "and(true, true)";
+
+		Rule rule = ruleBuilder.buildRule(expression);
+
+		assertEquals(INCORRECT_RULE_BUILT, SimplyfiedExpression, rule.getExpression(ruleClassBindings));
+	}
+	
+	public void testWhiteSpaceBetweenRulesIsIrrelevant() throws BuilderException {
+		RuleClassBindings ruleClassBindings = new RuleClassBindings(new String[] {"and", "true"},
+			new Class[] {AndRule.class, TrueRule.class});
+
+		RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
+
+		String subExpression = "and(true, true)";
+		String expression = subExpression + " \t\n, \n\n\t " + subExpression;
+
+		Rule[] rules = ruleBuilder.buildRules(expression);
+		
+		assertEquals(2, rules.length);
+		assertEquals(subExpression, rules[0].getExpression(ruleClassBindings));
+		assertEquals(subExpression, rules[1].getExpression(ruleClassBindings));
+	}
+	
+	public void testWhiteSpaceBetweenVariableAssignmentIsIrrelevant() throws BuilderException {
+		RuleClassBindings ruleClassBindings = new RuleClassBindings(new String[] {"and", "true"},
+			new Class[] {AndRule.class, TrueRule.class});
+
+		RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
+
+		String variable = "and(true, true)";
+		String expression = "var = " + variable;
+
+		Rule rule = ruleBuilder.buildRule(expression);
+		
+		assertNull(rule);
+		
+		Rule var = ruleBuilder.getVariable("var");
+		
+		assertEquals(variable, var.getExpression(ruleClassBindings));
+	}
+	
+	public void testVariableAssignment() {
+		
+	}
+	
+	public void testUseVariable() {
+		
+	}
+		
 	public void testParseSimpleExpression() {
 		String first = "a(b(c()))";
 		String second = "d()";
