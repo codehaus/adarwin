@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <projectDescription>
-	<name>ajester</name>
-	<comment></comment>
-	<projects>
-	</projects>
-	<buildSpec>
-		<buildCommand>
-			<name>org.eclipse.jdt.core.javabuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-	</buildSpec>
-	<natures>
-		<nature>org.eclipse.jdt.core.javanature</nature>
-	</natures>
+  <name>ajester</name>
+  <comment>aJester validates that your code is properly tested. It achieves this by mutating your code and rerunning the tests. If the tests still pass the mutated code is either uncovered by any tests or redundant.</comment>
+  <projects>
+  </projects>
+  <buildSpec>
+    <buildCommand>
+      <name>org.eclipse.jdt.core.javabuilder</name>
+      <arguments>
+      </arguments>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+  </natures>
 </projectDescription>

@@ -19,17 +19,17 @@ public class TestRunnerWrapper {
 //		}
 //	}
 //
-	public TestResults run(String testClassName, MutatingCodeAdapter mutatingCodeAdapter)
+	public TestResults run(String testClassName, MutatingClassAdapter mutatingClassAdapter)
 		throws Exception {
 		
-		return new TestRunner(mutatingCodeAdapter).run(testClassName);
+		return new TestRunner(mutatingClassAdapter).run(testClassName);
 	}
 
 	private class TestRunner extends BaseTestRunner {
-		private MutatingCodeAdapter mutatingCodeAdapter;
+		private MutatingClassAdapter mutatingClassAdapter;
 
-		public TestRunner(MutatingCodeAdapter mutatingCodeAdapter) {
-			this.mutatingCodeAdapter = mutatingCodeAdapter;
+		public TestRunner(MutatingClassAdapter mutatingClassAdapter) {
+			this.mutatingClassAdapter = mutatingClassAdapter;
 		}
 		
 		public TestResults run(String testClassName) throws Exception {
@@ -46,7 +46,7 @@ public class TestRunnerWrapper {
 		}
 
 		public TestSuiteLoader getLoader() {
-			return new MutatingClassLoader(mutatingCodeAdapter);
+			return new MutatingClassLoader(mutatingClassAdapter);
 		}
 
 		public void testFailed(int status, Test test, Throwable t) {

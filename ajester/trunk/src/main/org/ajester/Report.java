@@ -10,7 +10,7 @@ public class Report {
 	}
 
 	public String getReport() {
-		return removePackage(codeClassName) + ": " + getProblemString();
+		return getProblemString() + ": " + removePackage(codeClassName);
 	}
 
 	private String removePackage(String className) {
@@ -20,11 +20,11 @@ public class Report {
 	private String getProblemString() {
 		if (results.getErrors().size() == 0 &&
 			results.getFailures().size() == 0) {
+			
 			return "Some problems";
 		}
 		else {
 			return "No problems";
 		}
 	}
-
 }
