@@ -11,7 +11,8 @@ import junit.framework.TestCase;
 public class MethodCoverageTestCase extends TestCase {
 	public void testCovered() throws Exception {
 		Report report = new TestRunnerWrapper().run(BooleanReturnTestCase.class,
-			new MethodCoverageMutator(BooleanReturn.LOCATION));
+			new MethodCoverageMatcher(new CodeLocationMatcher(BooleanReturn.LOCATION)),
+			new MethodCoverageInstructionMutator());
 
 		assertEquals(1, report.getCoverage().getCoverage().size());
 		assertTrue(report.getCoverage().contains(BooleanReturn.LOCATION));
@@ -19,7 +20,8 @@ public class MethodCoverageTestCase extends TestCase {
 
 	public void testTwoClassesCovered() throws Exception {
 		Report report = new TestRunnerWrapper().run(BooleanReturnAndIfStatementTestSuite.class,
-			new MethodCoverageMutator(new PackageCodeMatcher("org.ajester.testmodel.code")));
+			new MethodCoverageMatcher(new PackageCodeMatcher("org.ajester.testmodel.code")),
+			new MethodCoverageInstructionMutator());
 
 		Set coverage = report.getCoverage().getCoverage();
 

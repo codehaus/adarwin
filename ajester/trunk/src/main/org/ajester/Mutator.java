@@ -6,7 +6,7 @@ import org.objectweb.asm.CodeVisitor;
 
 import java.util.Set;
 
-public interface Mutator extends ClassVisitor, CodeVisitor, InstructionMatcher, InstructionMutator {
+public interface Mutator extends ClassVisitor, CodeVisitor {
 	public byte[] visit(ClassReader reader);
 
 	public Set getMutations();

@@ -7,12 +7,14 @@ import org.objectweb.asm.Label;
 import junit.framework.TestCase;
 
 public class IfStatementMutatorTestCase extends TestCase {
-	private IfStatementMutator mutator;
+	private InstructionMutator mutator;
+	private InstructionMatcher matcher;
 
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		mutator = new IfStatementMutator(IfEqualsStatement.LOCATION);
+		matcher = new IfStatementMatcher(new CodeLocationMatcher(IfEqualsStatement.LOCATION));
+		mutator = new IfStatementInstructionMutator();
 	}
 
 	public void testMutatesMatchingMethod() {
@@ -23,7 +25,7 @@ public class IfStatementMutatorTestCase extends TestCase {
 		JumpInstruction expectedMutatedJumpInstruction =
 			new JumpInstruction(IfEqualsStatement.LOCATION, Constants.IFNE, label);
 		
-		assertTrue(mutator.matches(jumpInstruction));
+		assertTrue(matcher.matches(jumpInstruction));
 		assertEquals(expectedMutatedJumpInstruction, mutator.mutate(jumpInstruction));
 	}
 }

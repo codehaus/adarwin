@@ -26,6 +26,12 @@ public class TestRunnerWrapper {
 //		}
 //	}
 //
+	public Report run(Class testClass, InstructionMatcher instructionMatcher,
+		InstructionMutator instructionMutator) throws Exception {
+		
+		return run(testClass, new BaseMutator(instructionMatcher, instructionMutator));
+	}
+	
 	public Report run(Class testClass, Mutator mutator) throws Exception {
 		return run(testClass.getName(), mutator);
 	}

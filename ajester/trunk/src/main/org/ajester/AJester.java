@@ -23,7 +23,8 @@ public class AJester {
 		MutatorFactory[] factories) throws Exception {
 		
 		Report report = new TestRunnerWrapper().run(testCaseClass,
-			new MethodCoverageMutator(new ClassCodeMatcher(codeClass.getName())));
+			new MethodCoverageMatcher(new ClassCodeMatcher(codeClass.getName())),
+			new MethodCoverageInstructionMutator());
 
 		List mutators = new LinkedList();
 		
@@ -32,7 +33,7 @@ public class AJester {
 			for(Iterator iterator = coverage.getCoverage().iterator(); iterator.hasNext();) {
 				CodeLocation codeLocation = (CodeLocation) iterator.next();
 			
-				mutators.add(factories[fLoop].createMutator(codeLocation));
+				mutators.add(factories[fLoop].createMutator(new CodeLocationMatcher(codeLocation)));
 			}			
 		}
 		
@@ -52,6 +53,10 @@ public class AJester {
 	public AJester(Class testCaseClass, Class codeClass, Class mutatorClass) throws Exception {
 		this.testClassName = testCaseClass.getName();
 		this.mutators = getMutators(testCaseClass, codeClass, new MutatorFactory(mutatorClass));
+	}
+
+	public AJester(Class testCaseClass, InstructionMatcher matcher, InstructionMutator mutator) {
+		this(testCaseClass, new BaseMutator(matcher, mutator));
 	}
 
 	public Report run() throws Exception {

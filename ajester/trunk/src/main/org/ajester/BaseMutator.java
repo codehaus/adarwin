@@ -9,7 +9,7 @@ import org.objectweb.asm.Label;
 import java.util.HashSet;
 import java.util.Set;
 
-abstract class BaseMutator extends ClassAdapter implements Mutator {
+class BaseMutator extends ClassAdapter implements Mutator {
 	private final Set mutations;
 	private CodeVisitor codeVisitor;
 	private String currentClassName;
@@ -18,12 +18,12 @@ abstract class BaseMutator extends ClassAdapter implements Mutator {
 	private final InstructionMatcher instructionMatcher;
 	private final InstructionMutator instructionMutator;
 	
-	public BaseMutator() {
+	public BaseMutator(InstructionMatcher instructionMatcher, InstructionMutator instructionMutator) {
 		super(new ReuseableClassWriter());
 		this.mutations = new HashSet();
 
-		this.instructionMatcher = this;
-		this.instructionMutator = this;
+		this.instructionMatcher = instructionMatcher;
+		this.instructionMutator = instructionMutator;
 		currentClassName = "";
 	}
 
@@ -48,10 +48,14 @@ abstract class BaseMutator extends ClassAdapter implements Mutator {
 		
 		Access methodAccess = new Access(access);
 		boolean abstractOrNative = methodAccess.isAbstract || methodAccess.isNative; 
-		if (!abstractOrNative && getCodeMatcher().matches(getCurrentCodeLocation())) {
-			MethodCoverageMutator mutator = new MethodCoverageMutator(null);
+		if (!abstractOrNative && instructionMatcher.getCodeMatcher().matches(getCurrentCodeLocation())) {
+			MethodCoverageMatcher matcher =
+				new MethodCoverageMatcher(null);
 			
-			if (mutator.matches(instruction)) {
+			MethodCoverageInstructionMutator mutator =
+				new MethodCoverageInstructionMutator();
+			
+			if (matcher.matches(instruction)) {
 				mutator.mutate(instruction).visit(getClassVisitor(), codeVisitor);
 			}
 
@@ -80,7 +84,7 @@ abstract class BaseMutator extends ClassAdapter implements Mutator {
 	public final void visitInsn(final int opcode) {
 		print("visitInsn(" + lookup(opcode) + ")");
 		//codeVisitor.visitInsn(opcode);
-		mutateIfMatches(new OrdinaryInstruction(opcode));
+		mutateIfMatches(new OrdinaryInstruction(getCurrentCodeLocation(), opcode));
 	}
 
 	public final void visitIntInsn(final int opcode, final int operand) {
@@ -213,8 +217,6 @@ abstract class BaseMutator extends ClassAdapter implements Mutator {
 		return getClassWriter().toByteArray();
 	}
 	
-	abstract protected CodeMatcher getCodeMatcher();
-
 	protected ClassVisitor getClassVisitor() {
 		return this.cv;
 	}
@@ -234,5 +236,9 @@ abstract class BaseMutator extends ClassAdapter implements Mutator {
 		}
 		
 		instruction.visit(getClassVisitor(), getCodeVisitor());
+	}
+
+	public InstructionMutator getInstructionMutator() {
+		return instructionMutator;
 	}
 }
