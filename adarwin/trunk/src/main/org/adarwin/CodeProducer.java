@@ -1,6 +1,7 @@
 package org.adarwin;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
@@ -15,6 +16,41 @@ public class CodeProducer {
 		this.name = name;
 		this.fileAccessor = fileAccessor;
 	}
+	
+	public CodeIterator iterator() {
+		if (isClass(name)) {
+			return new CodeIterator() {
+				private boolean done = false;
+
+				public boolean hasNext() {
+					return !done;
+				}
+
+				public Code next() {
+					try {
+						return new ClassFile(fileAccessor.openFile(name));
+					}
+					catch (FileNotFoundException e) {
+						throw new ADarwinException(e);
+					}
+					finally {
+						done = true;
+					}
+				}
+			};
+		}
+		else if (isClassPath(name)) {
+			return new ClassPathIterator(name, fileAccessor);
+		}
+		else if (isJar(name)) {
+			return new JarIterator(name, fileAccessor);
+		}
+		else if (isDirectory(name)) {
+			return new ClassDirectoryIterator(fileAccessor, fileAccessor.files(name));
+		}
+
+		return CodeIterator.NULL;
+	}
 
 	public void produce(CodeConsumer codeConsumer) {
 		try {
@@ -26,11 +62,11 @@ public class CodeProducer {
 	}
 
 	private void produce(String name, CodeConsumer codeConsumer) throws IOException {
-		if (isClassPath(name)) {
-			produceClassPath(name, codeConsumer);
-		}
-		else if (isClass(name)) {
+		if (isClass(name)) {
 			codeConsumer.consume(new ClassFile(fileAccessor.openFile(name)));
+		}
+		else if (isClassPath(name)) {
+			produceClassPath(name, codeConsumer);
 		}
 		else if (isJar(name)) {
 			produceJar(name, codeConsumer);
@@ -72,7 +108,7 @@ public class CodeProducer {
 		return name.indexOf(File.pathSeparator) != -1;
 	}
 
-	private boolean isClass(String token) {
+	public static boolean isClass(String token) {
 		return token.endsWith(".class");
 	}
 

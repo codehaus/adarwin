@@ -64,9 +64,8 @@ public class FileAccessor implements IFileAccessor {
 	public boolean isDirectory(String name) {
 		return new File(name).isDirectory();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.adarwin.IFileAccessor#readFile(java.lang.String)
-	 */
 
+	public IFileIterator files(final String name) {
+		return new DirectoryFileIterator(name, this);
+	}
 }
