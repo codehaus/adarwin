@@ -17,16 +17,15 @@ public class ClassPathIterator implements CodeIterator {
 		return tokenizer.hasMoreTokens() || (iterator != null && iterator.hasNext());
 	}
 
-	public Code next() {
+	public ClassSummary next() {
 		if ((iterator == null || !iterator.hasNext()) && tokenizer.hasMoreTokens()) {
 			iterator = new CodeProducer(tokenizer.nextToken(), fileAccessor).iterator();
 		}
-		
+
 		if (iterator != null && iterator.hasNext()) {
 			return iterator.next();
 		}
-		else {
-			return Code.NULL;
-		}
+
+		return null;
 	}
 }

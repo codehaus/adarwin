@@ -5,12 +5,12 @@ public interface CodeIterator {
 		public boolean hasNext() {
 			return false;
 		}
-		public Code next() {
+		public ClassSummary next() {
 			return null;
 		}
 	};
 
 	public boolean hasNext();
 
-	public Code next();
+	public ClassSummary next();
 }

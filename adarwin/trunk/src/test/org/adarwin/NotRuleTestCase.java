@@ -20,13 +20,13 @@ public class NotRuleTestCase extends RuleTestCase {
     public void testNegatation() {
         Rule rule = new NotRule(new TrueRule());
 
-        assertNumMatches(0, rule, InPackageA.class);
+        assertFalse(matches(rule, InPackageA.class));
     }
 
     public void testDoubleNegation() {
         Rule rule = new NotRule(new NotRule(new TrueRule()));
 
-        assertNumMatches(1, rule, InPackageA.class);
+        assertTrue(matches(rule, InPackageA.class));
     }
 
 	public void testComplexNegation() {
@@ -39,6 +39,6 @@ public class NotRuleTestCase extends RuleTestCase {
 		
 		Rule rule = new NotRule(new UsesRule(createPackageRule(InPackageB.class)));
 
-		assertNumMatches(0, rule, UsesPackageAAndPackageB.class);
+		assertFalse(matches(rule, UsesPackageAAndPackageB.class));
 	}
 }

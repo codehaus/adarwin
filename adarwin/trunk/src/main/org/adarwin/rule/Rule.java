@@ -13,11 +13,5 @@ package org.adarwin.rule;
 import org.adarwin.ClassSummary;
 
 public interface Rule {
-	Rule NULL = new Rule() {
-		public ClassSummary inspect(ClassSummary classSummary) {
-			return classSummary.empty();
-		}
-	};
-
 	ClassSummary inspect(ClassSummary classSummary);
 }

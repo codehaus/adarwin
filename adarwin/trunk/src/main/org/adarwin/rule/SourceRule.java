@@ -30,7 +30,7 @@ public class SourceRule implements Rule, Filter {
 	}
 
 	public int hashCode() {
-		return getClass().hashCode() ^ wrappedRule.hashCode();
+		return getClass().hashCode();
 	}
 
 	public boolean equals(Object object) {

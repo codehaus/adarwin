@@ -20,7 +20,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Label;
 
-class RuleClassVisitor implements ClassVisitor {
+public class RuleClassVisitor implements ClassVisitor {
     private final CodeVisitor codeVisitor = new RuleCodeVisitor();
 	private final TypeParser typeParser = new TypeParser();
 	private final Set dependancies = new HashSet();
@@ -79,7 +79,7 @@ class RuleClassVisitor implements ClassVisitor {
 		String[] parameterNames = typeParser.parameterTypes(desc);
 
 		if (isConstructor(methodName)) {
-			dependancies.add(new ConstructorDeclaration(className, parameterNames));
+			dependancies.add(ConstructorInvocation.createDeclaration(className, parameterNames));
 		}
 		else {
 			inspect(CodeElement.createUses(typeParser.returnType(desc)));
@@ -135,7 +135,7 @@ class RuleClassVisitor implements ClassVisitor {
         	String[] parameterTypes = typeParser.parameterTypes(desc);
 
 			if (isConstructor(methodName)) {
-        		inspect(ConstructorInvocation.create(className, parameterTypes));
+        		inspect(ConstructorInvocation.createInvocation(className, parameterTypes));
         	}
         	else {
         		if (Class.class.getName().equals(className) && "forName".equals(methodName)) {

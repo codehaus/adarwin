@@ -40,81 +40,64 @@ public class RuleBuilder implements RuleProducer {
 		}
     }
 
-	public void produce(RuleConsumer ruleConsumer) {
-    	String[] subExpressions = parse(ruleExpression);
-
-    	for (int rLoop = 0; rLoop < subExpressions.length; rLoop++) {
-			produceRule(ruleConsumer, subExpressions[rLoop].trim());
-    	}
-    }
-
-	private void produceRule(RuleConsumer ruleConsumer, String subExpression) {
-		String ruleName = getRuleName(subExpression);
-
-		if (subExpression.indexOf('=') == -1) {
-			Rule rule = getRuleOrVariable(subExpression);
-
-			if (rule instanceof NameRule) {
-				logger.reset(CLASSES_VIOLATED + ((NameRule) rule).getName());
-			}
-			else {
-				logger.reset(CLASSES_VIOLATED + subExpression);
-			}
-
-			ruleConsumer.consume(rule, logger);
-		}
-		else if (getClass(ruleName) == null) {
-			throw new ADarwinException("No such rule: " + ruleName);
-		}
-		else {
-			variables.put(getVariableName(subExpression), buildRule(ruleName, subExpression));
-		}
-	}
-
 	public RuleIterator iterator() {
 		return new RuleIterator() {
 			String[] subExpressions = parse(ruleExpression);
+			String subExpression;
 			int index = 0;
+			Rule next = prefetch();
 
 			public boolean hasNext() {
-				return index < subExpressions.length;
+				return next != null;
 			}
 
 			public Rule next() {
-				if (hasNext()) {
-					String subExpression = subExpressions[index++];
+				Rule nextRule = this.next;
+
+				if (next != null) {
+					next = prefetch();
+				}
+
+				if (nextRule instanceof NameRule) {
+					logger.reset(CLASSES_VIOLATED + ((NameRule) nextRule).getName());
+				}
+				else {
+					logger.reset(CLASSES_VIOLATED + subExpression);
+				}
+
+				return nextRule;
+			}
+
+			private Rule prefetch() {
+				if (index < subExpressions.length) {
+					subExpression = subExpressions[index++];
 					String ruleName = getRuleName(subExpression);
 
 					if (subExpression.indexOf('=') == -1) {
-						Rule rule = getRuleOrVariable(subExpression);
-
-						if (rule instanceof NameRule) {
-							logger.reset(CLASSES_VIOLATED + ((NameRule) rule).getName());
-						}
-						else {
-							logger.reset(CLASSES_VIOLATED + subExpression);
-						}
-
-						return rule;
+						return getRuleOrVariable(subExpression);
 					}
 					else if (RuleBuilder.this.getClass(ruleName) == null) {
 						throw new ADarwinException("No such rule: " + ruleName);
 					}
 					else {
-						variables.put(getVariableName(subExpression), buildRule(ruleName, subExpression));
+						String variableName =
+							subExpression.substring(0, Math.max(0, subExpression.indexOf('=')));
+
+						if (variableName.length() > 0) {
+							variables.put(variableName, buildRule(ruleName, subExpression));
+						}
 					}
 				}
 
-				return Rule.NULL;
+				return null;
 			}
 		};
 	}
 
 	private Rule getRuleOrVariable(String expression) {
 		String ruleName = getRuleName(expression);
-		
-		if (getClass(ruleName) == null &&
-			variables.get(ruleName) == null) {
+
+		if (getClass(ruleName) == null && variables.get(ruleName) == null) {
 			throw new ADarwinException("No such rule, or variable: \"" + ruleName + "\"");
 		}
 		else if (getClass(ruleName) != null) {
@@ -125,65 +108,43 @@ public class RuleBuilder implements RuleProducer {
 		}
 	}
 
-	private String getVariableName(String expression) {
-		if (expression.indexOf('=') != -1) {
-			return expression.substring(0, expression.indexOf('='));
-		}
-
-		return "";
-	}
-
 	private String getRuleName(final String expression) {
-		int startOfName = 0;
-		
-		if (expression.indexOf('=') != -1) {
-			startOfName = expression.indexOf('=') + 1;
-		}
-		
-		int endOfName = expression.length();
-		
-        if (expression.indexOf('(') != -1) {
-			endOfName = expression.indexOf('(');
-        }
+		int startOfName = Math.max(0, expression.indexOf('=') + 1);
 
-		return expression.substring(startOfName, endOfName).trim();        
+		return expression.substring(startOfName, expression.indexOf('(')).trim();        
     }
 
     private String[] getParameters(final String expression) {
-        String[] parameters = new String[0];
-
         int firstParathesesPos = expression.indexOf('(');
-        if (firstParathesesPos != -1) {
-            int lastParathesisPos = expression.lastIndexOf(')');
+        int lastParathesisPos = expression.lastIndexOf(')');
 
-            if (lastParathesisPos - firstParathesesPos > 1) {
-                String innerBit = expression.substring(firstParathesesPos + 1, lastParathesisPos);
+        if (firstParathesesPos == -1 || lastParathesisPos - firstParathesesPos <= 1) {
+        	return new String[0];
+        }
 
-                int depth = 0;
-                int startPos = 0;
-                List parameterList = new LinkedList();
+        String innerBit = expression.substring(firstParathesesPos + 1, lastParathesisPos);
 
-                for (int cLoop = 0; cLoop < innerBit.length(); ++cLoop) {
-                    switch (innerBit.charAt(cLoop)) {
-                        case '(' : depth++; break;
-                        case ')' : depth--; break;
-                        case ',' :
-                            if (depth == 0) {
-                                parameterList.add(innerBit.substring(startPos, cLoop));
-                                startPos = cLoop+1;
-                            }
-                            
-                            break;
+        int depth = 0;
+        int startPos = 0;
+        List parameterList = new LinkedList();
+
+        for (int cLoop = 0; cLoop < innerBit.length(); ++cLoop) {
+            switch (innerBit.charAt(cLoop)) {
+                case '(' : depth++; break;
+                case ')' : depth--; break;
+                case ',' :
+                    if (depth == 0) {
+                        parameterList.add(innerBit.substring(startPos, cLoop));
+                        startPos = cLoop+1;
                     }
-                }
 
-                parameterList.add(innerBit.substring(startPos));
-
-                parameters = (String[]) parameterList.toArray(new String[0]);
+                    break;
             }
         }
 
-        return parameters;
+        parameterList.add(innerBit.substring(startPos));
+
+        return (String[]) parameterList.toArray(new String[0]);
     }
 
     private Rule buildRule(String ruleName, String expression) {
@@ -207,7 +168,7 @@ public class RuleBuilder implements RuleProducer {
 
     private Class getClass(String ruleName) {
     	String className = ruleMapping.getProperty(ruleName);
-		
+
 		if (className == null) {
 			return null;
 		}

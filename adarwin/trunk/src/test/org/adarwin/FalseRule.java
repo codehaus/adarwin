@@ -12,10 +12,12 @@ package org.adarwin;
 
 import org.adarwin.rule.Rule;
 
+import java.util.Collections;
+
 
 public class FalseRule implements Rule {
 	public ClassSummary inspect(ClassSummary classSummary) {
-		return classSummary.empty();
+		return new ClassSummary("", Collections.EMPTY_SET); 
 	}
 
 	public int hashCode() {

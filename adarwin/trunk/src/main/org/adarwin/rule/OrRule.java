@@ -12,6 +12,8 @@ package org.adarwin.rule;
 
 import org.adarwin.ClassSummary;
 
+import java.util.Arrays;
+
 public class OrRule implements Rule {
 	private Rule[] rules;
 
@@ -27,5 +29,15 @@ public class OrRule implements Rule {
 		}
 		
 		return ClassSummary.or(summaries);
+	}
+
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+
+	public boolean equals(Object object) {
+		return object != null &&
+			getClass().equals(object.getClass()) &&
+			Arrays.equals(rules, ((OrRule) object).rules);
 	}
 }

@@ -24,40 +24,12 @@ import org.easymock.MockControl;
 import java.util.Properties;
 
 public class RuleBuilderTestCase extends RuleTestCase {
-	private final MockControl ruleConsumerControl =
-		MockControl.createNiceControl(RuleConsumer.class);
-	private final RuleConsumer ruleConsumer = (RuleConsumer) ruleConsumerControl.getMock();
-	
 	private final MockControl loggerControl = MockControl.createNiceControl(Logger.class);
 	private final Logger logger = (Logger) loggerControl.getMock();
 
-	private final String[] ruleNames = new String[] {
-		"true", "and", "parent", "constructor",
-		"src", "package", "method", "uses",
-		"not", "false"
-	};
-	
-	private final Class[] ruleClasses = new Class[] {
-		TrueRule.class, AndRule.class, ParentRule.class, ConstructorRule.class,
-		SourceRule.class, PackageRule.class, MethodRule.class, UsesRule.class,
-		NotRule.class, FalseRule.class
-	};
-	
-	private final Properties ruleMapping = buildMapping(ruleNames, ruleClasses);
-
     public void testTrueRuleGrammer() {
-    	assertEquals(new TrueRule(), "true");
+    	assertEquals(new TrueRule(), "true()");
     }
-
-	private Properties buildMapping(String[] ruleNames, Class[] ruleClasses) {
-		Properties properties = new Properties();
-		
-		for (int rLoop = 0; rLoop < ruleClasses.length; rLoop++) {
-			properties.put(ruleNames[rLoop], ruleClasses[rLoop].getName());
-		}
-
-		return properties;
-	}
 
 	public void testInPackageRuleGrammer() {
 		assertEquals(new SourceRule(new PackageRule("x")), "src(package(x))");
@@ -72,7 +44,7 @@ public class RuleBuilderTestCase extends RuleTestCase {
 
     public void testTwoLevelsOfNesting() {
     	assertEquals(new NotRule(new AndRule(new Rule[] {new TrueRule(), new TrueRule()})),
-    		"not(and(true, true))");
+    		"not(and(true(), true()))");
     }
 
     public void testInPackageRule() {
@@ -81,7 +53,7 @@ public class RuleBuilderTestCase extends RuleTestCase {
 
     public void testAndRule() {
     	assertEquals(new AndRule(new Rule[] {new TrueRule(), new TrueRule(), new TrueRule()}),
-    		"and(true, true, true)");
+    		"and(true(), true(), true())");
     }
 
     public void testConstructorRule() {
@@ -100,13 +72,13 @@ public class RuleBuilderTestCase extends RuleTestCase {
 
 	public void testWhiteSpaceInRuleIsIrrelevant() {
 		assertEquals(new AndRule(new Rule[] {new TrueRule(), new TrueRule()}),
-			"  \t\nand \n\t(\n\n\t  true  \t\n\t , \t\t\n true  \t\t\n)  \n\n\t");
+			"  \t\nand \n\t(\n\n\t  true()  \t\n\t , \t\t\n true()  \t\t\n)  \n\n\t");
 	}
 	
 	public void testSimpleVariable() {
 		assertEquals(new TrueRule(), "var = true(), var");
 	}
-	
+
 	public void testComplexVariable() {
 		assertEquals(new AndRule(new Rule[] {new TrueRule()}), "var = true(), and(var)");
 	}
@@ -116,54 +88,43 @@ public class RuleBuilderTestCase extends RuleTestCase {
 	}
 
     public void testUnknownRule() {
-		ruleConsumerControl.replay();
-
 		try {
-			produceRules("gobbledygook");
+			produceRules("gobbledygook()", new Rule[0]);
 
 			fail();
 		}
 		catch (ADarwinException be) {
 			assertEquals("No such rule, or variable: " + "\"gobbledygook\"", be.getMessage());
 		}
-
-		ruleConsumerControl.verify();
     }
 
 	public void testUnbalancedBrackets() {
-		ruleConsumerControl.replay();
-
 		String expression = "(";
 		try {
-			produceRules("(");
+			produceRules("(", new Rule[0]);
 			fail();
 		}
 		catch (ADarwinException be) {
 			assertEquals("Unbalanced expression: \"" + expression + "\"", be.getMessage());
 		}
-		ruleConsumerControl.verify();
 	}
 
 	public void testMultipleRules() {
 		expectRule(new TrueRule());
 		expectRule(new TrueRule());
 
-		ruleConsumerControl.replay();
-
-		produceRules("true, true");
-
-		ruleConsumerControl.verify();
+		produceRules("true(), true()", new Rule[] {new TrueRule(), new TrueRule()});
 	}
 
 	public void testMultipleComplexRules() {
 		expectRule(new SourceRule(new PackageRule("package-a")));
 		expectRule(new SourceRule(new PackageRule("package-b")));
 
-		ruleConsumerControl.replay();
-
-		produceRules("src(package(package-a)), src(package(package-b))");
-
-		ruleConsumerControl.verify();
+		produceRules("src(package(package-a)), src(package(package-b))",
+			new Rule[] {
+				new SourceRule(new PackageRule("package-a")),
+				new SourceRule(new PackageRule("package-b"))
+		});
 	}
 
 	public void testWhiteSpaceBetweenRulesIsIrrelevant() {
@@ -171,28 +132,21 @@ public class RuleBuilderTestCase extends RuleTestCase {
 		expectRule(expectedRule);
 		expectRule(expectedRule);
 
-		ruleConsumerControl.replay();
-
-		produceRules("and(true, true) \t\n, \n\n\t and(true, true)");
-
-		ruleConsumerControl.verify();
+		produceRules("and(true(), true()) \t\n, \n\n\t and(true(), true())", new Rule[] {
+			expectedRule, expectedRule
+		});
 	}
 
 	public void testWhiteSpaceBetweenVariableAssignmentIsIrrelevant() {
-		ruleConsumer.consume(new AndRule(new Rule[] {new TrueRule()}), logger);
-		ruleConsumerControl.setReturnValue(true);
-		ruleConsumerControl.replay();
-
-		produceRules("var = true(), and(true)");
-
-		ruleConsumerControl.verify();
+		produceRules("var = true(), and(true)", new Rule[] {
+			new AndRule(new Rule[] {new TrueRule()})
+		});
 	}
 
-//	
 //	public void testVariableAssignment() {
 //		
 //	}
-//	
+
 //	public void testUseVariable() {
 //		
 //	}
@@ -200,21 +154,60 @@ public class RuleBuilderTestCase extends RuleTestCase {
 	private void assertEquals(Rule expectedRule, String expression) {
 		expectRule(expectedRule);
 
-		ruleConsumerControl.replay();
 		loggerControl.replay();
 
-		produceRules(expression);
+		produceRules(expression, new Rule[] {expectedRule});
 
-		ruleConsumerControl.verify();
 		loggerControl.verify();
 	}
 
-	private void produceRules(String expression) {
-		new RuleBuilder(expression, logger, ruleMapping).produce(ruleConsumer);
+	private void produceRules(String expression, Rule[] rules) {
+		int index = 0;
+
+		RuleIterator iterator = iterator(expression);
+		for (int rLoop = 0; rLoop < rules.length && iterator.hasNext(); rLoop++) {
+			Rule expected = rules[index++];
+			Rule actual = iterator.next();
+			
+			if (!expected.equals(actual)) {
+				System.out.println(expected.getClass());
+				System.out.println(actual.getClass());
+			}
+			
+			assertEquals(expected, actual);
+
+			//ruleConsumer.consume(iterator.next(), logger);
+		}
+	}
+	
+	private RuleIterator iterator(String expression) {
+		Properties ruleMapping = buildMapping(
+			new String[] {
+				"true", "and", "parent", "constructor",
+				"src", "package", "method", "uses",
+				"not", "false"
+			},
+			new Class[] {
+				TrueRule.class, AndRule.class, ParentRule.class, ConstructorRule.class,
+				SourceRule.class, PackageRule.class, MethodRule.class, UsesRule.class,
+				NotRule.class, FalseRule.class
+			});
+
+		return new RuleBuilder(expression, logger, ruleMapping).iterator();
+	}
+
+	private Properties buildMapping(String[] ruleNames, Class[] ruleClasses) {
+		Properties properties = new Properties();
+
+		for (int rLoop = 0; rLoop < ruleClasses.length; rLoop++) {
+			properties.put(ruleNames[rLoop], ruleClasses[rLoop].getName());
+		}
+
+		return properties;
 	}
 
 	private void expectRule(Rule rule) {
-		ruleConsumer.consume(rule, logger);
-		ruleConsumerControl.setReturnValue(true);
+//		ruleConsumer.consume(rule, logger);
+//		ruleConsumerControl.setReturnValue(true);
 	}
 }

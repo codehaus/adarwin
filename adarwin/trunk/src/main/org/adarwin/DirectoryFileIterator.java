@@ -6,6 +6,7 @@ import java.util.List;
 public class DirectoryFileIterator implements IFileIterator {
 	private final IFileAccessor fileAccessor;
 	private List fileStack = new LinkedList();
+	private String nextFile;
 
 	public DirectoryFileIterator(String directory, IFileAccessor fileAccessor) {
 		this.fileAccessor = fileAccessor;
@@ -16,13 +17,25 @@ public class DirectoryFileIterator implements IFileIterator {
 		else {
 			fileStack.add(directory);
 		}
+		
+		nextFile = prefetch();
 	}
 
 	public boolean hasNext() {
-		return !fileStack.isEmpty();
+		return nextFile != null;
 	}
 
 	public String next() {
+		String next = nextFile;
+
+		if (nextFile != null) {
+			nextFile = prefetch();
+		}
+
+		return next;
+	}
+
+	private String prefetch() {
 		String fileName = null;
 
 		while (fileName == null && !fileStack.isEmpty()) {
@@ -33,6 +46,7 @@ public class DirectoryFileIterator implements IFileIterator {
 			}
 			else {
 				addAll(fileName);
+
 				fileName = null;
 			}
 		}

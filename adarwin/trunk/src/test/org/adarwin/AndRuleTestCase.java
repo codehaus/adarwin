@@ -22,25 +22,25 @@ public class AndRuleTestCase extends RuleTestCase {
     public void testFalseAndFalse() {
         Rule rule = new AndRule(new Rule[] {new FalseRule(), new FalseRule()});
 
-        assertNumMatches(0, rule, InPackageA.class);
+        assertFalse(matches(rule, InPackageA.class));
     }
 
     public void testFalseAndTrue() {
         Rule rule = new AndRule(new Rule[] {new FalseRule(), new TrueRule()});
 
-        assertNumMatches(0, rule, InPackageA.class);
+        assertFalse(matches(rule, InPackageA.class));
     }
 
     public void testTrueAndFalse() {
         Rule rule = new AndRule(new Rule[] {new TrueRule(), new FalseRule()});
 
-        assertNumMatches(0, rule, InPackageA.class);
+        assertFalse(matches(rule, InPackageA.class));
     }
 
     public void testTrueAndTrue() {
         Rule rule = new AndRule(new Rule[] {new TrueRule(), new TrueRule()});
 
-        assertNumMatches(1, rule, InPackageAUsesClassFromPackageB.class);
+        assertTrue(matches(rule, InPackageAUsesClassFromPackageB.class));
     }
 
 	public void testRealTrueAndTrue() {
@@ -49,7 +49,7 @@ public class AndRuleTestCase extends RuleTestCase {
 			new UsesRule(createPackageRule(InPackageB.class))
 		});
 
-		assertNumMatches(1, rule, InPackageAUsesClassFromPackageB.class);
+		assertTrue(matches(rule, InPackageAUsesClassFromPackageB.class));
 	}
 
     public void testSequentialCoincedence() {
@@ -58,7 +58,7 @@ public class AndRuleTestCase extends RuleTestCase {
 			createPackageRule(InPackageB.class)
 		});
 
-        assertNumMatches(0, rule, InPackageA.class);
-        assertNumMatches(0, rule, InPackageB.class);
+        assertFalse(matches(rule, InPackageA.class));
+        assertFalse(matches(rule, InPackageB.class));
     }
 }

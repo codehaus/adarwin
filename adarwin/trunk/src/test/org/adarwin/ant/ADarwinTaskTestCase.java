@@ -11,8 +11,10 @@
 package org.adarwin.ant;
 
 
-import org.adarwin.ADarwinException;
 import org.adarwin.Logger;
+import org.adarwin.RuleBuilder;
+import org.adarwin.RuleClassVisitor;
+import org.adarwin.Runner;
 import org.apache.tools.ant.BuildException;
 import org.easymock.MockControl;
 
@@ -26,17 +28,20 @@ public class ADarwinTaskTestCase extends TestCase {
 	private boolean failFast = false;
 	private boolean failOnMatch = false;
 	private String binding = "rules.properties";
-	private String classPath = "classPath";
-	private String ruleExpression = "class(Rule)";
-	private Logger logger;
+	private String classPath = "target/classes";
+	private String ruleExpression = "class(ClassReader)";
+	private MockControl loggerControl = MockControl.createControl(Logger.class);
+	private Logger logger = (Logger) loggerControl.getMock();
 
 	protected void setUp() throws Exception {
-		logger = (Logger) MockControl.createNiceControl(Logger.class).getMock();
-
 		aDarwinTask = new ADarwinTask(logger);
 	}
-	
+
 	public void testRun() {
+		logger.log(Runner.EVALUATING_RULES_AGAINST + classPath);
+		logger.reset(RuleBuilder.CLASSES_VIOLATED + ruleExpression);
+		logger.log("  " + RuleClassVisitor.class.getName());
+
 		replay();
 
 		setProperties();
@@ -45,9 +50,11 @@ public class ADarwinTaskTestCase extends TestCase {
 
 		verify();
 	}
-	
+
 	public void testExecuteTranslatesRuleExceptionIntoBuildException() {
-		ruleExpression = "blah blah";
+		ruleExpression = "blahblah()";
+
+		logger.log(Runner.EVALUATING_RULES_AGAINST + classPath);
 
 		replay();
 
@@ -58,7 +65,7 @@ public class ADarwinTaskTestCase extends TestCase {
 			fail("BuildException expected");
 		}
 		catch (BuildException buildException) {
-			assertEquals("No such rule, or variable: \"blah blah\"", buildException.getMessage());
+			assertEquals("No such rule, or variable: \"blahblah\"", buildException.getMessage());
 		}
 
 		verify();
@@ -74,8 +81,10 @@ public class ADarwinTaskTestCase extends TestCase {
 	}
 
 	private void replay() {
+		loggerControl.replay();
 	}
 
 	private void verify() {
+		loggerControl.verify();
 	}
 }

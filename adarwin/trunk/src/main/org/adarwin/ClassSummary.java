@@ -73,7 +73,7 @@ public class ClassSummary {
 		return "ClassSummary(" + className + ", " + dependancies + ")";
 	}
 
-	public void log(Logger logger, boolean printDetail) {
+	public boolean log(Logger logger, boolean printDetail) {
 		if (!isEmpty()) {
 			logger.log("  " + className);
 
@@ -83,6 +83,8 @@ public class ClassSummary {
 				}
 			}
 		}
+		
+		return !isEmpty();
 	}
 
 	public boolean isEmpty() {
@@ -90,11 +92,7 @@ public class ClassSummary {
 	}
 
 	public ClassSummary negate(ClassSummary original) {
-		return isEmpty() ? original : empty();
-	}
-
-	public ClassSummary empty() {
-		return new ClassSummary(className, Collections.EMPTY_SET);
+		return isEmpty() ? original : new ClassSummary(className, Collections.EMPTY_SET);
 	}
 
 	public boolean classMatches(String pattern) {

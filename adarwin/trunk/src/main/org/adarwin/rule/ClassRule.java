@@ -33,4 +33,14 @@ public class ClassRule implements Rule, Filter {
 	public boolean matches(CodeElement codeElement) {
 		return codeElement.isUses() && codeElement.classMatches(pattern);
 	}
+
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+
+	public boolean equals(Object object) {
+		return object != null &&
+			getClass().equals(object.getClass()) &&
+			pattern.equals(((ClassRule) object).pattern);
+	}
 }

@@ -22,8 +22,7 @@ public class MethodRuleTestCase extends RuleTestCase {
 			}
 		}
 
-		assertNumMatches(1, createMethodRule("voidReturnMethod", Void.TYPE, new Class[0]),
-			ClassWithVoidReturnMethod.class);
+		assertTrue(matches(createMethodRule("voidReturnMethod", Void.TYPE, new Class[0]), ClassWithVoidReturnMethod.class));
 	}
 
 	public void testNoArgMethod() {
@@ -33,8 +32,7 @@ public class MethodRuleTestCase extends RuleTestCase {
 			}
 		}
 
-		assertNumMatches(1, createMethodRule("noArgMethod", Integer.class),
-			ClassWithNoArgMethod.class);
+		assertTrue(matches(createMethodRule("noArgMethod", Integer.class), ClassWithNoArgMethod.class));
 	}
 
 	public void testSingleArgMethod() {
@@ -44,8 +42,8 @@ public class MethodRuleTestCase extends RuleTestCase {
 			}
 		}
 
-		assertNumMatches(1, createMethodRule("singleArgMethod", Integer.class,
-			new Class[] {String.class}), ClassWithSingleArgMethod.class);
+		assertTrue(matches(createMethodRule("singleArgMethod", Integer.class,
+		new Class[] {String.class}), ClassWithSingleArgMethod.class));
 	}
 
 	public void testTwoArgMethod() {
@@ -55,8 +53,8 @@ public class MethodRuleTestCase extends RuleTestCase {
 			}
 		}
 
-		assertNumMatches(1, createMethodRule("twoArgMethod", Integer.class,
-			new Class[] {Integer.class, String.class}), ClassWithTwoArgMethod.class);
+		assertTrue(matches(createMethodRule("twoArgMethod", Integer.class,
+		new Class[] {Integer.class, String.class}), ClassWithTwoArgMethod.class));
 	}
 
 	public void testMethodReturningPrimitive() {
@@ -66,8 +64,7 @@ public class MethodRuleTestCase extends RuleTestCase {
 			}
 		}
 
-		assertNumMatches(1, createMethodRule("methodReturningPrimitive", Integer.TYPE),
-			ClassWithMethodReturningPrimitive.class);
+		assertTrue(matches(createMethodRule("methodReturningPrimitive", Integer.TYPE), ClassWithMethodReturningPrimitive.class));
 	}
 
 	public void testMethodDeclaration() {
@@ -79,13 +76,13 @@ public class MethodRuleTestCase extends RuleTestCase {
 
 		Rule rule = new SourceRule(createMethodRule("noArgMethod", Integer.class));
 
-		assertNumMatches(1, rule, ClassWithNoArgMethodReturningInteger.class);
+		assertTrue(matches(rule, ClassWithNoArgMethodReturningInteger.class));
 	}
 
 	public void testSelf() {
 		Rule rule = MethodRule.create(Void.TYPE.getName(), "testSelf", new String[0]); 
 
-		assertNumMatches(1, rule, MethodRuleTestCase.class);
+		assertTrue(matches(rule, MethodRuleTestCase.class));
 	}
 
 	public void testMethodInvocation() {
@@ -97,7 +94,7 @@ public class MethodRuleTestCase extends RuleTestCase {
 
 		Rule rule = new UsesRule(createMethodRule("toString", String.class, new Class[0]));
 
-		assertNumMatches(1, rule, InvokesMethod.class);
+		assertTrue(matches(rule, InvokesMethod.class));
 	}
 
 	public void testUsingAMethodNotRegardedAsHavingSaidMethod() {
@@ -107,8 +104,7 @@ public class MethodRuleTestCase extends RuleTestCase {
 			}
 		}
 
-		assertNumMatches(0, new SourceRule(createMethodRule("toString", String.class)),
-			InvokesMethod.class);
+		assertFalse(matches(new SourceRule(createMethodRule("toString", String.class)), InvokesMethod.class));
 	}
 
 	private Rule createMethodRule(String methodName, Class returnType) {

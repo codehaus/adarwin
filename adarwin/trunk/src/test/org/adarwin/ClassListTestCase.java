@@ -18,10 +18,10 @@ public class ClassListTestCase extends RuleTestCase {
 	private final Rule rule = createPackageRule(InPackageB.class);
 
 	public void testNoMatch() {
-		assertNumMatches(0, rule, InPackageA.class);
+		assertFalse(matches(rule, InPackageA.class));
 	}
 
 	public void testOneMatch() {
-		assertNumMatches(1, rule, InPackageB.class);
+		assertTrue(matches(rule, InPackageB.class));
 	}
 }

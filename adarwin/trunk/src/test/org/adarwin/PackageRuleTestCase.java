@@ -16,14 +16,14 @@ import java.util.Date;
 
 public class PackageRuleTestCase extends RuleTestCase {
 	public void testMatchingUsingClass() {
-		assertNumMatches(1, new PackageRule(RuleTestCase.packageName(Date.class)), Date.class);
+		assertTrue(matches(new PackageRule(RuleTestCase.packageName(Date.class)), Date.class));
     }
 
 	public void testMatchingUsingRegularExpression() {
-		assertNumMatches(1, new PackageRule(".*util"), Date.class);
+		assertTrue(matches(new PackageRule(".*util"), Date.class));
 	}
 
 	public void testNonMatchingUsingRegularExpression() {
-		assertNumMatches(0, new PackageRule(".*flibble"), Date.class);
+		assertFalse(matches(new PackageRule(".*flibble"), Date.class));
 	}
 }

@@ -12,7 +12,7 @@ package org.adarwin.rule;
 
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
-import org.adarwin.Constructor;
+import org.adarwin.ConstructorInvocation;
 import org.adarwin.Filter;
 import org.adarwin.Util;
 
@@ -41,8 +41,8 @@ public class ConstructorRule implements Rule, Filter {
 	}
 
 	public boolean matches(CodeElement codeElement) {
-		return codeElement instanceof Constructor &&
-			((Constructor) codeElement).matches(className, parameterTypes);
+		return codeElement instanceof ConstructorInvocation &&
+			((ConstructorInvocation) codeElement).matches(className, parameterTypes);
 	}
 
 	private static String getClassName(String signature) {

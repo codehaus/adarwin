@@ -15,18 +15,18 @@ import org.adarwin.rule.Rule;
 
 public class OrRuleTestCase extends RuleTestCase {
     public void testFalseOrFalse() {
-        assertNumMatches(0, new OrRule(new Rule[] {new FalseRule(), new FalseRule()}), Void.class);
+    	assertFalse(matches(new OrRule(new Rule[] {new FalseRule(), new FalseRule()}), Void.class));
     }
 
     public void testTrueOrFalse() {
-        assertNumMatches(1, new OrRule(new Rule[] {new TrueRule(), new FalseRule()}), Void.class);
+        assertTrue(matches(new OrRule(new Rule[] {new TrueRule(), new FalseRule()}), Void.class));
     }
 
     public void testFalseOrTrue() {
-        assertNumMatches(1, new OrRule(new Rule[] {new FalseRule(), new TrueRule()}), Void.class);
+        assertTrue(matches(new OrRule(new Rule[] {new FalseRule(), new TrueRule()}), Void.class));
     }
 
     public void testTrueOrTrue() {
-    	assertNumMatches(1, new OrRule(new Rule[] {new TrueRule(), new TrueRule()}), Void.class);
+    	assertTrue(matches(new OrRule(new Rule[] {new TrueRule(), new TrueRule()}), Void.class));
     }
 }

@@ -24,7 +24,7 @@ public class ConstructorRuleTestCase extends RuleTestCase {
 	}
 
 	public void testZeroArgMatchingConstructor() {
-		assertNumMatches(1, createConstructorRule(new Class[0]), HasZeroArgConstructor.class);
+		assertTrue(matches(createConstructorRule(new Class[0]), HasZeroArgConstructor.class));
 	}
 
 	static class DoesNotHaveZeroArgConstructor {
@@ -33,8 +33,7 @@ public class ConstructorRuleTestCase extends RuleTestCase {
 	}
 
 	public void testZeroArgNonMatchingConstructor() {
-		assertNumMatches(0, createConstructorRule(new Class[0]),
-			DoesNotHaveZeroArgConstructor.class);
+		assertFalse(matches(createConstructorRule(new Class[0]), DoesNotHaveZeroArgConstructor.class));
 	}
 
 	static class HasSingleArgConstructor {
@@ -43,7 +42,7 @@ public class ConstructorRuleTestCase extends RuleTestCase {
 	}
 
 	public void testSingleArgMatchingConstructor() {
-		assertNumMatches(1, createConstructorRule(Integer.class), HasSingleArgConstructor.class);
+		assertTrue(matches(createConstructorRule(Integer.class), HasSingleArgConstructor.class));
 	}
 
 	static class DoesNotHaveSingleArgConstructor {
@@ -52,8 +51,7 @@ public class ConstructorRuleTestCase extends RuleTestCase {
 	}
 
 	public void testSingleArgNonMatchingConstructor() {
-		assertNumMatches(0, createConstructorRule(Integer.class),
-			DoesNotHaveSingleArgConstructor.class);
+		assertFalse(matches(createConstructorRule(Integer.class), DoesNotHaveSingleArgConstructor.class));
 	}
 
 	static class HasTwoArgConstructor {
@@ -62,8 +60,7 @@ public class ConstructorRuleTestCase extends RuleTestCase {
 	}
 
 	public void testTwoArgMatchingConstructor() {
-		assertNumMatches(1, createConstructorRule(new Class[] {Integer.class, String.class}),
-			HasTwoArgConstructor.class);		
+		assertTrue(matches(createConstructorRule(new Class[] {Integer.class, String.class}), HasTwoArgConstructor.class));		
 	}
 
 	static class DoesNotHaveTwoArgConstructor {
@@ -72,8 +69,7 @@ public class ConstructorRuleTestCase extends RuleTestCase {
 	}
 
 	public void testTwoArgNonMatchingConstructor() {
-		assertNumMatches(0, createConstructorRule(new Class[] {Integer.class, String.class}),
-			DoesNotHaveTwoArgConstructor.class);		
+		assertFalse(matches(createConstructorRule(new Class[] {Integer.class, String.class}), DoesNotHaveTwoArgConstructor.class));		
 	}
 
 	static class InvokesZeroArgConstructor {
@@ -85,7 +81,7 @@ public class ConstructorRuleTestCase extends RuleTestCase {
 	public void testInvokingConstructor() {
 		Rule rule = new UsesRule(ConstructorRule.create(Date.class.getName(), (new String[0])));
 
-		assertNumMatches(1, rule, InvokesZeroArgConstructor.class);
+		assertTrue(matches(rule, InvokesZeroArgConstructor.class));
 	}
 
 	class InvokesButDoesNotHaveAConstructorWithAStringParameter {
@@ -95,8 +91,7 @@ public class ConstructorRuleTestCase extends RuleTestCase {
 	}
 
 	public void testInvokingConstructorNotRegardedAsHavingConstructor() {
-		assertNumMatches(0, new SourceRule(createConstructorRule(String.class)),
-			InvokesButDoesNotHaveAConstructorWithAStringParameter.class);
+		assertFalse(matches(new SourceRule(createConstructorRule(String.class)), InvokesButDoesNotHaveAConstructorWithAStringParameter.class));
 	}
 
 	static class HasButDoesNotInvokeConstructorWithStringParameter {
@@ -108,7 +103,7 @@ public class ConstructorRuleTestCase extends RuleTestCase {
 		Rule rule = new UsesRule(ConstructorRule.create(
 			Class.class.getName(), (new String[] {String.class.getName()})));
 
-		assertNumMatches(0, rule, HasButDoesNotInvokeConstructorWithStringParameter.class);
+		assertFalse(matches(rule, HasButDoesNotInvokeConstructorWithStringParameter.class));
 	}
 
 	private Rule createConstructorRule(Class parameterType) {

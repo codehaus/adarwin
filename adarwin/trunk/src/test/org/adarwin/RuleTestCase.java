@@ -16,35 +16,16 @@ import org.adarwin.rule.PackageRule;
 import org.adarwin.rule.Rule;
 
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 import junit.framework.TestCase;
 
 public abstract class RuleTestCase extends TestCase {
-	public Collection assertNumMatches(int expected, Rule rule, Class clazz) {
-		return assertNumMatches(expected, rule, new ClassFile(RuleTestCase.getInputStream(clazz)));
+	public boolean matches(Rule rule, Class clazz) {
+		ClassSummary summary = RuleClassVisitor.visit(RuleTestCase.getInputStream(clazz));
+
+		return !rule.inspect(summary).isEmpty();
 	}
-
-	public Collection assertNumMatches(int expected, Rule rule, Code code) {
-		final Set matches = new HashSet();
-
-		code.evaluate(rule, new RuleListener() {
-			public boolean matchesEvent(ClassSummary classSummary) {
-				if (!classSummary.isEmpty()) {
-					matches.add(classSummary);
-				}
-
-				return true;
-			}
-		});
-
-		assertEquals(expected, matches.size());
-
-		return matches;
-	}
-
+	
 	public Rule createPackageRule(Class clazz) {
 		return new PackageRule(RuleTestCase.packageName(clazz).replaceAll("\\.", "\\."));
 	}
