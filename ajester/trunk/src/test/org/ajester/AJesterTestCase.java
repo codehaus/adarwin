@@ -5,21 +5,19 @@ import org.ajester.testmodel.code.BooleanReturn;
 import org.ajester.testmodel.code.IfEqualsStatement;
 import org.ajester.testmodel.code.ProblematicIfStatement;
 import org.ajester.testmodel.test.BooleanReturnTestCase;
-import org.ajester.testmodel.test.IfStatementTestCase;
+import org.ajester.testmodel.test.IfEqualsStatementTestCase;
 import org.ajester.testmodel.test.ProblematicIfStatementTestCase;
 
 import junit.framework.TestCase;
 
 public class AJesterTestCase extends TestCase {
-	private static final int NUM_METHODS_IN_IF_STATEMENT_CLASS = 2;
-	
 	public void testGetMutatorsReturnsOneMutatorPerMethod() throws Exception {
-		Mutator[] mutators = AJester.getMutators(IfStatementTestCase.class,
+		Mutator[] mutators = AJester.getMutators(IfEqualsStatementTestCase.class,
 			IfEqualsStatement.class, new MutatorFactory(IfStatementMutator.class));
 
 		assertNotNull(mutators);
 		
-		assertEquals(NUM_METHODS_IN_IF_STATEMENT_CLASS, mutators.length);
+		assertEquals(1, mutators.length);
 		
 //		Set codeLocations = new HashSet();
 		
@@ -41,11 +39,11 @@ public class AJesterTestCase extends TestCase {
 			new MutatorFactory(BooleanReturnMutator.class)
 		};
 		
-		Mutator[] mutators = AJester.getMutators(IfStatementTestCase.class, IfEqualsStatement.class,
+		Mutator[] mutators = AJester.getMutators(IfEqualsStatementTestCase.class, IfEqualsStatement.class,
 			factories);
 		
 		assertNotNull(mutators);
-		assertEquals(NUM_METHODS_IN_IF_STATEMENT_CLASS * factories.length, mutators.length);
+		assertEquals(factories.length, mutators.length);
 		
 //		Set codeLocations = new HashSet();
 		
@@ -54,7 +52,7 @@ public class AJesterTestCase extends TestCase {
 
 //			codeLocations.add(mutator.getCodeMatcher());
 
-			if (mLoop < NUM_METHODS_IN_IF_STATEMENT_CLASS) {
+			if (mLoop < 1) {
 				assertEquals(IfStatementMutator.class, mutator.getClass());
 			}
 			else {
@@ -74,7 +72,7 @@ public class AJesterTestCase extends TestCase {
 	}
 	
 	public void testReportWithAnotherClass() throws Exception {
-		AJester ajester = new AJester(IfStatementTestCase.class,
+		AJester ajester = new AJester(IfEqualsStatementTestCase.class,
 			new BooleanReturnMutator(IfEqualsStatement.IF_EQUAL_LOCATION));
 
 		assertEquals(Report.NO_PROBLEMS, ajester.run().getReport());
