@@ -12,16 +12,16 @@ public class IfStatementMutatorTestCase extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		mutator = new IfStatementMutator(IfEqualsStatement.IF_EQUAL_LOCATION);
+		mutator = new IfStatementMutator(IfEqualsStatement.LOCATION);
 	}
 
 	public void testMutatesMatchingMethod() {
 		Label label = new Label();
 		
 		JumpInstruction jumpInstruction =
-			new JumpInstruction(IfEqualsStatement.IF_EQUAL_LOCATION, Constants.IFEQ, label);
+			new JumpInstruction(IfEqualsStatement.LOCATION, Constants.IFEQ, label);
 		JumpInstruction expectedMutatedJumpInstruction =
-			new JumpInstruction(IfEqualsStatement.IF_EQUAL_LOCATION, Constants.IFNE, label);
+			new JumpInstruction(IfEqualsStatement.LOCATION, Constants.IFNE, label);
 		
 		assertTrue(mutator.matches(jumpInstruction));
 		assertEquals(expectedMutatedJumpInstruction, mutator.mutate(jumpInstruction));
