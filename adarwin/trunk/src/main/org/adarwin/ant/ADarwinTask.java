@@ -32,32 +32,16 @@ public class ADarwinTask extends Task {
 		});
 	}
 
-	public boolean getPrint() {
-		return runner.getPrint();
-	}
-
 	public void setPrint(boolean print) {
 		runner.setPrint(print);
 	}
-
-	public String getClassPath() {
-		return runner.getClassPath();
-    }
 
     public void setClassPath(String classPath) {
     	runner.setClassPath(classPath);
     }
 
-    public String getRuleExpression() {
-    	return runner.getRuleExpression();
-    }
-
 	public void setRuleExpression(String rule) {
 		runner.setRuleExpression(rule);
-    }
-
-    public String getBinding() {
-    	return runner.getBinding();
     }
 
     public void setBinding(String binding) {
@@ -68,18 +52,6 @@ public class ADarwinTask extends Task {
 		runner.setRuleFileName(ruleFileName);
 	}
 	
-	public String getRuleFileName() {
-		return runner.getRuleFileName();
-	}
-
-    public Logger getLogger() {
-    	return runner.getLogger();
-    }
-
-	public boolean isFailOnMatch() {
-		return runner.isFailOnMatch();
-	}
-
 	public void setFailOnMatch(boolean failOnMatch) {
 		runner.setFailOnMatch(failOnMatch);
 	}

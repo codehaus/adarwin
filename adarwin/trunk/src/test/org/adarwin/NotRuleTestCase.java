@@ -20,7 +20,7 @@ import org.adarwin.rule.Rule;
 import org.adarwin.rule.TrueRule;
 import org.adarwin.rule.UsesRule;
 import org.adarwin.testmodel.a.InPackageA;
-import org.adarwin.testmodel.a.UsesPackageBAndPackageC;
+import org.adarwin.testmodel.a.UsesPackageAAndPackageB;
 import org.adarwin.testmodel.b.InPackageB;
 
 public class NotRuleTestCase extends TestCase {
@@ -39,6 +39,7 @@ public class NotRuleTestCase extends TestCase {
 	public void testComplexNegation() throws IOException {
 		Rule doesNotUseRule = new NotRule(new UsesRule(PackageRule.create(InPackageB.class)));
 
-		assertEquals(0, new ClassFile(UsesPackageBAndPackageC.class).evaluate(doesNotUseRule).getCount());
+		assertEquals(0,
+			new ClassFile(UsesPackageAAndPackageB.class).evaluate(doesNotUseRule).getCount());
 	}
 }

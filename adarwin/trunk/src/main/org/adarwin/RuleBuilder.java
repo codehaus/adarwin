@@ -160,8 +160,8 @@ public class RuleBuilder {
         return parameters;
     }
 
-    private Rule buildRule(String name, String[] arguments) throws BuilderException, IllegalAccessException,
-        InstantiationException, InvocationTargetException {
+    private Rule buildRule(String name, String[] arguments) throws BuilderException,
+    	IllegalAccessException, InstantiationException, InvocationTargetException {
 
         Class ruleClass = getRuleClass(name);
 
@@ -184,7 +184,7 @@ public class RuleBuilder {
 
 			return (Rule) ruleConstructor.newInstance(constructorParameters);
 		}
-		else {
+		else if (ruleConstructor.getParameterTypes()[0].equals(Rule[].class)) {
 			Rule[] constructorParameter = new Rule[arguments.length];
 
 			for (int cLoop = 0; cLoop < arguments.length; cLoop++) {
@@ -192,6 +192,9 @@ public class RuleBuilder {
 			}
 			
 			return (Rule) ruleConstructor.newInstance(new Object[] {constructorParameter});
+		}
+		else {
+			return (Rule) ruleConstructor.newInstance(new Object[] {arguments});
 		}
     }
 
@@ -230,7 +233,8 @@ public class RuleBuilder {
 	private boolean hasAggregateForm(Constructor constructor) {
 		Class[] parameterTypes = constructor.getParameterTypes();
 		return parameterTypes.length == 1 &&
-			Rule[].class.equals(parameterTypes[0]);
+			(Rule[].class.equals(parameterTypes[0]) ||
+			 String[].class.equals(parameterTypes[0]));
 	}
 
 	private boolean hasCorrectSimpleForm(Constructor constructor, int length) {

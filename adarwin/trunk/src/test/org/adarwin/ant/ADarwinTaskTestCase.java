@@ -19,12 +19,14 @@ import junit.framework.TestCase;
 
 import org.adarwin.Logger;
 import org.adarwin.Runner;
-import org.adarwin.ant.ADarwinTask;
+import org.adarwin.testmodel.a.InPackageA;
+import org.adarwin.testmodel.a.InPackageAUsesClassFromPackageB;
+import org.adarwin.testmodel.a.UsesPackageAAndPackageB;
 import org.apache.tools.ant.BuildException;
 
 import com.mockobjects.dynamic.OrderedMock;
 
-public class ADarwinTaskTest extends TestCase {
+public class ADarwinTaskTestCase extends TestCase {
 	private static final String CLASSPATH = "target/test-classes";
 	private static final String RULE = "package(org.adarwin.testmodel.a)";
 	private static final String SECOND_RULE = "package(org.adarwin.testmodel.x)";
@@ -39,6 +41,7 @@ public class ADarwinTaskTest extends TestCase {
 		task.setLogger(((Logger) mockLogger.proxy()));
 		task.setBinding("rules.properties");
 		task.setClassPath(CLASSPATH);
+		task.setFailOnMatch(true);
 		mockLogger.expect("log", "Evaluating rules against: " + CLASSPATH);
 	}
 
@@ -46,6 +49,7 @@ public class ADarwinTaskTest extends TestCase {
 		mockLogger.expect("log", "3 classes violated: " + RULE);
 
 		task.setRuleExpression(RULE);
+		task.setFailOnMatch(true);
 		
 		executeTask();
 
@@ -53,7 +57,11 @@ public class ADarwinTaskTest extends TestCase {
 	}
 	
 	public void testRuleInFile() throws IOException {
+		task.setPrint(true);
 		mockLogger.expect("log", "3 classes violated: " + RULE);
+		mockLogger.expect("log", "  " + UsesPackageAAndPackageB.class.getName());
+		mockLogger.expect("log", "  " + InPackageA.class.getName());
+		mockLogger.expect("log", "  " + InPackageAUsesClassFromPackageB.class.getName());
 		
 		task.setRuleFileName(createTempRuleFile(RULE));
 		
