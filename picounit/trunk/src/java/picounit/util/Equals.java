@@ -1,4 +1,4 @@
-package picounit.impl;
+package picounit.util;
 
 abstract public class Equals {
 	public final boolean equals(Object lhs, Object rhs) {

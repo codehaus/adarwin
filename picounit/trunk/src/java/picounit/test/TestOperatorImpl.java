@@ -1,8 +1,8 @@
 package picounit.test;
 
-import picounit.impl.Equals;
 import picounit.impl.MethodRunner;
 import picounit.impl.ResultListener;
+import picounit.util.Equals;
 
 import java.lang.reflect.Method;
 
