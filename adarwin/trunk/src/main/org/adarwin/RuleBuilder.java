@@ -135,39 +135,51 @@ public class RuleBuilder implements RuleProducer {
     private Rule buildRule(String name, String[] arguments) throws ADarwinException {
 		Constructor constructor = getConstructor(name, arguments);
 
-		if (!hasAggregateForm(constructor)) {
-			Object[] constructorParameters = new Object[arguments.length];
-
-			for (int cLoop = 0; cLoop < constructorParameters.length; cLoop++) {
-				if (Rule.class.isAssignableFrom(constructor.getParameterTypes()[cLoop])) {
-					constructorParameters[cLoop] = buildRule(arguments[cLoop]);
-				}
-				else {
-					constructorParameters[cLoop] = arguments[cLoop];
-				}
-			}
-
-			return (Rule) constructRule(constructor, constructorParameters);
+		if (hasCorrectSimpleForm(constructor, arguments.length)) {
+			return constructRule(constructor, getSimpleParameters(arguments, constructor));
 		}
-		else if (constructor.getParameterTypes()[0].equals(Rule[].class)) {
+		else {
+			return constructRule(constructor, getAggreateParameters(arguments, constructor));
+		}
+    }
+
+    private Object[] getAggreateParameters(final String[] arguments, final Constructor constructor) throws ADarwinException {
+		Object[] constructorParameters;
+		
+		if (constructor.getParameterTypes()[0].equals(Rule[].class)) {
 			Rule[] constructorParameter = new Rule[arguments.length];
 
 			for (int cLoop = 0; cLoop < arguments.length; cLoop++) {
 				constructorParameter[cLoop] = buildRule(arguments[cLoop]);
 			}
-
-			return (Rule) constructRule(constructor, new Object[] {constructorParameter});
+			
+			constructorParameters = new Object[] {constructorParameter};
 		}
 		else {
-			return (Rule) constructRule(constructor, new Object[] {arguments});
+			constructorParameters = new Object[] {arguments};
 		}
-    }
+		return constructorParameters;
+	}
 
-    private Object constructRule(Constructor constructor, Object[] constructorParameters)
+	private Object[] getSimpleParameters(final String[] arguments, Constructor constructor) throws ADarwinException {
+		Object[] constructorParameters = new Object[arguments.length];
+
+		for (int cLoop = 0; cLoop < constructorParameters.length; cLoop++) {
+			if (Rule.class.isAssignableFrom(constructor.getParameterTypes()[cLoop])) {
+				constructorParameters[cLoop] = buildRule(arguments[cLoop]);
+			}
+			else {
+				constructorParameters[cLoop] = arguments[cLoop];
+			}
+		}
+		return constructorParameters;
+	}
+
+	private Rule constructRule(Constructor constructor, Object[] constructorParameters)
 		throws ADarwinException {
 
 		try {
-			return constructor.newInstance(constructorParameters);
+			return (Rule) constructor.newInstance(constructorParameters);
 		} catch (Exception e) {
 			throw new ADarwinException(e);
 		}
