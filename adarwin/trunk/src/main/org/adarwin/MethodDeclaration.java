@@ -17,11 +17,23 @@ public class MethodDeclaration extends CodeElement implements Method {
 	private final String methodName;
 	private final String returnType;
 	private final String[] parameterTypes;
+	
+	public static CodeElement createDeclaration(String className, String returnType, 
+		String methodName, String[] parameterTypes) {
+		
+		return new MethodDeclaration(className, methodName, returnType, parameterTypes, SOURCE);
+	}
+	
+	public static CodeElement createInvocation(String className, String returnType, 
+		String methodName, String[] parameterTypes) {
+		
+		return new MethodDeclaration(className, methodName, returnType, parameterTypes, USES);
+	}
 
-	public MethodDeclaration(String className, String methodName, String returnType,
-		String[] parameterTypes)  {
+	private MethodDeclaration(String className, String methodName, String returnType,
+		String[] parameterTypes, int codeType)  {
 
-		super(className);
+		super(className, codeType);
 		this.methodName = methodName;
 		this.parameterTypes = parameterTypes;
 		this.returnType = returnType;

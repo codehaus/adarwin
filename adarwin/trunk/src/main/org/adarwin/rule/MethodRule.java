@@ -13,7 +13,7 @@ package org.adarwin.rule;
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
 import org.adarwin.Filter;
-import org.adarwin.Method;
+import org.adarwin.MethodDeclaration;
 import org.adarwin.Util;
 
 import java.util.Arrays;
@@ -43,8 +43,8 @@ public class MethodRule implements Rule, Filter {
 	}
 
 	public boolean matches(CodeElement codeElement) {
-		return codeElement instanceof Method &&
-			matchesMethod((Method) codeElement);
+		return codeElement instanceof MethodDeclaration &&
+			matchesMethod((MethodDeclaration) codeElement);
 	}
 
 	private static String getReturnType(String signature) {
@@ -59,7 +59,7 @@ public class MethodRule implements Rule, Filter {
 		return Util.getTokens(2, signature, " (,)");
 	}
 
-	private boolean matchesMethod(Method method) {
+	private boolean matchesMethod(MethodDeclaration method) {
 		return Pattern.matches(returnType, method.getReturnType()) &&
 			Pattern.matches(methodName, method.getMethodName()) &&
 			Util.matchesPatterns(parameterTypes, method.getParameterTypes());

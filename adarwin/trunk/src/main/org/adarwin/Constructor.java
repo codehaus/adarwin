@@ -11,18 +11,18 @@
 package org.adarwin;
 
 
-public class ConstructorInvocation extends CodeElement {
+public class Constructor extends CodeElement {
 	private final String[] parameterTypes;
 
 	public static CodeElement createInvocation(String usesClassName, String[] parameterTypes) {
-		return new ConstructorInvocation(usesClassName, parameterTypes, CodeElement.USES);
+		return new Constructor(usesClassName, parameterTypes, CodeElement.USES);
 	}
 
 	public static CodeElement createDeclaration(String usesClassName, String[] parameterTypes) {
-		return new ConstructorInvocation(usesClassName, parameterTypes, CodeElement.SOURCE);
+		return new Constructor(usesClassName, parameterTypes, CodeElement.SOURCE);
 	}
 
-	private ConstructorInvocation(String usesClassName, String[] parameterTypes, int codeType) {
+	private Constructor(String usesClassName, String[] parameterTypes, int codeType) {
 		super(usesClassName, codeType);
 		this.parameterTypes = parameterTypes;
 	}
