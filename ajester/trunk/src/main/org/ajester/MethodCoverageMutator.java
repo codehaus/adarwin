@@ -6,18 +6,19 @@ import org.objectweb.asm.Constants;
 
 public class MethodCoverageMutator extends BaseMutator {
 	private static final String COVERAGE_CLASS = Coverage.class.getName().replace('.', '/');
+	private final CodeMatcher codeMatcher;
 
 	public MethodCoverageMutator(CodeMatcher codeMatcher) {
-		super(codeMatcher);
+		this.codeMatcher = codeMatcher;
 	}
 
 	public boolean matches(Instruction instructionType) {
 		if (instructionType instanceof MethodInstruction) {
 			MethodInstruction methodInstruction =
 				(MethodInstruction) instructionType;
-			
-			return !methodInstruction.getMethodName().equals("<init>") &&
-				!methodInstruction.getMethodName().equals("<clinit>");
+
+			return !methodInstruction.getCodeLocation().getMethodName().equals("<init>") &&
+				!methodInstruction.getCodeLocation().getMethodName().equals("<clinit>");
 		}
 
 		return false;
@@ -28,11 +29,15 @@ public class MethodCoverageMutator extends BaseMutator {
 		
 		return new Instruction() {
 			public void visit(ClassVisitor classVisitor, CodeVisitor codeVisitor) {
-				codeVisitor.visitLdcInsn(methodInstruction.getCurrentClassName());
-				codeVisitor.visitLdcInsn(methodInstruction.getMethodName());
+				codeVisitor.visitLdcInsn(methodInstruction.getCodeLocation().getClassName());
+				codeVisitor.visitLdcInsn(methodInstruction.getCodeLocation().getMethodName());
 				codeVisitor.visitMethodInsn(Constants.INVOKESTATIC, COVERAGE_CLASS,
 						Coverage.METHOD_COVERED, "(Ljava/lang/String;Ljava/lang/String;)V");
 			}
 		};
+	}
+
+	public CodeMatcher getCodeMatcher() {
+		return codeMatcher;
 	}
 }

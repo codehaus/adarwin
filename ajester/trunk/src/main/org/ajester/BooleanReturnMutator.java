@@ -3,8 +3,10 @@ package org.ajester;
 import org.objectweb.asm.Constants;
 
 public class BooleanReturnMutator extends BaseMutator {
+	private final CodeMatcher codeMatcher;
+
 	public BooleanReturnMutator(CodeMatcher codeMatcher) {
-		super(codeMatcher);
+		this.codeMatcher = codeMatcher;
 	}
 
 	public boolean matches(Instruction instruction) {
@@ -20,5 +22,9 @@ public class BooleanReturnMutator extends BaseMutator {
 
 	public Instruction mutate(Instruction instruction) {
 		return new OrdinaryInstruction(Constants.ICONST_0);
+	}
+
+	public CodeMatcher getCodeMatcher() {
+		return codeMatcher;
 	}
 }
