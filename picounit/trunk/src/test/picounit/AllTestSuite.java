@@ -1,7 +1,7 @@
 package picounit;
 
-import picounit.mocker.easymock.ProxyFactory;
 import picounit.util.MethodUtil;
+import picounit.util.ProxyFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

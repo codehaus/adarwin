@@ -6,7 +6,7 @@ import picounit.Mocker;
 import picounit.Refinement;
 import picounit.util.CollectionUtil;
 import picounit.util.MethodUtil;
-
+import picounit.util.ProxyFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;

@@ -4,6 +4,7 @@ import picounit.Mocker;
 import picounit.Suite;
 import picounit.Test;
 import picounit.Verify;
+import picounit.impl.MethodRunner;
 import picounit.impl.Operator;
 import picounit.runner.ResultListener;
 import picounit.runner.ScopeImpl;

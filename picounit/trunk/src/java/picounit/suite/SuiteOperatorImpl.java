@@ -1,9 +1,10 @@
 package picounit.suite;
 
 import picounit.Suite;
+import picounit.impl.Equals;
+import picounit.impl.MethodRunner;
 import picounit.runner.ResultListener;
 import picounit.runner.ScopeImpl;
-import picounit.test.Equals;
 
 import java.lang.reflect.Method;
 

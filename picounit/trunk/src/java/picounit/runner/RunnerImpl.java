@@ -1,7 +1,7 @@
 package picounit.runner;
 
 import picounit.Runner;
-import picounit.test.Filter;
+import picounit.impl.Filter;
 
 public class RunnerImpl implements Runner {
 	private final Registry registry;

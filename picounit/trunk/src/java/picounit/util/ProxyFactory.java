@@ -1,4 +1,4 @@
-package picounit.mocker.easymock;
+package picounit.util;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;

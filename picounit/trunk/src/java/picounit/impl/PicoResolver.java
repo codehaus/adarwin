@@ -1,6 +1,5 @@
-package picounit.test;
+package picounit.impl;
 
-import picounit.impl.Resolver;
 
 public interface PicoResolver extends Resolver {
 }

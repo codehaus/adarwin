@@ -3,7 +3,7 @@ package picounit.around.setup;
 import picounit.Suite;
 import picounit.Test;
 import picounit.impl.MethodInvoker;
-import picounit.test.PicoResolver;
+import picounit.impl.PicoResolver;
 
 import java.lang.reflect.Method;
 

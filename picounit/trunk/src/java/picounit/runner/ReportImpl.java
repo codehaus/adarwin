@@ -3,7 +3,7 @@ package picounit.runner;
 import picounit.Suite;
 import picounit.Test;
 import picounit.impl.Logger;
-import picounit.test.PicoResolver;
+import picounit.impl.PicoResolver;
 
 import java.lang.reflect.Method;
 import java.util.Collection;

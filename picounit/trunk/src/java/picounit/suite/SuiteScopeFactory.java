@@ -1,6 +1,6 @@
 package picounit.suite;
 
-import picounit.test.ScopeFactory;
+import picounit.impl.ScopeFactory;
 
 public interface SuiteScopeFactory extends ScopeFactory {
 
