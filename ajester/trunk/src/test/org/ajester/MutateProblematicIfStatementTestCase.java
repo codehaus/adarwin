@@ -1,7 +1,7 @@
 package org.ajester;
 
-import org.ajester.testmodel.ProblematicIfStatement;
-import org.ajester.testmodel.ProblematicIfStatementTestCase;
+import org.ajester.testmodel.code.ProblematicIfStatement;
+import org.ajester.testmodel.test.ProblematicIfStatementTestCase;
 
 import junit.framework.TestCase;
 

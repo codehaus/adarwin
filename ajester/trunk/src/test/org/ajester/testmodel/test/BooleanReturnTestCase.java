@@ -1,4 +1,6 @@
-package org.ajester.testmodel;
+package org.ajester.testmodel.test;
+
+import org.ajester.testmodel.code.BooleanReturn;
 
 import junit.framework.TestCase;
 

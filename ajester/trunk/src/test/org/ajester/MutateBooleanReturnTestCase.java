@@ -1,8 +1,8 @@
 package org.ajester;
 
-import org.ajester.testmodel.BooleanReturn;
-import org.ajester.testmodel.BooleanReturnTestCase;
-import org.ajester.testmodel.IfStatement;
+import org.ajester.testmodel.code.BooleanReturn;
+import org.ajester.testmodel.code.IfStatement;
+import org.ajester.testmodel.test.BooleanReturnTestCase;
 
 import junit.framework.TestCase;
 

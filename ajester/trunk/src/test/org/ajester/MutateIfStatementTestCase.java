@@ -1,7 +1,7 @@
 package org.ajester;
 
-import org.ajester.testmodel.IfStatement;
-import org.ajester.testmodel.IfStatementTestCase;
+import org.ajester.testmodel.code.IfStatement;
+import org.ajester.testmodel.test.IfStatementTestCase;
 
 import junit.framework.TestCase;
 import junit.framework.TestFailure;
