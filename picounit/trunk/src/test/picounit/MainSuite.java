@@ -3,7 +3,7 @@ package picounit;
 import picounit.around.AroundSuite;
 import picounit.junit.JUnitSuite;
 import picounit.runner.RunnerSuite;
-import junit.framework.TestSuite;
+import picounit.test.TestSuite;
 
 public class MainSuite implements Suite {
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException {
