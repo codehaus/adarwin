@@ -10,7 +10,12 @@
 
 package org.adarwin.ant;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Iterator;
 
 import org.adarwin.BuilderException;
@@ -29,12 +34,13 @@ public class ADarwinTask extends Task {
 		public void log(String toLog);
 	}
 	
-    private String rulesFileName;
+    private String binding;
     private String classPath;
-    private String rule;
+    private String ruleExpression;
 	private boolean print;
 	private boolean failOnMatch = true;
 	private ILogger logger;
+	private String ruleFileName;
 	
 	public ADarwinTask() {
 		setLogger(new ILogger() {
@@ -60,22 +66,30 @@ public class ADarwinTask extends Task {
         this.classPath = classPath;
     }
 
-    public String getRule() {
-        return rule;
+    public String getRuleExpression() {
+    	return ruleExpression;
     }
 
-    public void setRule(String rule) {
-        this.rule = rule;
+	public void setRuleExpression(String rule) {
+        this.ruleExpression = rule;
     }
 
-    public String getRulesFileName() {
-        return rulesFileName;
+    public String getBinding() {
+        return binding;
     }
 
-    public void setRulesFileName(String rulesFileName) {
-        this.rulesFileName = rulesFileName;
+    public void setBinding(String binding) {
+        this.binding = binding;
     }
     
+	public void setRuleFileName(String ruleFileName) {
+		this.ruleFileName = ruleFileName;
+	}
+	
+	public String getRuleFileName() {
+		return ruleFileName;
+	}
+
     public void setLogger(ILogger logger) {
     	this.logger = logger;
     }
@@ -90,22 +104,21 @@ public class ADarwinTask extends Task {
 
 	public void execute() throws BuildException {
         try {
-        	Grammar grammar = new Grammar(getRulesFileName());
-            Rule rule = new RuleBuilder(grammar).buildRule(getRule());
-			logger.log("aDarwin checking classpath: " + getClassPath() + ", against the rule: " +
-				rule.getExpression(grammar));
+        	Grammar grammar = new Grammar(getBinding());
+            Rule[] rules = new RuleBuilder(grammar).buildRules(acquireRuleExpression());
             
-			Result result = createCodeFactory().create(getClassPath()).evaluate(rule);
-			if (getPrint()) {
-				for (Iterator iterator = result.getMatchingClasses().iterator(); iterator.hasNext();) {
-					logger.log((String) iterator.next());
-				}
-			}
-			logger.log("aDarwin evaluate: " + result.getCount());
+			logger.log("aDarwin checking classpath: " + getClassPath());
 
-			if (isFailOnMatch() && result.getCount() > 0) {
-				throw new BuildException("aDarwin Rule Violated");
+			boolean throwException = false;
+            
+            for (int rLoop = 0; rLoop < rules.length; rLoop++) {
+				throwException = throwException | executeRule(grammar, rules[rLoop]);	
 			}
+			
+			if (throwException) {
+				throw new BuildException("Rule violated");
+			}
+			
         } catch (IOException e) {
             throw new BuildException("Unable to find classpath(?): " + getClassPath(), e);
         } catch (BuilderException e) {
@@ -115,7 +128,42 @@ public class ADarwinTask extends Task {
         }
     }
 
+	private boolean executeRule(Grammar grammar, Rule rule) throws IOException, FileNotFoundException {
+		String ruleExpression = rule.getExpression(grammar);
+		
+		Result result = createCodeFactory().create(getClassPath()).evaluate(rule);
+		logger.log(result.getCount() + " classes matched: " + ruleExpression);
+		if (getPrint()) {
+			for (Iterator iterator = result.getMatchingClasses().iterator(); iterator.hasNext();) {
+				logger.log("  " + (String) iterator.next());
+			}
+		}
+
+		return isFailOnMatch() && result.getCount() > 0;
+	}
+
 	private ICodeFactory createCodeFactory() {
 		return new LazyCodeFactory(new CodeFactory());
+	}
+
+	private String acquireRuleExpression() throws IOException {
+		if (getRuleExpression() != null) {
+			return getRuleExpression();
+		}
+		else {
+			return readRuleExpressionFromFile();    		
+		}
+	}
+
+	private String readRuleExpressionFromFile() throws FileNotFoundException, IOException {
+		File ruleFile = new File(getRuleFileName());
+		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(ruleFile)));
+
+		try {
+			return reader.readLine();
+		}
+		finally {
+			reader.close();
+		}
 	}
 }
