@@ -8,14 +8,17 @@
  * Idea and Original Code by Stacy Curl                                      *
  *****************************************************************************/
 
-package org.adarwin.testmodel;
+package org.adarwin;
 
-public class HasZeroAndNonZeroArgConstructors {
-	public HasZeroAndNonZeroArgConstructors() {
-		
+public class UsageException extends Exception {
+	public static final String USAGE = "Usage: " + Runner.class.getName() +
+	" -b <binding-file> -c <class-path> {-r <rule> | -f <rule-file>} -p";
+
+	public UsageException() {
+		this(USAGE);
 	}
 	
-	public HasZeroAndNonZeroArgConstructors(boolean bool) {
-		
+	public UsageException(String message) {
+		super(message);
 	}
 }

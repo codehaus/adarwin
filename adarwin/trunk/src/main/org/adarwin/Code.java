@@ -10,10 +10,14 @@
 
 package org.adarwin;
 
-import java.io.IOException;
-
 import org.adarwin.rule.Rule;
 
 public interface Code {
-	void evaluate(Rule rule, RuleListener ruleListener) throws IOException;
+	Code NULL = new Code() {
+		public boolean evaluate(Rule rule, RuleListener ruleListener) throws ADarwinException {
+			return true;
+		}	
+	};
+
+	boolean evaluate(Rule rule, RuleListener ruleListener) throws ADarwinException;
 }

@@ -14,10 +14,8 @@ import org.adarwin.rule.Rule;
 import org.adarwin.rule.UsesRule;
 import org.adarwin.testmodel.a.InPackageAUsesClassFromPackageB;
 
-import java.io.IOException;
-
 public class UsesTestCase extends RuleTestCase {
-    public void testMinimal() throws IOException, BuilderException {
+    public void testMinimal() throws ADarwinException {
         String expression = "uses(true)";
 
         Rule rule = new RuleBuilder(new RuleClassBindings(new String[] {"uses", "true"},

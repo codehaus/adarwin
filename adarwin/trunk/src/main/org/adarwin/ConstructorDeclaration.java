@@ -30,7 +30,8 @@ public class ConstructorDeclaration extends CodeElement implements Constructor {
 	public String toString() {
 		synchronized (this) {
 			if (toString == null) {
-				StringBuffer buffer = new StringBuffer("Constructor(");
+				StringBuffer buffer = new StringBuffer(getClassName() + "(");
+				//StringBuffer buffer = new StringBuffer("Constructor(");
 				Util.appendArray(buffer, parameterTypes);
 				buffer.append(')');
 
@@ -42,7 +43,13 @@ public class ConstructorDeclaration extends CodeElement implements Constructor {
 	}
 
 	public int hashCode() {
-		return toString().hashCode();
+		int hashCode = super.hashCode();
+
+		for (int pLoop = 0; pLoop < parameterTypes.length; pLoop++) {
+			hashCode |= parameterTypes[pLoop].hashCode();
+		}
+
+		return hashCode;
 	}
 
 	public boolean equals(Object obj) {

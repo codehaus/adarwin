@@ -14,53 +14,109 @@ import org.adarwin.rule.MethodRule;
 import org.adarwin.rule.Rule;
 import org.adarwin.rule.SourceRule;
 import org.adarwin.rule.UsesRule;
-import org.adarwin.testmodel.CallsSimple;
-import org.adarwin.testmodel.Simple;
-
-import java.io.IOException;
 
 public class MethodRuleTestCase extends RuleTestCase {
-	public void testVoidReturnMethod() throws IOException {
-		assertNumMatches(1, createMethodRule(Simple.VOID_RETURN_METHOD), Simple.class);
+	public void testVoidReturnMethod() throws ADarwinException {
+		class ClassWithVoidReturnMethod {
+			public void voidReturnMethod() {
+			}
+		}
+
+		assertNumMatches(1, createMethodRule("voidReturnMethod", Void.TYPE, new Class[0]),
+			ClassWithVoidReturnMethod.class);
 	}
 
-	public void testNoArgMethod() throws IOException {
-		assertNumMatches(1, createMethodRule(Simple.NO_ARG_METHOD), Simple.class);
+	public void testNoArgMethod() throws ADarwinException {
+		class ClassWithNoArgMethod {
+			public Integer noArgMethod() {
+				return null;
+			}
+		}
+
+		assertNumMatches(1, createMethodRule("noArgMethod", Integer.class),
+			ClassWithNoArgMethod.class);
 	}
 
-	public void testSingleArgMethod() throws IOException {
-		assertNumMatches(1, createMethodRule(Simple.SINGLE_ARG_METHOD), Simple.class);
+	public void testSingleArgMethod() throws ADarwinException {
+		class ClassWithSingleArgMethod {
+			public Integer singleArgMethod(String string) {
+				return null;
+			}
+		}
+
+		assertNumMatches(1, createMethodRule("singleArgMethod", Integer.class,
+			new Class[] {String.class}), ClassWithSingleArgMethod.class);
 	}
 
-	public void testTwoArgMethod() throws IOException {
-		assertNumMatches(1, createMethodRule(Simple.TWO_ARG_METHOD), Simple.class);
+	public void testTwoArgMethod() throws ADarwinException {
+		class ClassWithTwoArgMethod {
+			public Integer twoArgMethod(Integer integer, String string) {
+				return null;
+			}
+		}
+
+		assertNumMatches(1, createMethodRule("twoArgMethod", Integer.class,
+			new Class[] {Integer.class, String.class}), ClassWithTwoArgMethod.class);
 	}
 
-	public void testMethodReturningPrimitive() throws IOException {
-		assertNumMatches(1, createMethodRule(Simple.METHOD_RETURNING_PRIMITIVE), Simple.class);
+	public void testMethodReturningPrimitive() throws ADarwinException {
+		class ClassWithMethodReturningPrimitive {
+			public int methodReturningPrimitive() {
+				return 0;
+			}
+		}
+
+		assertNumMatches(1, createMethodRule("methodReturningPrimitive", Integer.TYPE),
+			ClassWithMethodReturningPrimitive.class);
 	}
 
-	public void testMethodDeclaration() throws IOException {
-		Rule rule = new SourceRule(createMethodRule(Simple.NO_ARG_METHOD));
+	public void testMethodDeclaration() throws ADarwinException {
+		class ClassWithNoArgMethodReturningInteger {
+			public Integer noArgMethod() {
+				return null;
+			}
+		}
 
-		assertNumMatches(1, rule, Simple.class);
+		Rule rule = new SourceRule(createMethodRule("noArgMethod", Integer.class));
+
+		assertNumMatches(1, rule, ClassWithNoArgMethodReturningInteger.class);
 	}
 
-	public void testSelf() throws IOException {
+	public void testSelf() throws ADarwinException {
 		Rule rule = MethodRule.create(Void.TYPE.getName(), "testSelf", new String[0]); 
 
 		assertNumMatches(1, rule, MethodRuleTestCase.class);
 	}
 
-	public void testMethodInvocation() throws IOException {
-		Rule rule = new UsesRule(createMethodRule(Simple.NO_ARG_METHOD));
+	public void testMethodInvocation() throws ADarwinException {
+		class InvokesMethod {
+			public void method() {
+				new Integer(0).toString();
+			}
+		}
 
-		assertNumMatches(1, rule, CallsSimple.class);
+		Rule rule = new UsesRule(createMethodRule("toString", String.class, new Class[0]));
+
+		assertNumMatches(1, rule, InvokesMethod.class);
 	}
 
-	public void testUsingAMethodNotRegardedAsHavingSaidMethod() throws IOException {
-		Rule rule = new SourceRule(createMethodRule(Simple.NO_ARG_METHOD));
+	public void testUsingAMethodNotRegardedAsHavingSaidMethod() throws ADarwinException {
+		class InvokesMethod {
+			public void method() {
+				new Integer(0).toString();
+			}
+		}
 
-		assertNumMatches(0, rule, CallsSimple.class);
+		assertNumMatches(0, new SourceRule(createMethodRule("toString", String.class)),
+			InvokesMethod.class);
+	}
+
+	private Rule createMethodRule(String methodName, Class returnType) {
+		return MethodRule.create(returnType.getName(), methodName, new String[0]);
+	}
+
+	private Rule createMethodRule(String methodName, Class returnType, Class[] parameterTypes) {
+		return MethodRule.create(returnType.getName(), methodName,
+			Util.convertClassArrayToStringArray(parameterTypes));
 	}
 }

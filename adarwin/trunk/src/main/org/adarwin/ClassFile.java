@@ -12,7 +12,6 @@ package org.adarwin;
 
 import org.adarwin.rule.Rule;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 public class ClassFile implements Code {
@@ -22,9 +21,7 @@ public class ClassFile implements Code {
 		this.inputStream = inputStream;
     }
 
-	public void evaluate(Rule rule, RuleListener ruleListener) throws IOException {
-		ClassSummary classSummary = RuleClassVisitor.visit(inputStream);
-
-		ruleListener.matches(rule.inspect(classSummary));
+	public boolean evaluate(Rule rule, RuleListener ruleListener) throws ADarwinException {
+		return ruleListener.matchesEvent(rule.inspect(RuleClassVisitor.visit(inputStream)), rule, this);
 	}
 }

@@ -15,7 +15,6 @@ import org.adarwin.rule.MethodRule;
 import org.adarwin.rule.PackageRule;
 import org.adarwin.rule.Rule;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,21 +22,20 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 public abstract class RuleTestCase extends TestCase {
-	public Collection assertNumMatches(int expected, Rule rule, Class clazz) throws IOException {
+	public Collection assertNumMatches(int expected, Rule rule, Class clazz) throws ADarwinException {
 		return assertNumMatches(expected, rule, new ClassFile(Util.getInputStream(clazz)));
 	}
 
-	public Collection assertNumMatches(int expected, Rule rule, Code code) throws IOException {
+	public Collection assertNumMatches(int expected, Rule rule, Code code) throws ADarwinException {
 		final Set matches = new HashSet();
 
 		code.evaluate(rule, new RuleListener() {
-			public void matches(ClassSummary classSummary) {
+			public boolean matchesEvent(ClassSummary classSummary, Rule rule, Code code) {
 				if (!classSummary.isEmpty()) {
 					matches.add(classSummary);
 				}
-			}
 
-			public void matches(CodeElement codeElement) {
+				return true;
 			}
 		});
 
@@ -57,5 +55,15 @@ public abstract class RuleTestCase extends TestCase {
 	public Rule createMethodRule(Method method) {
 		return MethodRule.create(method.getReturnType(), method.getMethodName(),
 			method.getParameterTypes());
+	}
+
+	public MethodDeclaration createMethodDeclaration(String methodName, Class returnType, Class[] parameterTypes) {
+		return new MethodDeclaration(new ClassName(Integer.class.getName()), methodName,
+			returnType.getName(), Util.convertClassArrayToStringArray(parameterTypes));
+	}
+
+	public MethodDeclaration createMethodDeclaration(String methodName, Class returnType) {
+		return new MethodDeclaration(new ClassName(Integer.class.getName()), methodName,
+			returnType.getName(), new String[0]);
 	}
 }

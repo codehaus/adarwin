@@ -46,7 +46,7 @@ public class RuleClassBindingsTestCase extends TestCase {
         assertEquals(rule, ruleClassBindings.getRule(TrueRule.class));
     }
 
-	public void testAddSynonymForNegate() throws BuilderException {
+	public void testAddSynonymForNegate() throws ADarwinException {
 		RuleClassBindings ruleClassBindings = new RuleClassBindings(
 			new String[] {"not", "true"},
 			new Class[] {NotRule.class, TrueRule.class});
@@ -56,8 +56,11 @@ public class RuleClassBindingsTestCase extends TestCase {
 		assertEquals("not(true)", rule.toString(ruleClassBindings));
 	}
 
-	public void testAddSynonymFromPropertiesFile() throws IOException, ClassNotFoundException, BuilderException {
-		RuleClassBindings ruleClassBindings = new RuleClassBindings(createPropertiesFile());
+	public void testAddSynonymFromPropertiesFile() throws ADarwinException, IOException,
+		ADarwinException {
+
+		RuleClassBindings ruleClassBindings = new RuleClassBindings(createPropertiesFile(),
+			new FileAccessor());
 		String expression = "not(true)";
 		RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
 		Rule rule = ruleBuilder.buildRule(expression);

@@ -16,6 +16,7 @@ import org.adarwin.Constructor;
 import org.adarwin.RuleClassBindings;
 import org.adarwin.Util;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public class ConstructorRule implements Rule, Filter {
@@ -68,5 +69,16 @@ public class ConstructorRule implements Rule, Filter {
 	private boolean matchesConstructor(Constructor constructor) {
 		return Pattern.matches(className, constructor.getClassName().getFullClassName()) && 
 			Util.matchesPatterns(parameterTypes, constructor.getParameterTypes());
+	}
+
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+
+	public boolean equals(Object object) {
+		return object != null &&
+			getClass().equals(object.getClass()) &&
+			className.equals(((ConstructorRule) object).className) &&
+			Arrays.equals(parameterTypes, ((ConstructorRule) object).parameterTypes);
 	}
 }

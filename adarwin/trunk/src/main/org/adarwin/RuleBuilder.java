@@ -21,30 +21,37 @@ import java.util.StringTokenizer;
 
 import org.adarwin.rule.Rule;
 
-public class RuleBuilder {
+public class RuleBuilder implements RuleProducer {
     private final RuleClassBindings ruleClassBindings;
     private final Map variables = new HashMap();
 
     public RuleBuilder(RuleClassBindings ruleClassBindings) {
         this.ruleClassBindings = ruleClassBindings;
     }
-    
-	public Rule[] buildRules(String expression) throws BuilderException {
+
+    public void produce(String expression, RuleConsumer ruleBuilderListener)
+		throws ADarwinException {
+
+    	String[] subExpression = parse(expression);
+
+    	for (int rLoop = 0; rLoop < subExpression.length; rLoop++) {
+    		buildRule(subExpression[rLoop], ruleBuilderListener);
+    	}
+    }
+
+	public Rule[] buildRules(String expression) throws ADarwinException {
 		String[] subExpression = parse(expression);
-		
+
 		List rules = new ArrayList(subExpression.length);
-		
+
 		for (int rLoop = 0; rLoop < subExpression.length; rLoop++) {
-			Rule rule = buildRule(subExpression[rLoop]);
-			if (rule != null) {
-				rules.add(rule);
-			}
+			rules.add(buildRule(subExpression[rLoop]));
 		}
-		
+
 		return (Rule[]) rules.toArray(new Rule[0]);
 	}
 
-    public Rule buildRule(String expression) throws BuilderException {
+    public Rule buildRule(String expression) throws ADarwinException {
 		checkBalancedParathesis(expression);
         try {
         	String variable = getVariableValue(expression);
@@ -57,17 +64,46 @@ public class RuleBuilder {
             Rule rule = buildRule(name, getParameters(expression));
             if (variable != null && variable.length() > 0) {
             	variables.put(variable, rule);
-            	return null;
+            	return Rule.NULL;
             }
             return rule;
-        } catch (BuilderException e) {
+        } catch (ADarwinException e) {
             throw e;
         } catch (Exception e) {
-            throw new BuilderException(e);
+            throw new ADarwinException(e);
         }
     }
 
-	public Rule getVariable(String name) {
+    public Rule buildRule(String expression, RuleConsumer ruleBuilderListener)
+		throws ADarwinException {
+
+		checkBalancedParathesis(expression);
+        try {
+        	String variable = getVariableValue(expression);
+			String name = getName(expression);
+			
+			if (variables.get(name) != null) {
+				Rule variableValue = getVariable(name);
+				ruleBuilderListener.consume(variableValue, ruleClassBindings);
+				return variableValue;
+			}
+			
+            Rule rule = buildRule(name, getParameters(expression));
+            if (variable != null && variable.length() > 0) {
+            	variables.put(variable, rule);
+            	ruleBuilderListener.consume(Rule.NULL, ruleClassBindings);
+            	return Rule.NULL;
+            }
+            ruleBuilderListener.consume(rule, ruleClassBindings);
+            return rule;
+        } catch (ADarwinException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ADarwinException(e);
+        }
+    }
+
+    public Rule getVariable(String name) {
 		return (Rule) variables.get(name);
 	}
 
@@ -80,9 +116,9 @@ public class RuleBuilder {
 		return "";
 
 	}
-	private void checkBalancedParathesis(String expression) throws BuilderException {
+	private void checkBalancedParathesis(String expression) throws ADarwinException {
 		if (countNumberOf(expression, "(") != countNumberOf(expression, ")")) {
-			throw new BuilderException("Unbalanced expression: \"" + expression + "\"");
+			throw new ADarwinException("Unbalanced expression: \"" + expression + "\"");
 		}
 	}
 
@@ -111,13 +147,9 @@ public class RuleBuilder {
 		
         if (expression.indexOf('(') != -1) {
 			endOfName = expression.indexOf('(');
-            //return expression.substring(0, expression.indexOf('('));
         }
 
 		return expression.substring(startOfName, endOfName);        
-//        else {
-//            return expression;
-//        }
     }
 
     private String[] getParameters(String expression) {
@@ -159,13 +191,13 @@ public class RuleBuilder {
         return parameters;
     }
 
-    private Rule buildRule(String name, String[] arguments) throws BuilderException,
+    private Rule buildRule(String name, String[] arguments) throws ADarwinException,
     	IllegalAccessException, InstantiationException, InvocationTargetException {
 
         Class ruleClass = ruleClassBindings.getClass(name);
 
 		if (ruleClass == null) {
-			throw new BuilderException("No such rule: " + name);
+			throw new ADarwinException("No such rule: " + name);
 		}
 
 		Constructor ruleConstructor = getConstructor(name, ruleClass, arguments);
@@ -197,7 +229,9 @@ public class RuleBuilder {
 		}
     }
 
-    private Constructor getConstructor(String name, Class ruleClass, String[] arguments) throws BuilderException {
+    private Constructor getConstructor(String name, Class ruleClass, String[] arguments)
+		throws ADarwinException {
+
 		Constructor[] constructors = ruleClass.getConstructors();
 
 		for (int cLoop = 0; cLoop < constructors.length; ++cLoop) {
@@ -208,7 +242,7 @@ public class RuleBuilder {
 			}
 		}
 
-		throw new BuilderException("No constructor for: " + name + '(' + concat(arguments) + ')');
+		throw new ADarwinException("No constructor for: " + name + '(' + concat(arguments) + ')');
     }
 
 	private String concat(Object[] arguments) {
@@ -289,5 +323,4 @@ public class RuleBuilder {
 		
 		return (String[]) things.toArray(new String[0]);
 	}
-    
 }

@@ -37,4 +37,14 @@ public class ParentRule implements Rule, Filter {
 	public String toString(RuleClassBindings ruleClassBindings) {
 		return ruleClassBindings.getRule(getClass()) + '(' + className.getFullClassName() + ')';
 	}
+
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+
+	public boolean equals(Object object) {
+		return object != null &&
+			getClass().equals(object.getClass()) &&
+			className.equals(((ParentRule) object).className);
+	}
 }

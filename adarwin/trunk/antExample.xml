@@ -18,42 +18,37 @@
   <target name="main" depends="good, bad, ant"/>
   
   <property name="ruleUsingB" value="name(package a using package b, and(src(package(org.adarwin.testmodel.a)), uses(package(org.adarwin.testmodel.b))))"/>
-  <property name="ruleUsingC" value="name(package a using package c, and(src(package(org.adarwin.testmodel.a)), uses(package(org.adarwin.testmodel.c))))"/>
   
   <target name="bad">
     <adarwin binding="rules.properties"
              classPath="${basedir}/target/test-classes"
-             print="true"
              ruleExpression="${ruleUsingB}"/>
   </target>
 
   <target name="multi">
     <adarwin binding="rules.properties"
              classPath="${basedir}/target/test-classes"
-             print="true"
-             ruleExpression="${ruleUsingB}, ${ruleUsingC}"/>
+             ruleExpression="${ruleUsingB}, ${ruleUsingB}"/>
   </target>
 
   <target name="date">
     <adarwin binding="rules.properties"
              classPath="${basedir}/target/test-classes"
-             print="true"
              ruleExpression="constructor(.*Simple())"/>
   </target>
 
   <target name="boolean">
     <adarwin binding="rules.properties"
              classPath="${basedir}/target/test-classes"
-             print="true"
              ruleExpression="method(.* inspect(.*))"/>
   </target>
 
 
   <target name="file">
+    <loadfile property="ruleExpression" srcFile="rules.txt"/>
     <adarwin binding="rules.properties"
              classPath="${basedir}/target/test-classes"
-             print="true"
-             ruleFileName="rules.txt"/>
+             ruleExpression="${ruleExpression}"/>
   </target>
 
   <target name="good">
@@ -76,20 +71,17 @@
 
     <adarwin binding="rules.properties"
              classPath="C:\Documents and Settings\scurl\.maven\repository\ant\jars\ant-1.5.2.jar"
-             print="true"
              ruleExpression="uses(class(.*Task))"
              failOnMatch="false"/>
 -->
 
     <adarwin binding="rules.properties"
              classPath="C:\Documents and Settings\scurl\.maven\repository\ant\jars\ant-1.5.2.jar"
-             print="true"
              ruleExpression="src(constructor(java.lang.String))"
              failOnMatch="false"/>
 
     <adarwin binding="rules.properties"
              classPath="C:\Documents and Settings\scurl\.maven\repository\ant\jars\ant-1.5.2.jar"
-             print="true"
              ruleExpression="uses(constructor(java.util.Date()))"
              failOnMatch="false"/>
   </target>

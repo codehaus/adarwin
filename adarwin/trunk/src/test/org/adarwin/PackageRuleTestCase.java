@@ -15,25 +15,23 @@ import org.adarwin.rule.Rule;
 import org.adarwin.testmodel.a.InPackageA;
 import org.adarwin.testmodel.b.InPackageB;
 
-import java.io.IOException;
-
 public class PackageRuleTestCase extends RuleTestCase {
 	private final RuleBuilder ruleBuilder =
 		new RuleBuilder(new RuleClassBindings("package", PackageRule.class));
 
-	public void testMatchingUsingClass() throws BuilderException, IOException {
+	public void testMatchingUsingClass() throws ADarwinException {
 		Rule rule = ruleBuilder.buildRule("package(" + Util.packageName(InPackageB.class) + ')');
 
 		assertNumMatches(1, rule, InPackageB.class);
     }
 
-	public void testMatchingUsingRegularExpression() throws BuilderException, IOException {
+	public void testMatchingUsingRegularExpression() throws ADarwinException {
 		Rule rule = ruleBuilder.buildRule("package(.*a)");
 
 		assertNumMatches(1, rule, InPackageA.class);
 	}
 
-	public void testNonMatchingUsingRegularExpression() throws BuilderException, IOException {
+	public void testNonMatchingUsingRegularExpression() throws ADarwinException {
 		Rule rule = ruleBuilder.buildRule("package(.*b)");
 
 		assertNumMatches(0, rule, InPackageA.class);

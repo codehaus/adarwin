@@ -24,15 +24,22 @@ import org.objectweb.asm.Label;
 class RuleClassVisitor implements ClassVisitor {
     private final CodeVisitor codeVisitor = new RuleCodeVisitor();
 	private final TypeParser typeParser = new TypeParser();
+	private final ConstantLookup constantLookup = new ConstantLookup();
 	private final Set dependancies = new HashSet();
 	private ClassName className;
 
-	public static ClassSummary visit(InputStream inputStream) throws IOException {
+	public static ClassSummary visit(InputStream inputStream) throws ADarwinException {
 		try {
 			return new RuleClassVisitor().visit(new ClassReader(inputStream));
 		}
+		catch (IOException e) {
+			throw new ADarwinException(e);
+		}
 		finally {
-			inputStream.close();
+			try {
+				inputStream.close();
+			} catch (IOException e) {
+			}
 		}
 	}
 
@@ -56,7 +63,7 @@ class RuleClassVisitor implements ClassVisitor {
 
 		className = getFullClassName(sourceClassPath);
 
-		inspect(CodeElement.create(className, ElementType.SOURCE));
+		//inspect(CodeElement.create(className, ElementType.SOURCE));
 
 		inspect(CodeElement.create(getFullClassName(baseClassPath),
 			ElementType.EXTENDS_OR_IMPLEMENTS));
@@ -144,55 +151,63 @@ class RuleClassVisitor implements ClassVisitor {
 	public class RuleCodeVisitor implements CodeVisitor {
         public static final char STATIC_CLASS_SEPARATOR = '$';
         public static final String STATIC_CLASS_PREFIX = "class" + STATIC_CLASS_SEPARATOR;
+		private Object lastLoaded;
 
         public void visitInsn(int opcode) {
-        	logln("visitInsn: opcode = " + opcode);
+        	logln("visitInsn: opcode = " + constantLookup.getOpcodeName(opcode));
         }
 
         public void visitIntInsn(int opcode, int operand) {
-        	log("visitIntInsn: opcode = " + opcode);
+        	log("visitIntInsn: opcode = " + constantLookup.getOpcodeName(opcode));
         	logln(", operand = " + operand);
         }
 
         public void visitVarInsn(int opcode, int var) {
-        	log("visitVarInsn: opcode = " + opcode);
+        	log("visitVarInsn: opcode = " + constantLookup.getOpcodeName(opcode));
         	logln(", var = " + var);
         }
 
         public void visitTypeInsn(int opcode, String desc) {
-        	log("visitTypeInsn: opcode = " + opcode);
+        	log("visitTypeInsn: opcode = " + constantLookup.getOpcodeName(opcode));
         	logln(", desc = " + desc);
 			inspect(CodeElement.create(getFullClassName(desc), ElementType.USES));
         }
 
         public void visitFieldInsn(int opcode, String owner, String name, String desc) {
-        	log("visitFieldInsn: ");
-        	log("owner = " + owner);
+        	log("visitFieldInsn: opcode = " + constantLookup.getOpcodeName(opcode));
+        	log(", owner = " + owner);
         	log(", name = " + name);
         	logln(", desc = " + desc);
 
             if (name.startsWith(STATIC_CLASS_PREFIX)) {
-            	ClassName className = new ClassName(name.substring(STATIC_CLASS_PREFIX.length())
-                    .replace(STATIC_CLASS_SEPARATOR, '.'));
-
+            	String text = name.substring(STATIC_CLASS_PREFIX.length());
+            	
+            	ClassName className = new ClassName(text.replace(STATIC_CLASS_SEPARATOR, '.'));
 				inspect(CodeElement.create(className, ElementType.USES));
             }
         }
 
-        public void visitMethodInsn(int opcaode, String owner, String methodName, String desc) {
-        	log("visitMethodInsn: ");
-        	log("owner = " + owner);
+        public void visitMethodInsn(int opcode, String owner, String methodName, String desc) {
+        	log("visitMethodInsn: opcode = " + constantLookup.getOpcodeName(opcode));
+        	log(", owner = " + owner);
         	log(", name = " + methodName);
         	logln(", desc = " + desc);
 
         	String returnType = typeParser.parseMethodReturn(desc).getTypeName();
         	String[] parameterTypes = convertToStringArray(typeParser.parseMethodParameters(desc));
 
-        	if (isConstructor(methodName)) {
-        		inspect(ConstructorInvocation.create(getFullClassName(owner), parameterTypes));
+        	ClassName fullClassName = getFullClassName(owner);
+			if (isConstructor(methodName)) {
+        		inspect(ConstructorInvocation.create(fullClassName, parameterTypes));
         	}
         	else {
-        		inspect(MethodInvocation.create(getFullClassName(owner), returnType, methodName,
+        		if (Class.class.getName().equals(fullClassName.getFullClassName()) &&
+        			"forName".equals(methodName)) {
+        			
+        			inspect(UsesCodeElement.create(new ClassName((String) lastLoaded))); 
+        		}
+
+        		inspect(MethodInvocation.create(fullClassName, returnType, methodName,
         			parameterTypes));
         	}
         }
@@ -204,7 +219,8 @@ class RuleClassVisitor implements ClassVisitor {
         }
 
         public void visitLdcInsn(Object object) {
-            logln("visitLdcInsn:  " + object);
+        	lastLoaded = object;
+            logln("visitLdcInsn:  " + object);            
         }
 
         public void visitIincInsn(int var, int increment) {

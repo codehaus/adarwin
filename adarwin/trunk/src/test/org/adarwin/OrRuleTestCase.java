@@ -14,14 +14,12 @@ import org.adarwin.rule.OrRule;
 import org.adarwin.rule.Rule;
 import org.adarwin.testmodel.a.InPackageA;
 
-import java.io.IOException;
-
 public class OrRuleTestCase extends RuleTestCase {
     private final RuleClassBindings ruleClassBindings = new RuleClassBindings(
     	new String[] {"or", "true", "false"},
     	new Class[] {OrRule.class, TrueRule.class, FalseRule.class});
     
-    public void testFalseOrFalse() throws BuilderException, IOException {
+    public void testFalseOrFalse() throws ADarwinException {
         String expression = "or(false, false)";
 
         Rule rule = new RuleBuilder(ruleClassBindings).buildRule(expression);
@@ -31,7 +29,7 @@ public class OrRuleTestCase extends RuleTestCase {
         assertNumMatches(0, rule, InPackageA.class);
     }
 
-    public void testTrueOrFalse() throws IOException, BuilderException {
+    public void testTrueOrFalse() throws ADarwinException {
         String expression = "or(true, false)";
 
         Rule rule = new RuleBuilder(ruleClassBindings).buildRule(expression);
@@ -41,7 +39,7 @@ public class OrRuleTestCase extends RuleTestCase {
         assertNumMatches(1, rule, InPackageA.class);
     }
 
-    public void testFalseOrTrue() throws BuilderException, IOException {
+    public void testFalseOrTrue() throws ADarwinException {
         String expression = "or(false, true)";
 
         Rule rule = new RuleBuilder(ruleClassBindings).buildRule(expression);

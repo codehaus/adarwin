@@ -33,4 +33,14 @@ public class UsesRule implements Rule, Filter {
 	public String toString(RuleClassBindings ruleClassBindings) {
         return ruleClassBindings.getRule(getClass()) + '(' + wrappedRule.toString(ruleClassBindings) + ')';
     }
+
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+
+	public boolean equals(Object object) {
+		return object != null &&
+			getClass().equals(object.getClass()) &&
+			wrappedRule.equals(((UsesRule) object).wrappedRule);
+	}
 }

@@ -1,6 +1,14 @@
-package org.adarwin;
+/*****************************************************************************
+ * Copyright (C) aDarwin Organisation. All rights reserved.                  *
+ * ------------------------------------------------------------------------- *
+ * The software in this package is published under the terms of the BSD      *
+ * style license a copy of which has been included with this distribution in *
+ * the LICENSE.txt file.                                                     *
+ *                                                                           *
+ * Idea and Original Code by Stacy Curl                                      *
+ *****************************************************************************/
 
-import org.adarwin.rule.ElementType;
+package org.adarwin;
 
 import java.util.Arrays;
 
@@ -18,7 +26,7 @@ public class MethodInvocation extends UsesCodeElement implements Method {
 	private MethodInvocation(ClassName usesClassName, String returnType,
 		String methodName, String[] parameterTypes) {
 
-		super(usesClassName, ElementType.USES);
+		super(usesClassName);
 
 		this.returnType = returnType;
 		this.methodName = methodName;

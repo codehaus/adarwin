@@ -20,7 +20,7 @@ public class CodeElement {
 
 	public static CodeElement create(ClassName className, ElementType codeType) {
 		if (ElementType.USES.equals(codeType)) {
-			return UsesCodeElement.create(className, codeType);
+			return UsesCodeElement.create(className);
 		}
 
 		return new CodeElement(className, codeType);
