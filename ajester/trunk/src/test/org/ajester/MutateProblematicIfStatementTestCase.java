@@ -6,12 +6,21 @@ import org.ajester.testmodel.ProblematicIfStatementTestCase;
 import junit.framework.TestCase;
 
 public class MutateProblematicIfStatementTestCase extends TestCase {
-	public void testMutatingIFEQCausesIfStatementTestIfEqualToFail() throws Exception {
-		TestResults results = new TestRunnerWrapper().run(
+	public void testMutatingIFEQCausesLeavesTestStillPassing() throws Exception {
+		Report report = new TestRunnerWrapper().run(
 			ProblematicIfStatementTestCase.class,
 			new IfStatementMutator(ProblematicIfStatement.IF_EQUAL_LOCATION));
 
-		assertEquals(0, results.getFailures().size());
-		assertEquals(0, results.getErrors().size());
+		assertEquals(0, report.getFailures().size());
+		assertEquals(0, report.getErrors().size());
+	}
+	
+	public void testMutatingIFNECausesLeavesTestStillPassing() throws Exception {
+		Report report = new TestRunnerWrapper().run(
+			ProblematicIfStatementTestCase.class,
+			new IfStatementMutator(ProblematicIfStatement.IF_NOT_EQUAL_LOCATION));
+
+		assertEquals(0, report.getFailures().size());
+		assertEquals(0, report.getErrors().size());
 	}
 }

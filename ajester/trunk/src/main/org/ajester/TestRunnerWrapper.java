@@ -1,6 +1,13 @@
 package org.ajester;
 
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
+
+import junit.framework.AssertionFailedError;
 import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestListener;
 import junit.framework.TestResult;
 import junit.runner.BaseTestRunner;
 import junit.runner.TestSuiteLoader;
@@ -19,12 +26,11 @@ public class TestRunnerWrapper {
 //		}
 //	}
 //
-
-	public TestResults run(Class testClass, Mutator mutator) throws Exception {
+	public Report run(Class testClass, Mutator mutator) throws Exception {
 		return run(testClass.getName(), mutator);
 	}
 	
-	public TestResults run(String testClassName, Mutator mutator) throws Exception {
+	public Report run(String testClassName, Mutator mutator) throws Exception {
 		return new TestRunner(mutator).run(testClassName);
 	}
 	
@@ -34,9 +40,10 @@ public class TestRunnerWrapper {
 		public TestRunner(Mutator mutator) {
 			this.mutator = mutator;
 		}
-
-		public TestResults run(String testClassName) throws Exception {
+		
+		public Report run(String testClassName) throws Exception {
 			try {
+				Coverage.reset();
 				Test test = getTest(testClassName);
 				if (test == null) {
 					throw new Exception("Unable to find test: " + testClassName);
@@ -61,17 +68,43 @@ public class TestRunnerWrapper {
 		public void testEnded(String testName) {
 		}
 
-		private TestResults doRun(Test suite) {
+		private Report doRun(Test suite) {
 			TestResult result = new TestResult();
-			long startTime = System.currentTimeMillis();
-			suite.run(result);
-			long endTime = System.currentTimeMillis();
-			long runTime = endTime - startTime;
+			result.addListener(new TestListener() {
+				public void addError(Test test, Throwable t) {
+				}
 
-			return new TestResults(result);
+				public void addFailure(Test test, AssertionFailedError t) {
+				}
+
+				public void endTest(Test test) {
+				}
+
+				public void startTest(Test test) {
+					TestCase testCase = (TestCase) test;
+					Coverage.getInstance().setCaller(new CodeLocation(testCase.getClass(),
+						testCase.getName()));
+				}
+			});
+
+			suite.run(result);
+
+			return new Report(convertEnumerationToSet(result.failures()),
+				convertEnumerationToSet(result.errors()), mutator.getMutations(),
+				Coverage.getInstance());
 		}
 
 		protected void runFailed(String message) {
 		}
+	}
+	
+	public static Set convertEnumerationToSet(Enumeration enumeration) {
+		Set set = new HashSet();
+		
+		while(enumeration.hasMoreElements()) {
+			set.add(enumeration.nextElement());
+		}
+		
+		return set;
 	}
 }

@@ -2,17 +2,33 @@ package org.ajester;
 
 import org.objectweb.asm.Constants;
 
-public class BooleanReturnMutator extends Mutator {
-	public BooleanReturnMutator(CodeLocation codeLocation) {
-		super(codeLocation);
+public class BooleanReturnMutator extends BaseMutator {
+	public BooleanReturnMutator(CodeMatcher codeMatcher) {
+		super(codeMatcher);
 	}
 
 	public void visitInsn(int opcode) {
-		if (opcode == Constants.ICONST_1) {
-			super.visitInsn(Constants.ICONST_0);
-			return;
+		Instruction instruction = new OrdinaryInstruction(opcode);
+		if (matches(instruction)) {
+			addCovered();
+			instruction = mutate(instruction);
 		}
+		
+		instruction.visit(getClassVisitor(), getCodeVisitor());
+	}
 
-		super.visitInsn(opcode);
+	public boolean matches(Instruction instruction) {
+		if (instruction instanceof OrdinaryInstruction) {
+			OrdinaryInstruction ordinaryInstruction = (OrdinaryInstruction) instruction;
+
+			return !getMethodName().equals("<init>") && !getMethodName().equals("<clinit>") &&
+				ordinaryInstruction.getOpcode() == Constants.ICONST_1;
+		}
+		
+		return false;
+	}
+
+	public Instruction mutate(Instruction instruction) {
+		return new OrdinaryInstruction(Constants.ICONST_0);
 	}
 }

@@ -32,9 +32,11 @@ public class MutateUnionOfBooleanReturnAndIfStatementTestCase extends TestCase {
 		assertEquals(0, results.getErrors().size());
 	}
 	
-	public void atestBooleanReturnAndIfStatementMutation() throws Exception {
+	public void testBooleanReturnAndIfStatementMutation() throws Exception {
 		TestResults results = new TestRunnerWrapper().run(TEST_CLASS,
-			new AggregateMutator(GET_TRUE_MUTATOR, IF_EQUAL_MUTATOR));
+			new AggregateMutator(new Mutator[] {GET_TRUE_MUTATOR, IF_EQUAL_MUTATOR}));
+		
+		//TestResults.printResults(results);
 		
 		assertEquals(2, results.getFailures().size());
 		assertEquals(0, results.getErrors().size());

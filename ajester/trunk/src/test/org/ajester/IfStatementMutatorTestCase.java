@@ -11,8 +11,6 @@ import com.mockobjects.dynamic.Mock;
 import junit.framework.TestCase;
 
 public class IfStatementMutatorTestCase extends TestCase {
-	private static final String MATCHING_METHOD = "matchingMethod";
-	private static final String NON_MATCHING_METHOD = "nonMatchingMethod";
 	private IfStatementMutator mutator;
 	private Mock mockCodeVisitor;
 
@@ -25,12 +23,13 @@ public class IfStatementMutatorTestCase extends TestCase {
 		
 		mutator.setCodeVisitor((CodeVisitor) mockCodeVisitor.proxy());
 	}
-	
-	public void testMatchingMethod() {
+
+	public void testMutatesMatchingMethod() {
 		Label label = new Label();
 		mockCodeVisitor.expect("visitJumpInsn", C.args(C.eq(Constants.IFNE), C.eq(label))); 
 
-		mutator.setMethodName(MATCHING_METHOD);
+		mutator.setCurrentClassName(IfStatement.IF_EQUAL_LOCATION.getClassName());
+		mutator.setMethodName(IfStatement.IF_EQUAL_LOCATION.getMethodName());
 		mutator.visitJumpInsn(Constants.IFEQ, label);
 		
 		mockCodeVisitor.verify();

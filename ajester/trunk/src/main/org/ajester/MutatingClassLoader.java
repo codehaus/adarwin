@@ -6,7 +6,7 @@ import junit.runner.TestCaseClassLoader;
 import junit.runner.TestSuiteLoader;
 
 public class MutatingClassLoader extends TestCaseClassLoader implements TestSuiteLoader {
-	private Mutator mutator;
+	private final Mutator mutator;
 
 	public MutatingClassLoader(Mutator mutator) {
 		this.mutator = mutator;
@@ -22,11 +22,13 @@ public class MutatingClassLoader extends TestCaseClassLoader implements TestSuit
 
 	public synchronized Class loadClass(String className, boolean resolve)
 		throws ClassNotFoundException {
-		
-		if (mutator != null && mutator.shouldMutate(className)) {
+
+		if (mutator != null && mutator.getCodeMatcher().matches(className)) {
+//			System.out.println("mutating: " + className + ", with: " + mutator);
 			return loadAndMutateClass(mutator, className);
 		}
 		else if (className.equals(Coverage.class.getName())) {
+			//System.out.println("Not mutating Coverage");
 			return Coverage.class;
 		}
 		else {
@@ -36,18 +38,23 @@ public class MutatingClassLoader extends TestCaseClassLoader implements TestSuit
 
 	private synchronized Class loadAndMutateClass(Mutator mutator, final String className)
 		throws ClassNotFoundException {
-		
+
 		String classResourceName = className.replace('.', '/') + ".class";
 
 		try {
-			new ClassReader(getResourceAsStream(classResourceName)).accept(mutator, false);
-			byte[] b = mutator.getClassWriter().toByteArray();
-			
+//			System.out.println("loadAndMutateClass: " + className);
+			byte[] b = mutator.visit(new ClassReader(getResourceAsStream(classResourceName)));
+//			System.out.println(className + ".size = " + b.length);
 			return defineClass(className, b, 0, b.length);
 		} catch (Exception e) {
 			System.out.println("For some reason could not load: " + classResourceName);
 			e.printStackTrace();
 			throw new ClassNotFoundException(className, e);
 		}
+//		catch (Throwable t) {
+//			System.out.println("Something bejigered with: " + className + " (" + mutator + ")");
+//			t.printStackTrace(System.out);
+//			return null;
+//		}
 	}
 }

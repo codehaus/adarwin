@@ -8,20 +8,22 @@ import junit.framework.TestCase;
 
 public class MutateBooleanReturnTestCase extends TestCase {
 	public void testMutatingBooleanModelCausesBooleanTestToFail() throws Exception {
-		TestResults results = new TestRunnerWrapper().run(
-			BooleanReturnTestCase.class,
-			new BooleanReturnMutator(BooleanReturn.GET_TRUE_LOCATION));
+		Report report = new TestRunnerWrapper().run(
+			BooleanReturnTestCase.class, new BooleanReturnMutator(BooleanReturn.GET_TRUE_LOCATION));
+
+		assertEquals(1, report.getFailures().size());
+		assertEquals(0, report.getErrors().size());
 		
-		assertEquals(1, results.getFailures().size());
-		assertEquals(0, results.getErrors().size());
+		assertTrue(report.getCoverage().contains(BooleanReturn.GET_TRUE_LOCATION));
 	}
 
 	public void testMutatingSomeOtherClassLeavesBooleanTestPassing() throws Exception {
-		TestResults results = new TestRunnerWrapper().run(
-			BooleanReturnTestCase.class,
-			new BooleanReturnMutator(IfStatement.IF_EQUAL_LOCATION));
+		Report report = new TestRunnerWrapper().run(
+			BooleanReturnTestCase.class, new BooleanReturnMutator(IfStatement.IF_EQUAL_LOCATION));
+
+		assertEquals(0, report.getFailures().size());
+		assertEquals(0, report.getErrors().size());
 		
-		assertEquals(0, results.getFailures().size());
-		assertEquals(0, results.getErrors().size());
+		assertFalse(report.getCoverage().contains(IfStatement.IF_EQUAL_LOCATION));
 	}
 }

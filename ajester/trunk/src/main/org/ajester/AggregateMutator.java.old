@@ -1,0 +1,80 @@
+package org.ajester;
+
+import org.objectweb.asm.CodeVisitor;
+
+public class AggregateMutator extends BaseMutator {
+	private Mutator[] mutators;
+
+	public AggregateMutator(Mutator[] mutators) {
+		this.mutators = mutators;
+	}
+
+	public boolean shouldMutate(String className) {
+		for (int mLoop = 0; mLoop < mutators.length; mLoop++) {
+			if (mutators[mLoop].shouldMutate(className)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public Mutator getMutator(CodeLocation location) {
+		for (int mLoop = 0; mLoop < mutators.length; mLoop++) {
+			Mutator mutator = mutators[mLoop].getMutator(location);
+			if (mutator != null) {
+				return mutator;
+			}
+		}
+
+		return null;
+	}
+	
+
+	public boolean mutatedCodeCalled() {
+		for (int mLoop = 0; mLoop < mutators.length; mLoop++) {
+			if (mutators[mLoop].mutatedCodeCalled()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public void setCodeVisitor(CodeVisitor codeVisitor) {
+		super.setCodeVisitor(codeVisitor);
+		
+		for (int mLoop = 0; mLoop < mutators.length; mLoop++) {
+			mutators[mLoop].setCodeVisitor(codeVisitor);
+		}
+	}
+	
+	public void setCurrentClassName(String className) {
+		super.setCurrentClassName(className);
+		for (int mLoop = 0; mLoop < mutators.length; mLoop++) {
+			mutators[mLoop].setCurrentClassName(className);
+		}
+	}
+
+	public void setMethodName(String methodName) {
+		super.setMethodName(methodName);
+		for (int mLoop = 0; mLoop < mutators.length; mLoop++) {
+			mutators[mLoop].setMethodName(methodName);
+		}
+	}
+	
+	public CodeVisitor visitMethod(final int access, final String methodName, final String desc,
+		final String[] exceptions) {
+
+		setMethodName(methodName);
+		print("visitMethod(" + methodName + ")");
+		setCodeVisitor(cv.visitMethod(access, methodName, desc, exceptions));
+		Mutator mutator = getMutator(new CodeLocation(getCurrentClassNameWithDots(), currentMethodName));
+		if (mutator != null) {
+			mutator.setMethodName(methodName);
+			return mutator;
+		}
+		else {
+			return codeVisitor;
+		}
+	}
+}
