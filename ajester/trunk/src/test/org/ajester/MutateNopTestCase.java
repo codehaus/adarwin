@@ -1,9 +1,10 @@
-package org.ajester.testmodel.test;
+package org.ajester;
 
 import org.ajester.BooleanReturnMutator;
 import org.ajester.Report;
 import org.ajester.TestRunnerWrapper;
 import org.ajester.testmodel.code.Nop;
+import org.ajester.testmodel.test.NopTestCase;
 
 import junit.framework.TestCase;
 
