@@ -6,4 +6,8 @@ public class ProblematicIfStatementTestCase extends TestCase {
 	public void testIfEqual() {
 		assertTrue(new ProblematicIfStatement().ifEqual());
 	}
+
+	public void testIfNotEqual() {
+		assertFalse(new ProblematicIfStatement().ifNotEqual());
+	}
 }

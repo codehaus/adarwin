@@ -9,7 +9,6 @@ import junit.framework.TestCase;
 import junit.framework.TestFailure;
 
 public class Util {
-
 	public static void assertEqualsTestCase(TestFailure failure, Class testClass,
 		String testMethod) {
 		
