@@ -1,6 +1,5 @@
 package picounit.impl;
 
-import picounit.runner.Scope;
 
 public class FailingTypeFilter implements ScopeFilter {
 	private ScopeFilter scopeTypeFilter;

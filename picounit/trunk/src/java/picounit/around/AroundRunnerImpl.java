@@ -2,7 +2,7 @@ package picounit.around;
 
 import picounit.impl.PicoResolver;
 import picounit.impl.ResultListener;
-import picounit.runner.ScopeImpl;
+import picounit.impl.ScopeImpl;
 
 import java.lang.reflect.Method;
 import java.util.Collections;

@@ -1,8 +1,8 @@
 package picounit.suite;
 
 import picounit.Suite;
-import picounit.runner.Scope;
-import picounit.runner.ScopeImpl;
+import picounit.impl.Scope;
+import picounit.impl.ScopeImpl;
 
 import java.lang.reflect.Method;
 

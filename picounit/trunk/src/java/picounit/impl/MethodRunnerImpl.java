@@ -1,7 +1,6 @@
 package picounit.impl;
 
 import picounit.around.AroundRunner;
-import picounit.runner.Scope;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

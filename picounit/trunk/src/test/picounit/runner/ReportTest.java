@@ -5,6 +5,8 @@ import picounit.Test;
 import picounit.TestInstance;
 import picounit.Verify;
 import picounit.impl.Logger;
+import picounit.impl.ReportImpl;
+import picounit.impl.ScopeImpl;
 
 import java.lang.reflect.Method;
 

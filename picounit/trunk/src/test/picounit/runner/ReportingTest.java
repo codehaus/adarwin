@@ -5,6 +5,7 @@ import picounit.Test;
 import picounit.Verify;
 import picounit.impl.Logger;
 import picounit.impl.NullLogger;
+import picounit.impl.Report;
 
 import java.io.PrintStream;
 import java.lang.reflect.Method;
