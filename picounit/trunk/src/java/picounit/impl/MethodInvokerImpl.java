@@ -1,11 +1,9 @@
 package picounit.impl;
 
-import picounit.util.Empty;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class MethodInvokerImpl extends Empty implements MethodInvoker {
+public class MethodInvokerImpl implements MethodInvoker {
 	public void invokeMatchingMethods(Object object, String pattern, Resolver resolver) {
 		Method[] methods = object.getClass().getMethods();
 		for (int index = 0; index < methods.length; index++) {

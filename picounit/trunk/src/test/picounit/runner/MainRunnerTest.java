@@ -4,7 +4,6 @@ package picounit.runner;
 
 import org.picocontainer.MutablePicoContainer;
 
-import picounit.EmptyTest;
 import picounit.MainRunner;
 import picounit.Mocker;
 import picounit.Runner;
@@ -84,12 +83,12 @@ public class MainRunnerTest implements Test {
 
 	public void testRunNonSuite() {
 		expectInfrastructure();
-		expectRegisterTest(EmptyTest.class);
+		expectRegisterTest(ExampleTest.class);
 		mocker.ignoreReturn(infrastructureContainer.getComponentInstance(Report.class));
 
 		mocker.replay();
 
-		suiteRunner.run(EmptyTest.class);
+		suiteRunner.run(ExampleTest.class);
 	}
 
 	public void testRunSuite() {
@@ -186,7 +185,7 @@ public class MainRunnerTest implements Test {
 
 	public static class SuiteImpl implements Suite {
 		public void suite(Runner runner) {
-			runner.run(EmptyTest.class);
+			runner.run(ExampleTest.class);
 		}
 	}
 	
@@ -203,6 +202,11 @@ public class MainRunnerTest implements Test {
 	public static class TestRequireingNonStandardFixture implements Test {
 		public void test(Fixture fixture, Verify verify) {
 			verify.that(fixture.truth());
+		}
+	}
+	
+	public static class ExampleTest implements Test {
+		public void testExample() {
 		}
 	}
 }
