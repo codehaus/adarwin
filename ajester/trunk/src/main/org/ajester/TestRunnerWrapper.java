@@ -27,22 +27,18 @@ public class TestRunnerWrapper {
 //	}
 //
 	public Report run(Class testClass, InstructionMutator instructionMutator) throws Exception {
-		return run(testClass, new BaseMutator(instructionMutator));
+		return run(testClass.getName(), instructionMutator);
 	}
 	
-	public Report run(Class testClass, Mutator mutator) throws Exception {
-		return run(testClass.getName(), mutator);
-	}
-	
-	public Report run(String testClassName, Mutator mutator) throws Exception {
+	public Report run(String testClassName, InstructionMutator mutator) throws Exception {
 		return new TestRunner(mutator).run(testClassName);
 	}
 	
 	private class TestRunner extends BaseTestRunner {
 		private Mutator mutator;
 
-		public TestRunner(Mutator mutator) {
-			this.mutator = mutator;
+		public TestRunner(InstructionMutator mutator) {
+			this.mutator = new BaseMutator(mutator);
 		}
 		
 		public Report run(String testClassName) throws Exception {

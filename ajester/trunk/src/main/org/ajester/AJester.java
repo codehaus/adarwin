@@ -10,8 +10,8 @@ import java.util.Set;
 
 public class AJester {
 	private String testClassName;
-	private Mutator mutator;
-	private Mutator[] mutators;
+	private InstructionMutator mutator;
+	private InstructionMutator[] mutators;
 	
 	public static InstructionMutator[] getMutators(Class testCaseClass, Class codeClass,
 		MutatorFactory mutatorFactory) throws Exception {
@@ -39,30 +39,14 @@ public class AJester {
 		return (InstructionMutator[]) mutators.toArray(new InstructionMutator[0]);
 	}
 	
-	public AJester(Class testCaseClass, Mutator mutator) {
-		this.testClassName = testCaseClass.getName();
-		this.mutator = mutator;
-	}
-
-	public AJester(Class testCaseClass, Mutator[] mutators) {
-		this.testClassName = testCaseClass.getName();
-		this.mutators = mutators;
-	}
-
 	public AJester(Class testCaseClass, Class codeClass, Class mutatorClass) throws Exception {
 		this.testClassName = testCaseClass.getName();
-		
-		InstructionMutator[] instructionMutators = getMutators(testCaseClass, codeClass, new MutatorFactory(mutatorClass));
-		
-		this.mutators = new Mutator[instructionMutators.length];
-		
-		for (int iLoop = 0; iLoop < instructionMutators.length; iLoop++) {
-			mutators[iLoop] = new BaseMutator(instructionMutators[iLoop]);
-		}
+		mutators = getMutators(testCaseClass, codeClass, new MutatorFactory(mutatorClass));
 	}
 
 	public AJester(Class testCaseClass, InstructionMutator mutator) {
-		this(testCaseClass, new BaseMutator(mutator));
+		this.testClassName = testCaseClass.getName();
+		this.mutator = mutator;
 	}
 
 	public Report run() throws Exception {
@@ -79,7 +63,7 @@ public class AJester {
 		}
 	}
 
-	private Report runOne(Mutator mutator) throws Exception {
+	private Report runOne(InstructionMutator mutator) throws Exception {
 		TestRunnerWrapper runnerWrapper = new TestRunnerWrapper();
 		return runnerWrapper.run(testClassName, mutator);
 	}

@@ -11,6 +11,10 @@ public class MutatingClassLoader extends TestCaseClassLoader implements TestSuit
 
 	private final Mutator mutator;
 
+	public MutatingClassLoader(InstructionMutator instructionMutator) {
+		this(new BaseMutator(instructionMutator));
+	}
+	
 	public MutatingClassLoader(Mutator mutator) {
 		this.mutator = mutator;
 	}
