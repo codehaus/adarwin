@@ -10,13 +10,13 @@
 
 package org.adarwin.rule;
 
+import java.util.Iterator;
+import java.util.regex.Pattern;
+
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
 import org.adarwin.Grammar;
 import org.adarwin.Util;
-
-import java.util.regex.Pattern;
-import java.util.Iterator;
 
 public class PackageRule implements Rule {
 	private String pattern;

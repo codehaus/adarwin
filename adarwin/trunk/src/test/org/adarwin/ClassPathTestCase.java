@@ -10,11 +10,11 @@
 
 package org.adarwin;
 
-import com.mockobjects.dynamic.Mock;
-
 import java.io.FileNotFoundException;
 
 import junit.framework.TestCase;
+
+import com.mockobjects.dynamic.Mock;
 
 public class ClassPathTestCase extends TestCase {
 	public void testPathParsing() throws FileNotFoundException {

@@ -11,24 +11,36 @@
 package org.adarwin.rule;
 
 import org.adarwin.ClassSummary;
-import org.adarwin.CodeElement;
 import org.adarwin.Grammar;
 
 public class OrRule implements Rule {
-	private Rule left;
-	private Rule right;
+	private Rule[] rules;
 
-	public OrRule(Rule left, Rule right) {
-		this.left = left;
-		this.right = right;
+	public OrRule(Rule[] rules) {
+		this.rules = rules;
 	}
 
 	public boolean inspect(ClassSummary classSummary) {
-		return left.inspect(classSummary) || right.inspect(classSummary);
+		boolean result = false;
+		
+		for (int rLoop = 0; rLoop < rules.length; ++rLoop) {
+			result |= rules[rLoop].inspect(classSummary);
+		}
+		
+		return result;
 	}
 
 	public String getExpression(Grammar grammar) {
-		return grammar.getRule(getClass()) + '(' + left.getExpression(grammar) + ", " + right.getExpression(grammar)
-            + ')';
+		StringBuffer buffer = new StringBuffer(grammar.getRule(getClass()) + '(');
+		
+		for (int rLoop = 0; rLoop < rules.length; ++rLoop) {
+			if (rLoop != 0) {
+				buffer.append(", ");
+			}
+			buffer.append(rules[rLoop].getExpression(grammar));
+		}
+		buffer.append(')');
+            
+        return buffer.toString();
 	}
 }

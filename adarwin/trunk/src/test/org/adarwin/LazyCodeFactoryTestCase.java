@@ -10,12 +10,14 @@
 
 package org.adarwin;
 
-import junit.framework.TestCase;
-import com.mockobjects.dynamic.Mock;
-import org.adarwin.rule.TrueRule;
-import org.adarwin.rule.Rule;
-
 import java.io.IOException;
+
+import junit.framework.TestCase;
+
+import org.adarwin.rule.Rule;
+import org.adarwin.rule.TrueRule;
+
+import com.mockobjects.dynamic.Mock;
 
 public class LazyCodeFactoryTestCase extends TestCase {
 	private Mock mockCodeFactory;

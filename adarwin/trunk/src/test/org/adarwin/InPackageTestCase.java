@@ -10,14 +10,15 @@
 
 package org.adarwin;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
+
 import org.adarwin.rule.PackageRule;
 import org.adarwin.rule.Rule;
 import org.adarwin.rule.SourceRule;
 import org.adarwin.testmodel.a.InPackageA;
 import org.adarwin.testmodel.b.InPackageB;
-
-import java.io.IOException;
 
 public class InPackageTestCase extends TestCase {
     private Rule rule;

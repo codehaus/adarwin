@@ -10,9 +10,9 @@
 
 package org.adarwin;
 
-import org.adarwin.rule.Rule;
-
 import java.io.IOException;
+
+import org.adarwin.rule.Rule;
 
 public class LazyCodeFactory implements ICodeFactory {
 	private ICodeFactory codeFactory;

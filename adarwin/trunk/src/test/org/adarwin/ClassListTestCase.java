@@ -10,18 +10,16 @@
 
 package org.adarwin;
 
-import junit.framework.TestCase;
-import org.adarwin.rule.PackageRule;
-import org.adarwin.rule.Rule;
-import org.adarwin.rule.SourceRule;
-import org.adarwin.testmodel.a.InPackageA;
-import org.adarwin.testmodel.b.IInPackageB;
-import org.adarwin.testmodel.b.InPackageB;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import junit.framework.TestCase;
+
+import org.adarwin.rule.PackageRule;
+import org.adarwin.testmodel.a.InPackageA;
+import org.adarwin.testmodel.b.InPackageB;
 
 public class ClassListTestCase extends TestCase {
 	public void testNoMatch() throws IOException {
@@ -38,15 +36,6 @@ public class ClassListTestCase extends TestCase {
 		Code code = new ClassFile(InPackageB.class);
 
 		assertEquals(createSet(InPackageB.class), code.evaluate(rule).getMatchingClasses());
-	}
-
-	public void testTwoMatches() throws IOException {
-		Rule rule = new SourceRule(PackageRule.create(InPackageB.class));
-
-		Code code = new ClassDirectory("c:\\work\\misc\\adarwin\\target\\idea");
-
-		assertEquals(createSet(new Class[] {InPackageB.class, IInPackageB.class}),
-			code.evaluate(rule).getMatchingClasses());
 	}
 
 	private Set createSet(Class[] classes) {

@@ -10,13 +10,14 @@
 
 package org.adarwin;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
+
 import org.adarwin.rule.Rule;
 import org.adarwin.rule.SourceRule;
 import org.adarwin.rule.TrueRule;
 import org.adarwin.testmodel.a.InPackageA;
-
-import java.io.IOException;
 
 public class SourceTestCase extends TestCase {
     public void testMatchesMinimalClass() throws BuilderException, IOException {

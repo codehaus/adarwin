@@ -10,7 +10,10 @@
 
 package org.adarwin;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
+
 import org.adarwin.rule.AndRule;
 import org.adarwin.rule.NotRule;
 import org.adarwin.rule.PackageRule;
@@ -19,8 +22,6 @@ import org.adarwin.rule.SourceRule;
 import org.adarwin.rule.TrueRule;
 import org.adarwin.rule.UsesRule;
 import org.adarwin.testmodel.a.InPackageA;
-
-import java.io.IOException;
 
 public class RuleBuilderTestCase extends TestCase {
     private final String INCORRECT_RULE_BUILT = "Incorrect rule built";
@@ -102,7 +103,7 @@ public class RuleBuilderTestCase extends TestCase {
 
         RuleBuilder ruleBuilder = new RuleBuilder(grammar);
 
-        String expression = "and(true, true)";
+        String expression = "and(true, true, true)";
 
         Rule rule = ruleBuilder.buildRule(expression);
 
@@ -115,7 +116,7 @@ public class RuleBuilderTestCase extends TestCase {
         RuleBuilder ruleBuilder = new RuleBuilder(new Grammar());
 
 		try {
-        	Rule rule = ruleBuilder.buildRule("gobbledygook");
+        	ruleBuilder.buildRule("gobbledygook");
 			fail();
 		}
 		catch (BuilderException be) {

@@ -20,7 +20,7 @@
   <target name="bad">
     <adarwin rulesFileName="rules.properties"
              classPath="target/idea"
-             rule="and(src(package(org.adarwin.testmodel.a)), uses(package(org.adarwin.testmodel.b)))"/>
+             rule="name(package a using package b, and(src(package(org.adarwin.testmodel.a)), uses(package(org.adarwin.testmodel.b))))"/>
   </target>
 
   <target name="good">

@@ -10,15 +10,16 @@
 
 package org.adarwin;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import junit.framework.TestCase;
+
 import org.adarwin.rule.FalseRule;
 import org.adarwin.rule.NotRule;
 import org.adarwin.rule.Rule;
 import org.adarwin.rule.TrueRule;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 public class GrammarTestCase extends TestCase {
     public void testAddMapping() {

@@ -10,9 +10,9 @@
 
 package org.adarwin;
 
-import org.adarwin.rule.Rule;
-
 import java.io.IOException;
+
+import org.adarwin.rule.Rule;
 
 public interface Code {
 	Result evaluate(Rule rule) throws IOException;

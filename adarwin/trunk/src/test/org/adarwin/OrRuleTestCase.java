@@ -10,14 +10,15 @@
 
 package org.adarwin;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
+
 import org.adarwin.rule.FalseRule;
 import org.adarwin.rule.OrRule;
 import org.adarwin.rule.Rule;
 import org.adarwin.rule.TrueRule;
 import org.adarwin.testmodel.a.InPackageA;
-
-import java.io.IOException;
 
 public class OrRuleTestCase extends TestCase {
     private Grammar grammar;
