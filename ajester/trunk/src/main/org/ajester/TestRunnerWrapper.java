@@ -19,18 +19,16 @@ public class TestRunnerWrapper {
 //		}
 //	}
 //
-	public TestResults run(String testClassName, String mutationClassName,
-		MutatingCodeAdapter mutatingCodeAdapter) throws Exception {
+	public TestResults run(String testClassName, MutatingCodeAdapter mutatingCodeAdapter)
+		throws Exception {
 		
-		return new TestRunner(mutationClassName, mutatingCodeAdapter).run(testClassName);
+		return new TestRunner(mutatingCodeAdapter).run(testClassName);
 	}
 
 	private class TestRunner extends BaseTestRunner {
-		private String mutationClassName;
 		private MutatingCodeAdapter mutatingCodeAdapter;
 
-		public TestRunner(String mutationClassName, MutatingCodeAdapter mutatingCodeAdapter) {
-			this.mutationClassName = mutationClassName;
+		public TestRunner(MutatingCodeAdapter mutatingCodeAdapter) {
 			this.mutatingCodeAdapter = mutatingCodeAdapter;
 		}
 		
