@@ -1,7 +1,7 @@
 package org.adarwin.rule;
 
 import org.adarwin.ClassSummary;
-import org.adarwin.Grammar;
+import org.adarwin.RuleClassBindings;
 
 public class NameRule implements Rule {
 	private Rule rule;
@@ -16,7 +16,7 @@ public class NameRule implements Rule {
 		return rule.inspect(classSummary);
 	}
 
-	public String getExpression(Grammar grammar) {
+	public String getExpression(RuleClassBindings ruleClassBindings) {
 		return name;
 	}
 	

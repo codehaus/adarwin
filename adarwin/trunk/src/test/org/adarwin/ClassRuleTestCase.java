@@ -22,7 +22,7 @@ public class ClassRuleTestCase extends TestCase {
     public void testNonMatchingClass() throws BuilderException, IOException {
         String expression = "class(Fred)";
 
-        Rule rule = new RuleBuilder(new Grammar("class", ClassRule.class)).buildRule(expression);
+        Rule rule = new RuleBuilder(new RuleClassBindings("class", ClassRule.class)).buildRule(expression);
 
         assertEquals(0, new ClassFile(InPackageA.class).evaluate(rule).getCount());
     }
@@ -30,7 +30,7 @@ public class ClassRuleTestCase extends TestCase {
     public void testMatchingClass() throws BuilderException, IOException {
         String expression = "class(In.*)";
 
-        Rule rule = new RuleBuilder(new Grammar("class", ClassRule.class)).buildRule(expression);
+        Rule rule = new RuleBuilder(new RuleClassBindings("class", ClassRule.class)).buildRule(expression);
 
         assertEquals(1, new ClassFile(InPackageA.class).evaluate(rule).getCount());
     }

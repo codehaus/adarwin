@@ -24,49 +24,49 @@ import org.adarwin.rule.TrueRule;
 public class GrammarTestCase extends TestCase {
     public void testAddMapping() {
         String rule = "rule";
-        Grammar grammar = new Grammar();
-        grammar.addMapping(rule, TrueRule.class);
+		RuleClassBindings ruleClassBindings = new RuleClassBindings();
+		ruleClassBindings.addMapping(rule, TrueRule.class);
 
-        assertEquals(TrueRule.class, grammar.getClass(rule));
+        assertEquals(TrueRule.class, ruleClassBindings.getClass(rule));
     }
 
     public void testTwoMappingsToDifferentClasses() {
         String firstRule = "firstRule";
         String secondRule = "secondRule";
 
-        Grammar grammar = new Grammar();
-        grammar.addMapping(firstRule, TrueRule.class);
-        grammar.addMapping(secondRule, FalseRule.class);
+		RuleClassBindings ruleClassBindings = new RuleClassBindings();
+		ruleClassBindings.addMapping(firstRule, TrueRule.class);
+		ruleClassBindings.addMapping(secondRule, FalseRule.class);
 
-        assertEquals(TrueRule.class, grammar.getClass(firstRule));
-        assertEquals(FalseRule.class, grammar.getClass(secondRule));
+        assertEquals(TrueRule.class, ruleClassBindings.getClass(firstRule));
+        assertEquals(FalseRule.class, ruleClassBindings.getClass(secondRule));
     }
 
     public void testReverseMapping() {
         String rule = "rule";
-        Grammar grammar = new Grammar();
-        grammar.addMapping(rule, TrueRule.class);
+		RuleClassBindings ruleClassBindings = new RuleClassBindings();
+		ruleClassBindings.addMapping(rule, TrueRule.class);
 
-        assertEquals(rule, grammar.getRule(TrueRule.class));
+        assertEquals(rule, ruleClassBindings.getRule(TrueRule.class));
     }
 
 	public void testAddSynonymForNegate() throws BuilderException, ClassNotFoundException {
-		Grammar grammar = new Grammar();
-		grammar.addMapping("not", NotRule.class);
-		grammar.addMapping("true", TrueRule.class);
+		RuleClassBindings ruleClassBindings = new RuleClassBindings();
+		ruleClassBindings.addMapping("not", NotRule.class);
+		ruleClassBindings.addMapping("true", TrueRule.class);
 
-		Rule rule = new RuleBuilder(grammar).buildRule("not(true)");
+		Rule rule = new RuleBuilder(ruleClassBindings).buildRule("not(true)");
 
-		assertEquals("not(true)", rule.getExpression(grammar));
+		assertEquals("not(true)", rule.getExpression(ruleClassBindings));
 	}
 
 	public void testAddSynonymFromPropertiesFile() throws IOException, ClassNotFoundException, BuilderException {
-		Grammar grammar = new Grammar(createPropertiesFile());
+		RuleClassBindings ruleClassBindings = new RuleClassBindings(createPropertiesFile());
 		String expression = "not(true)";
-		RuleBuilder ruleBuilder = new RuleBuilder(grammar);
+		RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
 		Rule rule = ruleBuilder.buildRule(expression);
 
-		assertEquals(expression, rule.getExpression(grammar));
+		assertEquals(expression, rule.getExpression(ruleClassBindings));
 	}
 
 	private String createPropertiesFile() throws IOException {

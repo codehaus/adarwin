@@ -17,16 +17,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
-public class Grammar {
+public class RuleClassBindings {
     private Map ruleToClass;
     private Map classToRule;
 
-    public Grammar() {
+    public RuleClassBindings() {
         ruleToClass = new HashMap();
         classToRule = new HashMap();
     }
 
-    public Grammar(String propertiesFileName) throws IOException, ClassNotFoundException {
+    public RuleClassBindings(String propertiesFileName) throws IOException, ClassNotFoundException {
         this();
 
         Properties properties = new Properties();
@@ -37,7 +37,7 @@ public class Grammar {
         }
     }
 
-    public Grammar(String[] names, Class[] classes) {
+    public RuleClassBindings(String[] names, Class[] classes) {
         this();
 
         for (int mLoop = 0; mLoop < names.length; ++mLoop) {
@@ -45,7 +45,7 @@ public class Grammar {
         }
     }
 
-    public Grammar(String name, Class classes) {
+    public RuleClassBindings(String name, Class classes) {
         this(new String[] {name}, new Class[] {classes});
     }
 

@@ -11,7 +11,7 @@
 package org.adarwin.rule;
 
 import org.adarwin.ClassSummary;
-import org.adarwin.Grammar;
+import org.adarwin.RuleClassBindings;
 
 
 public class NotRule implements Rule {
@@ -25,7 +25,7 @@ public class NotRule implements Rule {
 		return !ruleToNegate.inspect(classSummary);
 	}
 
-	public String getExpression(Grammar grammar) {
-		return grammar.getRule(getClass()) + '(' + ruleToNegate.getExpression(grammar) + ')';
+	public String getExpression(RuleClassBindings ruleClassBindings) {
+		return ruleClassBindings.getRule(getClass()) + '(' + ruleToNegate.getExpression(ruleClassBindings) + ')';
 	}
 }

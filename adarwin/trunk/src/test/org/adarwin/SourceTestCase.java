@@ -23,7 +23,7 @@ public class SourceTestCase extends TestCase {
     public void testMatchesMinimalClass() throws BuilderException, IOException {
         String expression = "src(true)";
 
-        Rule rule = new RuleBuilder(new Grammar(new String[] {"src", "true"},
+        Rule rule = new RuleBuilder(new RuleClassBindings(new String[] {"src", "true"},
             new Class[] {SourceRule.class, TrueRule.class})).buildRule(expression);
 
         assertEquals(1, new ClassFile(InPackageA.class).evaluate(rule).getCount());

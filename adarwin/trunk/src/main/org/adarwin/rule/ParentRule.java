@@ -12,7 +12,7 @@ package org.adarwin.rule;
 
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
-import org.adarwin.Grammar;
+import org.adarwin.RuleClassBindings;
 import org.adarwin.Util;
 
 public class ParentRule implements Rule {
@@ -33,7 +33,7 @@ public class ParentRule implements Rule {
 			ElementType.EXTENDS_OR_IMPLEMENTS));
 	}
 
-	public String getExpression(Grammar grammar) {
-		return grammar.getRule(getClass()) + '(' + packageName + ", " + className + ')';
+	public String getExpression(RuleClassBindings ruleClassBindings) {
+		return ruleClassBindings.getRule(getClass()) + '(' + packageName + ", " + className + ')';
 	}
 }

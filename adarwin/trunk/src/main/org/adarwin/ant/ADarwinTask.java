@@ -20,16 +20,21 @@ import java.util.Iterator;
 
 import org.adarwin.BuilderException;
 import org.adarwin.CodeFactory;
-import org.adarwin.Grammar;
 import org.adarwin.ICodeFactory;
 import org.adarwin.LazyCodeFactory;
 import org.adarwin.Result;
 import org.adarwin.RuleBuilder;
+import org.adarwin.RuleClassBindings;
 import org.adarwin.rule.Rule;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
 public class ADarwinTask extends Task {
+	public static final String BINDING = "binding";
+	public static final String CLASSPATH = "classPath";
+	public static final String MISSING_OR_EMPTY = " parameter missing or empty";
+	public static final String RULE_VIOLATED = "aDarwin rule violated";
+	
 	public static interface ILogger {
 		public void log(String toLog);
 	}
@@ -103,39 +108,61 @@ public class ADarwinTask extends Task {
 	}
 
 	public void execute() throws BuildException {
+		verifyParameter(getBinding(), BINDING);
+		if (isParameterNullOrEmpty(getClassPath())) {
+			throw new BuildException(CLASSPATH + MISSING_OR_EMPTY);
+		}
+		if (isParameterNullOrEmpty(getRuleExpression()) &&
+			isParameterNullOrEmpty(getRuleFileName())) {
+			throw new BuildException("both ruleExpression and ruleFileName parameters are missing or empty");		
+		}
+		
         try {
-        	Grammar grammar = new Grammar(getBinding());
-            Rule[] rules = new RuleBuilder(grammar).buildRules(acquireRuleExpression());
+        	RuleClassBindings ruleClassBindings = new RuleClassBindings(getBinding());
+            Rule[] rules = new RuleBuilder(ruleClassBindings).buildRules(acquireRuleExpression());
             
-			logger.log("aDarwin checking classpath: " + getClassPath());
+			logger.log("Evaluating rules against: " + getClassPath());
 
 			boolean throwException = false;
             
             for (int rLoop = 0; rLoop < rules.length; rLoop++) {
-				throwException = throwException | executeRule(grammar, rules[rLoop]);	
+				throwException = throwException | executeRule(ruleClassBindings, rules[rLoop]);	
 			}
 			
 			if (throwException) {
-				throw new BuildException("Rule violated");
+				throw new BuildException(RULE_VIOLATED);
 			}
 			
         } catch (IOException e) {
             throw new BuildException("Unable to find classpath(?): " + getClassPath(), e);
         } catch (BuilderException e) {
+        	e.printStackTrace();
 			throw new BuildException(e);
         } catch (ClassNotFoundException e) {
             throw new BuildException("Unable to find classpath(?): " + getClassPath(), e);
         }
     }
 
-	private boolean executeRule(Grammar grammar, Rule rule) throws IOException, FileNotFoundException {
-		String ruleExpression = rule.getExpression(grammar);
+	private void verifyParameter(String value, String name) {
+		if (isParameterNullOrEmpty(value)) {
+			throw new BuildException(name + MISSING_OR_EMPTY);
+		}
+	}
+
+	private boolean isParameterNullOrEmpty(String value) {
+		return value == null || value.length() == 0;
+	}
+
+	private boolean executeRule(RuleClassBindings ruleClassBindings, Rule rule) throws IOException, FileNotFoundException {
+		String ruleExpression = rule.getExpression(ruleClassBindings);
 		
 		Result result = createCodeFactory().create(getClassPath()).evaluate(rule);
-		logger.log(result.getCount() + " classes matched: " + ruleExpression);
-		if (getPrint()) {
-			for (Iterator iterator = result.getMatchingClasses().iterator(); iterator.hasNext();) {
-				logger.log("  " + (String) iterator.next());
+		if (result.getCount() > 0) {
+			logger.log(result.getCount() + " classes violated: " + ruleExpression);
+			if (getPrint()) {
+				for (Iterator iterator = result.getMatchingClasses().iterator(); iterator.hasNext();) {
+					logger.log("  " + (String) iterator.next());
+				}
 			}
 		}
 
@@ -160,7 +187,16 @@ public class ADarwinTask extends Task {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(ruleFile)));
 
 		try {
-			return reader.readLine();
+			StringBuffer buffer = new StringBuffer();
+			
+			String currentLine = reader.readLine();
+			
+			while (currentLine != null) {
+				buffer.append(currentLine);
+				currentLine = reader.readLine();
+			}
+			
+			return buffer.toString();
 		}
 		finally {
 			reader.close();

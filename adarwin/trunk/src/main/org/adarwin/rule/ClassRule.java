@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
-import org.adarwin.Grammar;
+import org.adarwin.RuleClassBindings;
 
 public class ClassRule implements Rule {
 	private String pattern;
@@ -35,7 +35,7 @@ public class ClassRule implements Rule {
 		return false;
 	}
 
-	public String getExpression(Grammar grammar) {
-        return grammar.getRule(getClass()) + '(' + pattern + ')';
+	public String getExpression(RuleClassBindings ruleClassBindings) {
+        return ruleClassBindings.getRule(getClass()) + '(' + pattern + ')';
     }
 }

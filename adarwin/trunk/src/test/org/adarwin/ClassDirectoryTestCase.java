@@ -10,13 +10,9 @@
 
 package org.adarwin;
 
-import junit.framework.TestCase;
-import org.adarwin.rule.PackageRule;
-import org.adarwin.rule.Rule;
-import org.adarwin.rule.SourceRule;
-import org.adarwin.testmodel.a.InPackageA;
-
 import java.io.IOException;
+
+import junit.framework.TestCase;
 
 public class ClassDirectoryTestCase extends TestCase {
 	public void testInPackageA() throws IOException {

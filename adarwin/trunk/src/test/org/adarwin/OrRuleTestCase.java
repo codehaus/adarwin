@@ -21,13 +21,13 @@ import org.adarwin.rule.TrueRule;
 import org.adarwin.testmodel.a.InPackageA;
 
 public class OrRuleTestCase extends TestCase {
-    private Grammar grammar;
+    private RuleClassBindings ruleClassBindings;
     private ClassFile code;
 
     protected void setUp() throws Exception {
         super.setUp();
 
-        grammar = new Grammar(new String[] {"or", "true", "false"},
+		ruleClassBindings = new RuleClassBindings(new String[] {"or", "true", "false"},
                     new Class[] {OrRule.class, TrueRule.class, FalseRule.class});
 
         code = new ClassFile(InPackageA.class);
@@ -36,9 +36,9 @@ public class OrRuleTestCase extends TestCase {
     public void testFalseOrFalse() throws BuilderException, IOException {
         String expression = "or(false, false)";
 
-        Rule rule = new RuleBuilder(grammar).buildRule(expression);
+        Rule rule = new RuleBuilder(ruleClassBindings).buildRule(expression);
 
-        assertEquals(expression, rule.getExpression(grammar));
+        assertEquals(expression, rule.getExpression(ruleClassBindings));
 
         assertEquals(0, code.evaluate(rule).getCount());
     }
@@ -46,9 +46,9 @@ public class OrRuleTestCase extends TestCase {
     public void testTrueOrFalse() throws IOException, BuilderException {
         String expression = "or(true, false)";
 
-        Rule rule = new RuleBuilder(grammar).buildRule(expression);
+        Rule rule = new RuleBuilder(ruleClassBindings).buildRule(expression);
 
-        assertEquals(expression, rule.getExpression(grammar));
+        assertEquals(expression, rule.getExpression(ruleClassBindings));
 
         assertTrue(code.evaluate(rule).getCount() > 0);
     }
@@ -56,9 +56,9 @@ public class OrRuleTestCase extends TestCase {
     public void testFalseOrTrue() throws BuilderException, IOException {
         String expression = "or(false, true)";
 
-        Rule rule = new RuleBuilder(grammar).buildRule(expression);
+        Rule rule = new RuleBuilder(ruleClassBindings).buildRule(expression);
 
-        assertEquals(expression, rule.getExpression(grammar));
+        assertEquals(expression, rule.getExpression(ruleClassBindings));
 
         assertTrue(code.evaluate(rule).getCount() > 0);
     }
