@@ -8,7 +8,6 @@ import picounit.around.mock.MockAround;
 import picounit.around.setup.SetUpAround;
 import picounit.impl.PicoResolver;
 import picounit.impl.ResultListener;
-import picounit.impl.ScopeImpl;
 
 import java.lang.reflect.Method;
 
@@ -22,7 +21,6 @@ public class AroundRunnerTest implements Test {
 
 	// Unit
 	private AroundRunnerImpl aroundRunner;
-	private ResultListener resultListener;
 
 	public void mock(PicoResolver picoResolver, TestInstance testInstance, MockAround mockAround,
 		SetUpAround setUpAround, ResultListener resultListener) {
@@ -31,7 +29,6 @@ public class AroundRunnerTest implements Test {
 		this.testInstance = testInstance;
 		this.mockAround = mockAround;
 		this.setUpAround = setUpAround;
-		this.resultListener = resultListener;
 
 		this.aroundRunner = new AroundRunnerImpl(picoResolver, resultListener);
 	}
@@ -40,10 +37,8 @@ public class AroundRunnerTest implements Test {
 		mocker.expectAndReturn(picoResolver.getComponent(SetUpAround.class), setUpAround);
 		mocker.expectAndReturn(picoResolver.getComponent(MockAround.class), mockAround);
 
-		resultListener.enter(new ScopeImpl(Around.class, setUpAround));
 		setUpAround.before(testInstance, TestInstance.testOne);
 
-		resultListener.enter(new ScopeImpl(Around.class, mockAround));
 		mockAround.before(testInstance, TestInstance.testOne);
 
 	 	mocker.replay();
@@ -75,9 +70,7 @@ public class AroundRunnerTest implements Test {
 		};
 		
 		mocker.expectAndReturn(picoResolver.getComponent(mockAround.getClass()), mockAround);
-		resultListener.exit();
 		mocker.expectAndReturn(picoResolver.getComponent(setUpAround.getClass()), setUpAround);
-		resultListener.exit();
 
 		mocker.replay();
 

@@ -8,8 +8,9 @@ public class TestSuite implements Suite {
 		runner.run(FilterTest.class);
 		runner.run(FixtureTest.class);
 		runner.run(PicoTest.class);
-		runner.run(TestMatcherTest.class);
-		runner.run(TestRunnerTest.class);
 		runner.run(TestInstantiatorTest.class);
+		runner.run(TestMatcherTest.class);
+		runner.run(TestScopeFactoryTest.class);
+		runner.run(TestRunnerTest.class);
 	}
 }

@@ -1,17 +1,29 @@
 package picounit.test;
 
 import picounit.Test;
-import picounit.impl.Scope;
+import picounit.impl.ResultListener;
 import picounit.impl.ScopeImpl;
 
 import java.lang.reflect.Method;
 
 public class TestScopeFactoryImpl implements TestScopeFactory {
-	public Scope createClassScope(Object scope) {
-		return new ScopeImpl(Test.class, scope);
+	private final ResultListener resultListener;
+
+	public TestScopeFactoryImpl(ResultListener resultListener) {
+		this.resultListener = resultListener;
 	}
 
-	public Scope createMethodScope(Object scope) {
-		return new ScopeImpl(Method.class, scope);
+	public void enterClass(Class someClass) {
+		resultListener.enter(new ScopeImpl(Test.TEST, Test.class, someClass));
+	}
+
+	public void runMethod(Method method) {
+		resultListener.enter(new ScopeImpl(Test.TEST_METHOD, Method.class, method));
+
+		resultListener.exit();
+	}
+
+	public void exit() {
+		resultListener.exit();
 	}
 }

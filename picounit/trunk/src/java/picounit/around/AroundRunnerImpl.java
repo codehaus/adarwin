@@ -2,7 +2,6 @@ package picounit.around;
 
 import picounit.impl.PicoResolver;
 import picounit.impl.ResultListener;
-import picounit.impl.ScopeImpl;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -29,22 +28,14 @@ public class AroundRunnerImpl implements AroundRunner {
 
 	public void before(Object object, Method method) {
 		for (Iterator iterator = arounds.iterator(); iterator.hasNext(); ) {
-			Around around = nextAround(iterator);
-
-			resultListener.enter(new ScopeImpl(Around.class, around));
-
-			around.before(object, method);
+			nextAround(iterator).before(object, method);
 		}
 	}
 
 	public void after(Object object, java.lang.reflect.Method method) {
 		for (Iterator iterator = reverse(arounds).iterator(); iterator.hasNext(); ) {
-			Around around = nextAround(iterator);
-
 			try {
-				around.after(object, method);
-
-				resultListener.exit();
+				nextAround(iterator).after(object, method);
 			}
 			catch (Throwable throwable) {
 				resultListener.exit(throwable);	

@@ -7,6 +7,4 @@ public interface ResultListener {
 	void exit();
 
 	void exit(Throwable throwable);
-
-	void error(Scope scope, Throwable throwable);
 }

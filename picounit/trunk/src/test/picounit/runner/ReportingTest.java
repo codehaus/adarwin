@@ -1,82 +1,46 @@
 package picounit.runner;
 
-import picounit.MainRunner;
-import picounit.Runner;
+import picounit.Mocker;
 import picounit.Test;
+import picounit.TestInstance;
 import picounit.Verify;
-import picounit.impl.Logger;
-import picounit.impl.NullLogger;
+import picounit.impl.MethodInvoker;
 import picounit.impl.ReportImpl;
+import picounit.impl.ScopeImpl;
 
-import java.io.PrintStream;
 import java.lang.reflect.Method;
 
 public class ReportingTest implements Test {
 	// Unit
-	private final Runner runner = MainRunner.create();
+	private ReportImpl report;
 
-	public static class WooWooLogger implements Logger {
+	// Mocks
+	private MethodInvoker methodInvoker;
 
-		public void info(String message) {
-			System.err.println("woo woo");
-		}
-
-		public void error(String message) {
-			System.err.println("woo woo");
-		}
-
-		public PrintStream printStream() {
-			return System.err;
-		}
-	}
-	
-	public void testPassingTest(Verify verify) {
-		ReportImpl report = new ReportImpl();
+	public void mock(MethodInvoker methodInvoker) {
+		this.report = new ReportImpl(methodInvoker);
 		
-	 	runner.registerFixture(Logger.class, NullLogger.class).run(PassingTest.class, report);
-
-	 	verify.equal(1, report.visitedCount(Test.class));
-	 	verify.equal(2, report.visitedCount(Method.class));
-	 	verify.equal(2, report.successesCount(Method.class));
-	 	verify.equal(0, report.failuresCount(Method.class));
-
-	 	verify.equal(9, report.visitedCount());
-	 	verify.equal(9, report.successesCount());
-	 	verify.equal(0, report.failuresCount());
+		this.methodInvoker = methodInvoker;
 	}
-
-	public void testFailingTest(Verify verify) {
-		ReportImpl report = new ReportImpl();
 	
-		runner.run(FailingTest.class, report);
-
-	 	verify.equal(1, report.visitedCount(Test.class));
-	 	verify.equal(2, report.visitedCount(Method.class));
-	 	verify.equal(0, report.successesCount(Method.class));
-	 	verify.equal(2, report.failuresCount(Method.class));
-	 	
-	 	verify.equal(9, report.visitedCount());
-	 	verify.equal(7, report.successesCount());
-	 	verify.equal(2, report.failuresCount());
+	public void testStartsOutWithAllCountsZero(Verify verify) {
+		verify.equal(0, report.visitedCount());
+		verify.equal(0, report.successesCount());
+		verify.equal(0, report.failuresCount());
 	}
 
-	public static class PassingTest implements Test {
-		public void testFirst(Verify verify) {
-			verify.that(true);
-		}
+	public void testAddEvents(Mocker mocker, Verify verify) {
+		methodInvoker.invokeMethod(TestInstance.testOne);
+		
+		mocker.replay();
 
-		public void testSecond(Verify verify) {
-			verify.not(false);
-		}
-	}
+		report.enter(new ScopeImpl(Test.TEST, Test.class, TestInstance.class));
+		report.enter(new ScopeImpl(Test.TEST_METHOD, Method.class, TestInstance.testOne));
+		report.exit();
+		report.exit();
 
-	public static class FailingTest implements Test {
-		public void testFirst(Verify verify) {
-			verify.that(false);
-		}
-
-		public void testSecond(Verify verify) {
-			verify.not(true);
-		}
+		verify.equal(2, report.visitedCount());
+		verify.equal(2, report.successesCount());
+		verify.equal(0, report.failuresCount());
 	}
 }

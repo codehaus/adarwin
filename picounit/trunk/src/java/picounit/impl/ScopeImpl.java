@@ -5,14 +5,20 @@ import java.io.StringWriter;
 
 public class ScopeImpl implements Scope {
 	private final Class type;
+	private final String typeName;
 	private final Object value;
 	private Throwable reason;
 
-	public ScopeImpl(Class type, Object value) {
+	public ScopeImpl(String typeName, Class type, Object value) {
+		this.typeName = typeName;
 		this.type = type;
 		this.value = value;
 	}
 
+	public boolean matches(String typeNameFilter) {
+		return typeName.equals(typeNameFilter);
+	}
+	
 	public boolean matches(Class filter) {
 		return type.equals(filter);
 	}

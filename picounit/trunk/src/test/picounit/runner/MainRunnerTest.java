@@ -24,10 +24,13 @@ import picounit.around.setup.SetUpAroundImpl;
 import picounit.impl.DelegatingResultListener;
 import picounit.impl.Logger;
 import picounit.impl.LoggerImpl;
+import picounit.impl.MethodInvoker;
+import picounit.impl.MethodInvokerImpl;
 import picounit.impl.MethodRunner;
 import picounit.impl.MethodRunnerImpl;
 import picounit.impl.PicoResolver;
 import picounit.impl.Registry;
+import picounit.impl.ReportImpl;
 import picounit.impl.ResultListener;
 import picounit.impl.UserPicoResolver;
 import picounit.impl.VerifyImpl;
@@ -54,7 +57,6 @@ public class MainRunnerTest implements Test {
 	private MutablePicoContainer infrastructureContainer;
 	private Registry registry;
 	private DelegatingResultListener delegatingResultListener;
-	
 
 	public MainRunnerTest(Mocker mocker) {
 		this.mocker = mocker;
@@ -72,8 +74,8 @@ public class MainRunnerTest implements Test {
 		this.delegatingResultListener = delegatingResultListener;
 	}
 
-	private MainRunner create() {
-		return new MainRunner(overrideableContainer, userContainer, infrastructureContainer, registry,
+	private Runner create() {
+		return MainRunner.create(overrideableContainer, userContainer, infrastructureContainer, registry,
 			delegatingResultListener);
 	}
 
@@ -83,8 +85,7 @@ public class MainRunnerTest implements Test {
 
 		mocker.replay();
 
-		MainRunner mainRunner = create();
-		mainRunner.run(ExampleTest.class);
+		create().run(ExampleTest.class);
 	}
 
 	public void testRunSuite() {
@@ -93,19 +94,17 @@ public class MainRunnerTest implements Test {
 
 		mocker.replay();
 
-		MainRunner mainRunner = create();
-		mainRunner.run(SuiteImpl.class);
+		create().run(SuiteImpl.class);
 	}
 
 	public void testAddFixture() {
 		expectInfrastructure();
-		expectRegister(Fixture.class, FixtureImpl.class);
+		expectRegisterFixture(Fixture.class, FixtureImpl.class);
 		expectRegisterTest(TestRequireingNonStandardFixture.class);
 
 		mocker.replay();
 
-		MainRunner mainRunner = create();
-		mainRunner.registerInfrastructure(Fixture.class, FixtureImpl.class)
+		create().registerFixture(Fixture.class, FixtureImpl.class)
 			.run(TestRequireingNonStandardFixture.class);
 	}
 	
@@ -117,14 +116,17 @@ public class MainRunnerTest implements Test {
 		mocker.ignoreReturn(overrideableContainer.registerComponentInstance(
 			Runner.class, mocker.instanceOf(Runner.class)));
 
+		expectRegister(ReportImpl.class);
+
 		expectRegisterOverrideable(Logger.class, LoggerImpl.class);
 		expectRegisterOverrideable(Verify.class, VerifyImpl.class);
 		expectRegisterOverrideable(Mocker.class, MockerImpl.class);
-
+		
 		expectRegister(PicoResolver.class, PicoResolverImpl.class);
 		expectRegisterFixture(UserPicoResolver.class, mocker.instanceOf(PicoResolver.class)); 
 
 		expectRegister(MethodRunner.class, MethodRunnerImpl.class);
+		expectRegister(MethodInvoker.class, MethodInvokerImpl.class);
 
 		// Runner
 
