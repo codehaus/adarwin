@@ -13,18 +13,17 @@ public class AJester {
 	private Mutator mutator;
 	private Mutator[] mutators;
 	
-	public static Mutator[] getMutators(Class testCaseClass, Class codeClass,
+	public static InstructionMutator[] getMutators(Class testCaseClass, Class codeClass,
 		MutatorFactory mutatorFactory) throws Exception {
 		
 		return getMutators(testCaseClass, codeClass, new MutatorFactory[] {mutatorFactory});
 	}
 
-	public static Mutator[] getMutators(Class testCaseClass, Class codeClass,
+	public static InstructionMutator[] getMutators(Class testCaseClass, Class codeClass,
 		MutatorFactory[] factories) throws Exception {
 		
 		Report report = new TestRunnerWrapper().run(testCaseClass,
-			new MethodCoverageMatcher(new ClassCodeMatcher(codeClass.getName())),
-			new MethodCoverageInstructionMutator());
+			new MethodCoverageInstructionMutator(new ClassCodeMatcher(codeClass.getName())));
 
 		List mutators = new LinkedList();
 		
@@ -37,7 +36,7 @@ public class AJester {
 			}			
 		}
 		
-		return (Mutator[]) mutators.toArray(new Mutator[0]);
+		return (InstructionMutator[]) mutators.toArray(new InstructionMutator[0]);
 	}
 	
 	public AJester(Class testCaseClass, Mutator mutator) {
@@ -52,11 +51,18 @@ public class AJester {
 
 	public AJester(Class testCaseClass, Class codeClass, Class mutatorClass) throws Exception {
 		this.testClassName = testCaseClass.getName();
-		this.mutators = getMutators(testCaseClass, codeClass, new MutatorFactory(mutatorClass));
+		
+		InstructionMutator[] instructionMutators = getMutators(testCaseClass, codeClass, new MutatorFactory(mutatorClass));
+		
+		this.mutators = new Mutator[instructionMutators.length];
+		
+		for (int iLoop = 0; iLoop < instructionMutators.length; iLoop++) {
+			mutators[iLoop] = new BaseMutator(instructionMutators[iLoop]);
+		}
 	}
 
 	public AJester(Class testCaseClass, InstructionMatcher matcher, InstructionMutator mutator) {
-		this(testCaseClass, new BaseMutator(matcher, mutator));
+		this(testCaseClass, new BaseMutator(mutator));
 	}
 
 	public Report run() throws Exception {

@@ -18,11 +18,11 @@ class BaseMutator extends ClassAdapter implements Mutator {
 	private final InstructionMatcher instructionMatcher;
 	private final InstructionMutator instructionMutator;
 	
-	public BaseMutator(InstructionMatcher instructionMatcher, InstructionMutator instructionMutator) {
+	public BaseMutator(InstructionMutator instructionMutator) {
 		super(new ReuseableClassWriter());
 		this.mutations = new HashSet();
 
-		this.instructionMatcher = instructionMatcher;
+		this.instructionMatcher = instructionMutator;
 		this.instructionMutator = instructionMutator;
 		currentClassName = "";
 	}
@@ -53,7 +53,7 @@ class BaseMutator extends ClassAdapter implements Mutator {
 				new MethodCoverageMatcher(null);
 			
 			MethodCoverageInstructionMutator mutator =
-				new MethodCoverageInstructionMutator();
+				new MethodCoverageInstructionMutator(null);
 			
 			if (matcher.matches(instruction)) {
 				mutator.mutate(instruction).visit(getClassVisitor(), codeVisitor);

@@ -4,7 +4,11 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Constants;
 
-public class MethodCoverageInstructionMutator implements InstructionMutator {
+public class MethodCoverageInstructionMutator extends MethodCoverageMatcher implements InstructionMutator {
+	public MethodCoverageInstructionMutator(CodeMatcher codeMatcher) {
+		super(codeMatcher);
+	}
+
 	private static final String COVERAGE_CLASS = Coverage.class.getName().replace('.', '/');
 
 	public Instruction mutate(Instruction instruction) {

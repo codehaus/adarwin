@@ -12,8 +12,8 @@ import junit.framework.TestCase;
 
 public class AJesterTestCase extends TestCase {
 	public void testGetMutatorsReturnsOneMutatorPerMethod() throws Exception {
-		Mutator[] mutators = AJester.getMutators(IfEqualsStatementTestCase.class,
-			IfEqualsStatement.class, new MutatorFactory(IfStatementMutator.class));
+		InstructionMutator[] mutators = AJester.getMutators(IfEqualsStatementTestCase.class,
+			IfEqualsStatement.class, new MutatorFactory(IfStatementInstructionMutator.class));
 
 		assertNotNull(mutators);
 		
@@ -22,11 +22,11 @@ public class AJesterTestCase extends TestCase {
 //		Set codeLocations = new HashSet();
 		
 		for (int mLoop = 0; mLoop < mutators.length; mLoop++) {
-			Mutator mutator = mutators[mLoop];
+			InstructionMutator mutator = mutators[mLoop];
 
 //			codeLocations.add(mutator.getCodeMatcher());
 
-			assertEquals(IfStatementMutator.class, mutator.getClass());
+			assertEquals(IfStatementInstructionMutator.class, mutator.getClass());
 		}
 
 //		assertTrue(codeLocations.contains(IfStatement.IF_EQUAL_LOCATION));
@@ -35,11 +35,11 @@ public class AJesterTestCase extends TestCase {
 
 	public void testMultipleMutators() throws Exception {
 		MutatorFactory[] factories = new MutatorFactory[] {
-			new MutatorFactory(IfStatementMutator.class),
-			new MutatorFactory(BooleanReturnMutator.class)
+			new MutatorFactory(IfStatementInstructionMutator.class),
+			new MutatorFactory(BooleanReturnInstructionMutator.class)
 		};
 		
-		Mutator[] mutators = AJester.getMutators(IfEqualsStatementTestCase.class, IfEqualsStatement.class,
+		InstructionMutator[] mutators = AJester.getMutators(IfEqualsStatementTestCase.class, IfEqualsStatement.class,
 			factories);
 		
 		assertNotNull(mutators);
@@ -48,15 +48,15 @@ public class AJesterTestCase extends TestCase {
 //		Set codeLocations = new HashSet();
 		
 		for (int mLoop = 0; mLoop < mutators.length; mLoop++) {
-			Mutator mutator = mutators[mLoop];
+			InstructionMutator mutator = mutators[mLoop];
 
 //			codeLocations.add(mutator.getCodeMatcher());
 
 			if (mLoop < 1) {
-				assertEquals(IfStatementMutator.class, mutator.getClass());
+				assertEquals(IfStatementInstructionMutator.class, mutator.getClass());
 			}
 			else {
-				assertEquals(BooleanReturnMutator.class, mutator.getClass());	
+				assertEquals(BooleanReturnInstructionMutator.class, mutator.getClass());	
 			}
 		}
 		
@@ -67,7 +67,7 @@ public class AJesterTestCase extends TestCase {
 	public void testReport() throws Exception {
 		AJester ajester = new AJester(BooleanReturnTestCase.class,
 			new BooleanReturnMatcher(new CodeLocationMatcher(BooleanReturn.LOCATION)),
-			new BooleanReturnInstructionMutator());
+			new BooleanReturnInstructionMutator(new CodeLocationMatcher(BooleanReturn.LOCATION)));
 
 		assertEquals(Report.NO_PROBLEMS, ajester.run().getReport());
 	}
@@ -75,7 +75,7 @@ public class AJesterTestCase extends TestCase {
 	public void testReportWithAnotherClass() throws Exception {
 		AJester ajester = new AJester(IfEqualsStatementTestCase.class,
 			new BooleanReturnMatcher(new CodeLocationMatcher(IfEqualsStatement.LOCATION)),
-			new BooleanReturnInstructionMutator());
+			new BooleanReturnInstructionMutator(new CodeLocationMatcher(IfEqualsStatement.LOCATION)));
 
 		assertEquals(Report.NO_PROBLEMS, ajester.run().getReport());
 	}
@@ -84,7 +84,7 @@ public class AJesterTestCase extends TestCase {
 		AJester ajester = new AJester(ProblematicIfStatementTestCase.class,
 			new IfStatementMatcher(
 				new CodeLocationMatcher(ProblematicIfEqualsStatement.IF_EQUAL_LOCATION)),
-			new IfStatementInstructionMutator());
+			new IfStatementInstructionMutator(new CodeLocationMatcher(ProblematicIfEqualsStatement.IF_EQUAL_LOCATION)));
 
 		String expectedReport = Report.SOME_PROBLEMS + ":\n" +
 			"\t" + ProblematicIfEqualsStatement.IF_EQUAL_LOCATION;
@@ -96,7 +96,7 @@ public class AJesterTestCase extends TestCase {
 	public void testGetCoverage() throws Exception {
 		Report report = new AJester(BooleanReturnTestCase.class,
 			new BooleanReturnMatcher(new CodeLocationMatcher(BooleanReturn.LOCATION)),
-			new BooleanReturnInstructionMutator()).run();
+			new BooleanReturnInstructionMutator(new CodeLocationMatcher(BooleanReturn.LOCATION))).run();
 
 		assertTrue(report.getCoverage().contains(BooleanReturn.LOCATION));
 	}
@@ -108,7 +108,7 @@ public class AJesterTestCase extends TestCase {
 			"nonExistantMethod");
 		AJester ajester = new AJester(ProblematicIfStatementTestCase.class,
 			new IfStatementMatcher(new CodeLocationMatcher(codeLocation)),
-			new IfStatementInstructionMutator());
+			new IfStatementInstructionMutator(new CodeLocationMatcher(codeLocation)));
 		assertEquals(Report.NO_PROBLEMS, ajester.run().getReport());
 	}
 
@@ -128,7 +128,7 @@ public class AJesterTestCase extends TestCase {
 	public void testNoLocation() throws Exception {
 		AJester ajester = new AJester(ProblematicIfStatementTestCase.class,
 			ProblematicIfEqualsStatement.class,
-			IfStatementMutator.class);
+			IfStatementInstructionMutator.class);
 
 		String expectedReport = Report.SOME_PROBLEMS + ":\n" +
 			"\t" + ProblematicIfEqualsStatement.IF_EQUAL_LOCATION;
