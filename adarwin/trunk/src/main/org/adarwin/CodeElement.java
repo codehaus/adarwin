@@ -19,6 +19,10 @@ public class CodeElement {
 	private final String className;
 	private final String fullyQualifiedClassName;
 	private ElementType elementType;
+	
+	public CodeElement(IType type, ElementType codeType) {
+		this(type.getTypeName(), codeType);
+	}
 
 	public CodeElement(String fullyQualifiedClassName, ElementType codeType) {
 		this.packageName = packageName(fullyQualifiedClassName);

@@ -11,7 +11,6 @@
 package org.adarwin;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,25 +19,27 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Label;
-import org.objectweb.asm.Type;
 
 class RuleClassVisitor implements ClassVisitor {
     private CodeVisitor codeVisitor;
 	private String fullyQualifiedClassName;
-	private Set dependancies;
 	private Set constructors;
+	private Set methods;
+	private Set dependancies;
+	private TypeParser typeParser;
 
 	public RuleClassVisitor() {
 		constructors = new HashSet();
+		methods = new HashSet();
 		dependancies = new HashSet();
         codeVisitor = new RuleCodeVisitor();
+        typeParser = new TypeParser();
     }
 
     public ClassSummary visit(ClassReader reader) {
 		reader.accept(this, false);
 
-        return new ClassSummary(fullyQualifiedClassName, constructors, Collections.EMPTY_SET,
-        	dependancies);
+        return new ClassSummary(fullyQualifiedClassName, constructors, methods, dependancies);
     }
 
 	public void visit(int access, String sourceClassPath, String baseClassPath, String[] interfaces, String fileName) {
@@ -72,34 +73,40 @@ class RuleClassVisitor implements ClassVisitor {
 		log(", desc = " + desc);
 		logln(", value = " + value);
 
-        String fullyQualifiedClassName = getFullyQualifiedClassName(stripOddStuff(desc));
-		inspect(new CodeElement(fullyQualifiedClassName, ElementType.USES));
+		IType type = typeParser.parse(desc);
+		if (!type.isPrimative()) {
+			inspect(new CodeElement(type, ElementType.USES));
+		}
     }
 
 	public CodeVisitor visitMethod(int access, String name, String desc, String[] exceptions) {
 		logln("visitMethod: " + name + ", " + desc + ", " + exceptions);
 		
 		if ("<init>".equals(name)) {
-			
-			Type[] parameterTypes = Type.getArgumentTypes(desc);
+			IType[] parameterTypes = typeParser.parseMethodParameters(desc);
 			String[] parameters = new String[parameterTypes.length];
 			for (int pLoop = 0; pLoop < parameters.length; pLoop++) {
-				if (!isPrimative(parameterTypes[pLoop])) {
-					parameters[pLoop] = parameterTypes[pLoop].getClassName();
-				}
-				else {
-					parameters[pLoop] = parameterTypes[pLoop].getDescriptor();
-				}
+				parameters[pLoop] = parameterTypes[pLoop].getTypeName();
 			}
 			
-			Constructor constructor = new Constructor(parameters);
+			Constructor constructor = new Constructor(parameterTypes);
 			constructors.add(constructor);
 		}
 		else {
-			Type returnType = Type.getReturnType(desc);
-			if (desc.indexOf(")L") != -1) {
-				inspect(new CodeElement(returnType.getClassName(), ElementType.USES));
+			IType returnType = typeParser.parseMethodReturn(desc); 
+			
+			if (!returnType.isPrimative()) {
+				inspect(new CodeElement(returnType.getTypeName(), ElementType.USES));
 			}
+			
+			IType[] argumentTypes = typeParser.parseMethodParameters(desc);
+			String[] parameterNames = new String[argumentTypes.length];
+			for (int aLoop = 0; aLoop < argumentTypes.length; aLoop++) {
+				parameterNames[aLoop] = argumentTypes[aLoop].getTypeName();
+			}
+			
+			Method method = new Method(name, returnType.getTypeName(), parameterNames);
+			methods.add(method);
 		}
 
 		if (exceptions != null) {
@@ -111,17 +118,6 @@ class RuleClassVisitor implements ClassVisitor {
 
         return codeVisitor;
     }
-
-	private boolean isPrimative(Type type) {
-		return Type.BOOLEAN_TYPE == type ||
-			Type.BYTE_TYPE == type ||
-			Type.CHAR_TYPE == type ||
-			Type.DOUBLE_TYPE == type ||
-			Type.FLOAT_TYPE == type ||
-			Type.INT_TYPE == type ||
-			Type.LONG_TYPE == type ||
-			Type.SHORT_TYPE == type;
-	}
 
 	public void visitEnd() {
 	}
@@ -202,23 +198,16 @@ class RuleClassVisitor implements ClassVisitor {
 
         public void visitLocalVariable(String name, String desc, Label start, Label end, int index) {
 			if (!"this".equals(name)) {
-				String fullyQualifiedClassName = getFullyQualifiedClassName(stripOddStuff(desc));
-				inspect(new CodeElement(fullyQualifiedClassName, ElementType.USES));
+				IType type = typeParser.parse(desc);
+				if (!type.isPrimative()) {
+					inspect(new CodeElement(type.getTypeName(), ElementType.USES));
+				}
 			}
         }
 
         public void visitLineNumber(int i, Label label) {
         }
     }
-
-	private String stripOddStuff(String desc) {
-		if (desc.endsWith(";") && desc.startsWith("L")) {
-			return desc.substring(1, desc.length() - 1);
-		}
-		else {
-			return desc;
-		}
-	}
 
 	private String getFullyQualifiedClassName(String packagePath) {
 		return packagePath.replace('/', '.');
@@ -227,7 +216,6 @@ class RuleClassVisitor implements ClassVisitor {
 	public ClassSummary visit(ClassFile classFile) throws IOException {
 		return classFile.accept(this);
 	}
-
 
 	private void log(String toLog) {
 //		System.out.print(toLog);

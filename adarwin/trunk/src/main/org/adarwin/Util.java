@@ -24,4 +24,14 @@ public class Util {
 	public static String packageName(String name) {
 		return name.substring(0, Math.max(0, name.lastIndexOf('.')));
 	}
+
+	public static String[] convertClassArrayToStringArray(Class[] classParameterTypes) {
+		String[] parameterTypes = new String[classParameterTypes.length];
+		
+		for (int cLoop = 0; cLoop < classParameterTypes.length; ++cLoop) {
+			parameterTypes[cLoop] = classParameterTypes[cLoop].getName();
+		}
+		
+		return parameterTypes;
+	}
 }

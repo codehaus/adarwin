@@ -25,6 +25,8 @@ public class Runner {
 	public static final String CLASSPATH = "classPath";
 	public static final String RULE_VIOLATED = "aDarwin rule violated";
 	public static final String MISSING_OR_EMPTY = " parameter missing or empty";
+	public static final String RULE_EXPRESSION_AND_RULE_FILE_NAME_MISSING =
+		"both ruleExpression and ruleFileName parameters are missing or empty";
 
 	private Logger logger;
 	private String binding;
@@ -90,7 +92,7 @@ public class Runner {
 
 		if (isParameterNullOrEmpty(getRuleExpression()) &&
 			isParameterNullOrEmpty(getRuleFileName())) {
-			throw new RuleException("both ruleExpression and ruleFileName parameters are missing or empty");		
+			throw new RuleException(RULE_EXPRESSION_AND_RULE_FILE_NAME_MISSING);		
 		}
 		
 		try {
@@ -184,5 +186,76 @@ public class Runner {
 
 	public void setLogger(Logger logger) {
 		this.logger = logger;
+	}
+	
+	public static class Main {
+		public static final String USAGE = "Usage: " + Runner.class.getName() +
+			" -b <binding-file> -c <class-path> {-r <rule> | -f <rule-file>} -p";
+			
+		private Runner runner;
+
+		public Main(String[] args) throws UsageException {
+			runner = new Runner();
+			if (args.length < 3 || args.length > 5) {
+				usage();
+				return;
+			}
+			for (int aLoop = 0; aLoop < args.length; ++aLoop) {
+				String currentArg = args[aLoop];
+				switch (currentArg.charAt(1)) {
+					case 'b':
+						checkMoreArgs(aLoop, args.length, currentArg);
+						runner.setBinding(args[++aLoop]);
+						break;
+					case 'c':
+						checkMoreArgs(aLoop, args.length, currentArg);
+						runner.setClassPath(args[++aLoop]);
+						break;
+					case 'r':
+						checkMoreArgs(aLoop, args.length, currentArg);
+						runner.setRuleExpression(args[++aLoop]);
+						break;
+					case 'f':
+						checkMoreArgs(aLoop, args.length, currentArg);
+						runner.setRuleFileName(args[++aLoop]);
+						break;
+					case 'p':
+						runner.setPrint(true);
+						break;
+					default:
+				}
+			}
+		}
+
+		public Runner getRunner() {
+			return runner;
+		}
+
+		private void usage() throws UsageException {
+			throw new UsageException(USAGE);
+		}
+
+		private void checkMoreArgs(int currentIndex, int numArgs, String argument)
+			throws UsageException {
+				
+			if (numArgs <= currentIndex) {
+				throw new UsageException("Missing parameter after: " + argument);
+			}
+		}
+	}
+	
+	public static class UsageException extends Exception {
+		public UsageException(String message) {
+			super(message);
+		}
+	}
+	
+	public static void main(String[] args) throws Exception {
+		try {
+			Main main = new Main(args);
+			main.getRunner().run();
+		} catch (UsageException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 }
