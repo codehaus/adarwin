@@ -23,13 +23,21 @@ public class MutatingClassLoader extends TestCaseClassLoader implements TestSuit
 	public synchronized Class loadClass(String className, boolean resolve)
 		throws ClassNotFoundException {
 
-		if (mutator != null && mutator.getCodeMatcher().matches(className)) {
-//			System.out.println("mutating: " + className + ", with: " + mutator);
-			return loadAndMutateClass(mutator, className);
+		boolean newBoolean = !className.startsWith("java") && !className.startsWith("junit");
+		boolean oldBoolean = mutator != null && mutator.getCodeMatcher().matches(className);
+		
+		if (newBoolean != oldBoolean) {
+			System.out.println("new ain't gonna work with: " + className);
 		}
-		else if (className.equals(Coverage.class.getName())) {
+		
+		if (className.equals(Coverage.class.getName())) {
 			//System.out.println("Not mutating Coverage");
 			return Coverage.class;
+		}
+		//else if (newBoolean && !className.equals("org.ajester.CodeMatcher")) {
+		else if (oldBoolean) {
+//			System.out.println("mutating: " + className + ", with: " + mutator);
+			return loadAndMutateClass(mutator, className);
 		}
 		else {
 			return super.loadClass(className, resolve);

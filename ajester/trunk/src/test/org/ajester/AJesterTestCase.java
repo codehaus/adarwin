@@ -20,6 +20,11 @@ public class AJesterTestCase extends TestCase {
 			IfStatement.class, new MutatorFactory(IfStatementMutator.class));
 
 		assertNotNull(mutators);
+		
+		for (int mLoop = 0; mLoop < mutators.length; mLoop++) {
+			System.out.println("-- " + mutators[mLoop].getCodeMatcher());
+		}
+		
 		assertEquals(NUM_METHODS_IN_IF_STATEMENT_CLASS, mutators.length);
 		
 		Set codeLocations = new HashSet();

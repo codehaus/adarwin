@@ -16,10 +16,16 @@ abstract class BaseMutator extends ClassAdapter implements Mutator {
 	private String currentClassName;
 	private String currentMethodName;
 	
+	private final InstructionMatcher instructionMatcher;
+	private final InstructionMutator instructionMutator;
+	
 	public BaseMutator(CodeMatcher codeMatcher) {
 		super(new ReuseableClassWriter());
 		this.codeMatcher = codeMatcher;
 		this.mutations = new HashSet();
+
+		this.instructionMatcher = this;
+		this.instructionMutator = this;
 	}
 
 	public CodeMatcher getCodeMatcher() {
@@ -34,31 +40,39 @@ abstract class BaseMutator extends ClassAdapter implements Mutator {
 		return (ReuseableClassWriter) getClassVisitor();
 	}
 
-	public CodeVisitor visitMethod(final int access, final String methodName, final String desc,
-		final String[] exceptions) {
+	public final CodeVisitor visitMethod(final int access, final String methodName,
+		final String desc, final String[] exceptions) {
 
 		setMethodName(methodName);
 		print("visitMethod(" + methodName + ")");
 		setCodeVisitor(cv.visitMethod(access, methodName, desc, exceptions));
 
+		CodeVisitor codeVisitor = this.codeVisitor;
+		Instruction instruction = new MethodInstruction(getCurrentClassName(), access,
+			methodName, desc, exceptions);
+		
 		if (getCodeMatcher().matches(
 			new CodeLocation(getCurrentClassNameWithDots(), getMethodName()))) {
 
 			MethodCoverageMutator mutator = new MethodCoverageMutator(null);
 			
-			if (mutator.matches(new MethodInstruction(access, methodName, desc, exceptions))) {
-				mutator.addMethodCoverageCall(codeVisitor, getCurrentClassName(),
-					getMethodName());
+			if (mutator.matches(instruction)) {
+				mutator.mutate(instruction).visit(getClassVisitor(), getCodeVisitor());
 			}
-
-			return this;
+			
+			codeVisitor = this;
 		}
-		else {
-			return codeVisitor;
+		
+		if (instructionMatcher.matches(instruction)) {
+			addCovered();
+			
+			instructionMutator.mutate(instruction).visit(getClassVisitor(), getCodeVisitor());
 		}
+		
+		return codeVisitor;
 	}
 
-	public void visit(int access, String className, String superName, String[] interfaces,
+	public final void visit(int access, String className, String superName, String[] interfaces,
 		String sourceFile) {
 
 		setCurrentClassName(className);
@@ -68,92 +82,95 @@ abstract class BaseMutator extends ClassAdapter implements Mutator {
 	}
 
 	// CodeVisitor methods
-	public void visitInsn(final int opcode) {
+	public final void visitInsn(final int opcode) {
 		print("visitInsn(" + lookup(opcode) + ")");
-		codeVisitor.visitInsn(opcode);
+		//codeVisitor.visitInsn(opcode);
+		mutateIfMatches(new OrdinaryInstruction(opcode));
 	}
 
-	public void visitIntInsn(final int opcode, final int operand) {
+	public final void visitIntInsn(final int opcode, final int operand) {
 		print("visitIntInsn(" + lookup(opcode) + ")");
 		codeVisitor.visitIntInsn(opcode, operand);
 	}
 
-	public void visitVarInsn(final int opcode, final int var) {
+	public final void visitVarInsn(final int opcode, final int var) {
 		print("visitVarInsn(" + lookup(opcode) + ")");
 		codeVisitor.visitVarInsn(opcode, var);
 	}
 
-	public void visitTypeInsn(final int opcode, final String desc) {
+	public final void visitTypeInsn(final int opcode, final String desc) {
 		print("visitTypeInsn(" + lookup(opcode) + ")");
 		codeVisitor.visitTypeInsn(opcode, desc);
 	}
 
-	public void visitFieldInsn(final int opcode, final String owner, final String name,
+	public final void visitFieldInsn(final int opcode, final String owner, final String name,
 		final String desc) {
 
 		print("visitFieldInsn(" + lookup(opcode) + ")");
 		codeVisitor.visitFieldInsn(opcode, owner, name, desc);
 	}
 
-	public void visitMethodInsn(final int opcode, final String owner, final String name,
+	public final void visitMethodInsn(final int opcode, final String owner, final String name,
 		final String desc) {
 
 		print("visitMethodInsn(" + lookup(opcode) + ")");
 		codeVisitor.visitMethodInsn(opcode, owner, name, desc);
 	}
 
-	public void visitJumpInsn(final int opcode, final Label label) {
+	public final void visitJumpInsn(final int opcode, final Label label) {
 		print("visitJumpInsn(" + lookup(opcode) + ")");
-		
-		codeVisitor.visitJumpInsn(opcode, label);
+		mutateIfMatches(new JumpInstruction(opcode, label));
+		//codeVisitor.visitJumpInsn(opcode, label);
 	}
 
-	public void visitLabel(final Label label) {
+	public final void visitLabel(final Label label) {
 		print("visitLabel");
 		codeVisitor.visitLabel(label);
 	}
 
-	public void visitLdcInsn(final Object cst) {
+	public final void visitLdcInsn(final Object cst) {
 		print("visitLdcInsn(" + cst + ")");
 		codeVisitor.visitLdcInsn(cst);
 	}
 
-	public void visitIincInsn(final int var, final int increment) {
+	public final void visitIincInsn(final int var, final int increment) {
 		codeVisitor.visitIincInsn(var, increment);
 	}
 
-	public void visitTableSwitchInsn(final int min, final int max, final Label dflt,
+	public final void visitTableSwitchInsn(final int min, final int max, final Label dflt,
 		final Label labels[]) {
 
 		codeVisitor.visitTableSwitchInsn(min, max, dflt, labels);
 	}
 
-	public void visitLookupSwitchInsn(final Label dflt, final int keys[], final Label labels[]) {
+	public final void visitLookupSwitchInsn(final Label dflt, final int keys[],
+		final Label labels[]) {
+
 		codeVisitor.visitLookupSwitchInsn(dflt, keys, labels);
 	}
 
-	public void visitMultiANewArrayInsn(final String desc, final int dims) {
+	public final void visitMultiANewArrayInsn(final String desc, final int dims) {
 		codeVisitor.visitMultiANewArrayInsn(desc, dims);
 	}
 
-	public void visitTryCatchBlock(final Label start, final Label end, final Label handler,
+	public final void visitTryCatchBlock(final Label start, final Label end, final Label handler,
 		final String type) {
 
 		codeVisitor.visitTryCatchBlock(start, end, handler, type);
 	}
 
-	public void visitMaxs(final int maxStack, final int maxLocals) {
+	public final void visitMaxs(final int maxStack, final int maxLocals) {
 		codeVisitor.visitMaxs(maxStack, maxLocals);
 	}
 
-	public void visitLocalVariable(final String name, final String desc, final Label start,
+	public final void visitLocalVariable(final String name, final String desc, final Label start,
 		final Label end, final int index) {
 
 		print("visitLocalVariable(" + name + ")");
 		codeVisitor.visitLocalVariable(name, desc, start, end, index);
 	}
 
-	public void visitLineNumber(final int line, final Label start) {
+	public final void visitLineNumber(final int line, final Label start) {
 		print("visitLineNumber(" + line + ")");
 		codeVisitor.visitLineNumber(line, start);
 	}
@@ -207,5 +224,14 @@ abstract class BaseMutator extends ClassAdapter implements Mutator {
 
 	protected void addCovered() {
 		mutations.add(new CodeLocation(getCurrentClassNameWithDots(), getMethodName()));
+	}
+
+	public void mutateIfMatches(Instruction instruction) {
+		if (instructionMatcher.matches(instruction)) {
+			addCovered();
+			instruction = instructionMutator.mutate(instruction);
+		}
+		
+		instruction.visit(getClassVisitor(), getCodeVisitor());
 	}
 }

@@ -7,16 +7,6 @@ public class BooleanReturnMutator extends BaseMutator {
 		super(codeMatcher);
 	}
 
-	public void visitInsn(int opcode) {
-		Instruction instruction = new OrdinaryInstruction(opcode);
-		if (matches(instruction)) {
-			addCovered();
-			instruction = mutate(instruction);
-		}
-		
-		instruction.visit(getClassVisitor(), getCodeVisitor());
-	}
-
 	public boolean matches(Instruction instruction) {
 		if (instruction instanceof OrdinaryInstruction) {
 			OrdinaryInstruction ordinaryInstruction = (OrdinaryInstruction) instruction;
