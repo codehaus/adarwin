@@ -10,17 +10,23 @@
 
 package org.adarwin;
 
+import org.adarwin.rule.NotRule;
+import org.easymock.MockControl;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 import junit.framework.TestCase;
 
-import org.adarwin.rule.NotRule;
-import org.adarwin.rule.Rule;
-
 public class RuleClassBindingsTestCase extends TestCase {
-    public void testSingleMapping() {
+	private MockControl ruleConsumerControl = MockControl.createNiceControl(RuleConsumer.class);
+	private RuleConsumer ruleConsumer = (RuleConsumer) ruleConsumerControl.getMock();
+	
+	private MockControl loggerControl = MockControl.createNiceControl(Logger.class);
+	private Logger logger = (Logger) loggerControl.getMock();
+	
+	public void testSingleMapping() {
         String rule = "rule";
 		RuleClassBindings ruleClassBindings = new RuleClassBindings(rule, TrueRule.class);
 
@@ -51,9 +57,13 @@ public class RuleClassBindingsTestCase extends TestCase {
 			new String[] {"not", "true"},
 			new Class[] {NotRule.class, TrueRule.class});
 
-		Rule rule = new RuleBuilder(ruleClassBindings).buildRule("not(true)");
+		ruleConsumer.consume(new NotRule(new TrueRule()), logger);
+		ruleConsumerControl.setReturnValue(true);
+		ruleConsumerControl.replay();
 
-		assertEquals("not(true)", rule.toString(ruleClassBindings));
+		new RuleBuilder(ruleClassBindings, "not(true)", logger).produce(ruleConsumer);
+
+		ruleConsumerControl.verify();
 	}
 
 	public void testAddSynonymFromPropertiesFile() throws ADarwinException, IOException,
@@ -61,11 +71,15 @@ public class RuleClassBindingsTestCase extends TestCase {
 
 		RuleClassBindings ruleClassBindings = new RuleClassBindings(createPropertiesFile(),
 			new FileAccessor());
-		String expression = "not(true)";
-		RuleBuilder ruleBuilder = new RuleBuilder(ruleClassBindings);
-		Rule rule = ruleBuilder.buildRule(expression);
 
-		assertEquals(expression, rule.toString(ruleClassBindings));
+		ruleConsumer.consume(new NotRule(new TrueRule()), logger);
+		ruleConsumerControl.setReturnValue(true);
+
+		ruleConsumerControl.replay();
+
+		new RuleBuilder(ruleClassBindings, "not(true)", logger).produce(ruleConsumer);
+
+		ruleConsumerControl.verify();
 	}
 
 	private String createPropertiesFile() throws IOException {

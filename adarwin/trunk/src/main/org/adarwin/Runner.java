@@ -28,15 +28,12 @@ public class Runner implements IRunner {
 	private final boolean failFast;
 	private final String classPath;
 	private final Logger logger;
-	private String ruleExpression;
-	private RuleProducer builder;
+
+	private final RuleProducer ruleProducer;
 	private final CodeProducer codeProducer;
 
 	public Runner(boolean printDetail, boolean failOnMatch, boolean failFast, String binding,
-		String classPath, String ruleExpression, Logger logger,
-		RuleConsumer ruleBuilderListener, RuleProducer ruleBuilder, CodeProducer codeProducer) {
-
-		this.ruleExpression = ruleExpression;
+		String classPath, Logger logger, RuleProducer ruleProducer, CodeProducer codeProducer) {
 
 		this.printDetail = printDetail;
 		this.failOnMatch = failOnMatch;
@@ -44,15 +41,13 @@ public class Runner implements IRunner {
 		this.classPath = classPath;
 		this.logger = logger;
 
-		this.builder = ruleBuilder;
+		this.ruleProducer = ruleProducer;
 		this.codeProducer = codeProducer;
 	}
 
 	public final RuleConsumer ruleConsumer = new RuleConsumer() {
-		public boolean consume(final Rule rule, final RuleClassBindings ruleClassBindings)
+		public boolean consume(final Rule rule, final Logger logger)
 			throws ADarwinException {
-
-			logger.reset(CLASSES_VIOLATED + rule.toString(ruleClassBindings));
 
 			class RuleListenerImpl implements RuleListener {
 				private boolean matched;
@@ -92,9 +87,9 @@ public class Runner implements IRunner {
 
 		final Boolean matches = new Boolean();
 
-		builder.produce(ruleExpression, new RuleConsumer() {
-			public boolean consume(Rule rule, RuleClassBindings ruleClassBindings) throws ADarwinException {
-				matches.matches = matches.matches | ruleConsumer.consume(rule, ruleClassBindings);
+		ruleProducer.produce(new RuleConsumer() {
+			public boolean consume(Rule rule, Logger logger) throws ADarwinException {
+				matches.matches = matches.matches | ruleConsumer.consume(rule, logger);
 
 				return true;
 			}
@@ -178,11 +173,10 @@ public class Runner implements IRunner {
 		};
 
 		RuleProducer ruleBuilder = new RuleBuilder(
-			new RuleClassBindings(binding, new FileAccessor()));
+			new RuleClassBindings(binding, new FileAccessor()), ruleExpression, logger);
 
 		new Runner(printDetail, failOnMatch, failFast, binding, classPath,
-			ruleExpression, logger, RuleConsumer.NULL, ruleBuilder,
-			new CodeProducer(classPath)).run();
+			logger, ruleBuilder, new CodeProducer(classPath)).run();
 	}
 
 	private static void checkMoreArgs(int currentIndex, int numArgs, String argument)

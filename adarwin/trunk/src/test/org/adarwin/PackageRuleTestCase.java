@@ -11,29 +11,19 @@
 package org.adarwin;
 
 import org.adarwin.rule.PackageRule;
-import org.adarwin.rule.Rule;
-import org.adarwin.testmodel.a.InPackageA;
-import org.adarwin.testmodel.b.InPackageB;
+
+import java.util.Date;
 
 public class PackageRuleTestCase extends RuleTestCase {
-	private final RuleBuilder ruleBuilder =
-		new RuleBuilder(new RuleClassBindings("package", PackageRule.class));
-
 	public void testMatchingUsingClass() throws ADarwinException {
-		Rule rule = ruleBuilder.buildRule("package(" + Util.packageName(InPackageB.class) + ')');
-
-		assertNumMatches(1, rule, InPackageB.class);
+		assertNumMatches(1, new PackageRule(Util.packageName(Date.class)), Date.class);
     }
 
 	public void testMatchingUsingRegularExpression() throws ADarwinException {
-		Rule rule = ruleBuilder.buildRule("package(.*a)");
-
-		assertNumMatches(1, rule, InPackageA.class);
+		assertNumMatches(1, new PackageRule(".*util"), Date.class);
 	}
 
 	public void testNonMatchingUsingRegularExpression() throws ADarwinException {
-		Rule rule = ruleBuilder.buildRule("package(.*b)");
-
-		assertNumMatches(0, rule, InPackageA.class);
+		assertNumMatches(0, new PackageRule(".*flibble"), Date.class);
 	}
 }

@@ -13,7 +13,6 @@ package org.adarwin.ant;
 import org.adarwin.IRunnerFactory;
 import org.adarwin.Logger;
 import org.adarwin.ADarwinException;
-import org.adarwin.RuleConsumer;
 import org.adarwin.RunnerFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
@@ -79,7 +78,7 @@ public class ADarwinTask extends Task {
 	public void execute() throws BuildException {
 		try {
 			runnerFactory.create(printDetail, binding, classPath, failFast,
-				failOnMatch, rule, logger, RuleConsumer.NULL).run();
+				failOnMatch, rule, logger).run();
 		} catch (ADarwinException e) {
 			throw new BuildException(e.getMessage(), e.getCause());
 		}

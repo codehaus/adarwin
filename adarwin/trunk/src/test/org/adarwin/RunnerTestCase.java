@@ -50,8 +50,7 @@ public class RunnerTestCase extends TestCase {
 
 	private IRunner createRunner() throws ADarwinException {
 		return runner = new Runner(printDetail, failOnMatch, failFast, binding, classPath,
-			ruleExpression, logger, RuleConsumer.NULL, ruleBuilder,
-			new CodeProducer(classPath));
+			logger, ruleBuilder, new CodeProducer(classPath));
 	}
 
 	public static void expectRuleViolated(Logger logger, String rule, Class[] classes) {

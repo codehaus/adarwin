@@ -15,12 +15,12 @@ import org.adarwin.IRunner;
 import org.adarwin.IRunnerFactory;
 import org.adarwin.ADarwinException;
 import org.adarwin.Logger;
-import org.adarwin.RuleConsumer;
 import org.apache.tools.ant.BuildException;
 import org.easymock.MockControl;
 
 import junit.framework.TestCase;
 
+// TODO: This should become an integration test and then IRunnerFactory can go
 public class ADarwinTaskTestCase extends TestCase {
 	private ADarwinTask aDarwinTask;
 	private MockControl runnerFactoryControl;
@@ -88,7 +88,7 @@ public class ADarwinTaskTestCase extends TestCase {
 
 	private void expectFactory() throws ADarwinException {
 		runnerFactory.create(printDetail, binding, classPath, failFast, failOnMatch,
-			ruleExpression, logger, RuleConsumer.NULL);
+			ruleExpression, logger);
 		runnerFactoryControl.setReturnValue(runner);
 	}
 
