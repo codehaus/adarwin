@@ -13,19 +13,6 @@ import junit.runner.BaseTestRunner;
 import junit.runner.TestSuiteLoader;
 
 public class TestRunnerWrapper {
-//	public static void main(String[] args) throws Exception {
-//		TestResults r = new TestRunnerWrapper().run("org.ajester.testmodel.SimpleConditionalTest",
-//				"org.ajester.testmodel.BooleanModel",
-//				new BooleanReturnCodeAdapter());
-//		for (Iterator iterator = r.getFailures().iterator(); iterator.hasNext(); ) {
-//			System.out.println("Failure: " + iterator.next());
-//		}
-//
-//		for (Iterator iterator = r.getErrors().iterator(); iterator.hasNext(); ) {
-//			System.out.println("Errors: " + iterator.next());
-//		}
-//	}
-//
 	public Report run(Class testClass, InstructionMutator instructionMutator) throws Exception {
 		return run(testClass.getName(), instructionMutator);
 	}
@@ -35,10 +22,12 @@ public class TestRunnerWrapper {
 	}
 	
 	private class TestRunner extends BaseTestRunner {
-		private Mutator mutator;
+		private final InstructionMutator instructionMutator;
+		private final MutatingClassLoader loader;
 
-		public TestRunner(InstructionMutator mutator) {
-			this.mutator = new BaseMutator(mutator);
+		public TestRunner(final InstructionMutator instructionMutator) {
+			this.instructionMutator = instructionMutator;
+			loader = new MutatingClassLoader(instructionMutator);
 		}
 		
 		public Report run(String testClassName) throws Exception {
@@ -49,14 +38,15 @@ public class TestRunnerWrapper {
 					throw new Exception("Unable to find test: " + testClassName);
 				}
 				return doRun(test);
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				e.printStackTrace();
 				throw new Exception("Could not create and run test suite: " + e);
 			}
 		}
 
 		public TestSuiteLoader getLoader() {
-			return new MutatingClassLoader(mutator);
+			return loader;
 		}
 
 		public void testFailed(int status, Test test, Throwable t) {
@@ -90,7 +80,7 @@ public class TestRunnerWrapper {
 			suite.run(result);
 
 			return new Report(convertEnumerationToSet(result.failures()),
-				convertEnumerationToSet(result.errors()), mutator.getMutations(),
+				convertEnumerationToSet(result.errors()), instructionMutator.getMutations(),
 				Coverage.getInstance());
 		}
 

@@ -2,6 +2,8 @@ package org.ajester;
 
 import org.objectweb.asm.ClassReader;
 
+import java.io.IOException;
+
 import junit.runner.TestCaseClassLoader;
 import junit.runner.TestSuiteLoader;
 
@@ -9,14 +11,10 @@ public class MutatingClassLoader extends TestCaseClassLoader implements TestSuit
 	private static final String[] PROHIBITED_CLASSES = new String[] {
 		"java", "junit", "org.ajester.CodeMatcher", "org.ajester.testmodel.test" };
 
-	private final Mutator mutator;
+	private final BaseMutator mutator;
 
 	public MutatingClassLoader(InstructionMutator instructionMutator) {
-		this(new BaseMutator(instructionMutator));
-	}
-	
-	public MutatingClassLoader(Mutator mutator) {
-		this.mutator = mutator;
+		this.mutator = new BaseMutator(instructionMutator);
 	}
 
 	public Class load(String suiteClassName) throws ClassNotFoundException {
@@ -53,14 +51,14 @@ public class MutatingClassLoader extends TestCaseClassLoader implements TestSuit
 		return false;
 	}
 
-	private synchronized Class loadAndMutateClass(Mutator mutator, final String className)
+	private synchronized Class loadAndMutateClass(BaseMutator mutator, final String className)
 		throws ClassNotFoundException {
 
 		String classResourceName = className.replace('.', '/') + ".class";
 
 		try {
 //			System.out.println("loadAndMutateClass: " + className);
-			byte[] b = mutator.visit(new ClassReader(getResourceAsStream(classResourceName)));
+			byte[] b = visit(mutator, classResourceName);
 //			System.out.println(className + ".size = " + b.length);
 			return defineClass(className, b, 0, b.length);
 		} catch (Exception e) {
@@ -73,5 +71,13 @@ public class MutatingClassLoader extends TestCaseClassLoader implements TestSuit
 //			t.printStackTrace(System.out);
 //			return null;
 //		}
+	}
+
+	private byte[] visit(BaseMutator mutator, String classResourceName) throws IOException {
+		ClassReader reader = new ClassReader(getResourceAsStream(classResourceName));
+		
+		mutator.getClassWriter().reset();
+		reader.accept(mutator, false);
+		return mutator.getClassWriter().toByteArray();
 	}
 }
