@@ -1,5 +1,9 @@
 package picounit.runner;
 
+import picounit.impl.RegistryListener;
+import picounit.impl.ResultListener;
+import picounit.impl.ScopeFilter;
+
 public interface Report extends ResultListener, RegistryListener {
 	Scope[] matching(ScopeFilter scopeFilter);
 

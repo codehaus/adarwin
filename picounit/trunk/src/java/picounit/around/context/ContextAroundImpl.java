@@ -1,7 +1,7 @@
 package picounit.around.context;
 
 import picounit.Suite;
-import picounit.runner.Registry;
+import picounit.impl.Registry;
 
 import java.lang.reflect.Method;
 

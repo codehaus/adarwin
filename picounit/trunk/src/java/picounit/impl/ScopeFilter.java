@@ -1,4 +1,6 @@
-package picounit.runner;
+package picounit.impl;
+
+import picounit.runner.Scope;
 
 interface ScopeFilter {
 	public static final ScopeFilter PASSING_FILTER = new ScopeFilter() {

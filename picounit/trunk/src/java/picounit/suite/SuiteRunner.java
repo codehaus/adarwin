@@ -1,6 +1,6 @@
 package picounit.suite;
 
-import picounit.runner.RegistryListener;
+import picounit.impl.RegistryListener;
 
 public class SuiteRunner implements RegistryListener {
 	private final SuiteMatcher suiteMatcher;

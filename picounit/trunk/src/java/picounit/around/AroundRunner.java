@@ -1,6 +1,6 @@
 package picounit.around;
 
-import picounit.runner.RegistryListener;
+import picounit.impl.RegistryListener;
 
 public interface AroundRunner extends RegistryListener, Around {
 }

@@ -9,6 +9,8 @@ import picounit.Test;
 import picounit.around.AroundRunner;
 import picounit.around.AroundRunnerImpl;
 import picounit.impl.PicoResolver;
+import picounit.impl.Registry;
+import picounit.impl.RegistryImpl;
 import picounit.pico.DynamicHeirarchyPicoContainer;
 
 public class RegistryTest implements Test {

@@ -1,7 +1,7 @@
 package picounit.test;
 
 
-import picounit.runner.RegistryListener;
+import picounit.impl.RegistryListener;
 
 public class TestRunner implements RegistryListener {
 	private final TestMatcher testMatcher;

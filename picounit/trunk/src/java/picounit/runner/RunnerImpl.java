@@ -2,6 +2,7 @@ package picounit.runner;
 
 import picounit.Runner;
 import picounit.impl.Filter;
+import picounit.impl.Registry;
 
 public class RunnerImpl implements Runner {
 	private final Registry registry;

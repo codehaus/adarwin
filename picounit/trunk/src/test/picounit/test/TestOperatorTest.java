@@ -6,7 +6,7 @@ import picounit.TestInstance;
 import picounit.Verify;
 import picounit.impl.MethodRunner;
 import picounit.impl.Operator;
-import picounit.runner.ResultListener;
+import picounit.impl.ResultListener;
 import picounit.runner.ScopeImpl;
 
 import java.lang.reflect.Method;
