@@ -20,14 +20,14 @@ public class OrRule implements Rule {
 		this.rules = rules;
 	}
 
-	public boolean inspect(ClassSummary classSummary) {
-		boolean result = false;
+	public ClassSummary inspect(ClassSummary classSummary) {
+		ClassSummary[] summaries = new ClassSummary[rules.length];
 		
 		for (int rLoop = 0; rLoop < rules.length; ++rLoop) {
-			result |= rules[rLoop].inspect(classSummary);
+			summaries[rLoop] = rules[rLoop].inspect(classSummary);
 		}
 		
-		return result;
+		return ClassSummary.or(summaries);
 	}
 
 	public String toString(RuleClassBindings ruleClassBindings) {

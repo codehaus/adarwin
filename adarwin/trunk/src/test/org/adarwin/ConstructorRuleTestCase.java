@@ -10,52 +10,77 @@
 
 package org.adarwin;
 
-import java.io.IOException;
-
 import org.adarwin.rule.ConstructorRule;
 import org.adarwin.rule.Rule;
-import org.adarwin.testmodel.HasTwoArgConstructor;
+import org.adarwin.rule.SourceRule;
+import org.adarwin.rule.UsesRule;
+import org.adarwin.testmodel.CallsSimple;
 import org.adarwin.testmodel.HasSingleArgConstructor;
+import org.adarwin.testmodel.HasTwoArgConstructor;
 import org.adarwin.testmodel.HasZeroArgConstructor;
+import org.adarwin.testmodel.Simple;
 
-import junit.framework.TestCase;
+import java.io.IOException;
 
-public class ConstructorRuleTestCase extends TestCase {
-	TestUtil testUtil = new TestUtil();
-	
+public class ConstructorRuleTestCase extends RuleTestCase {
 	public void testZeroArgMatchingConstructor() throws IOException {
-		Rule rule = new ConstructorRule();
+		Rule rule = createConstructorRule(new String[0]);
 		
-		testUtil.assertRuleMatchingCount(1, rule, HasZeroArgConstructor.class);
+		assertNumMatches(1, rule, HasZeroArgConstructor.class);
 	}
 	
 	public void testZeroArgNonMatchingConstructor() throws IOException {
-		Rule rule = new ConstructorRule();
+		Rule rule = createConstructorRule(new String[0]);
 		
-		testUtil.assertRuleMatchingCount(0, rule, HasSingleArgConstructor.class);
+		assertNumMatches(0, rule, HasSingleArgConstructor.class);
 	}
 	
 	public void testSingleArgMatchingConstructor() throws IOException {
-		Rule rule = new ConstructorRule(new Class[] {Integer.class});
+		Rule rule = createConstructorRule(new String[] {Integer.class.getName()});
 		
-		testUtil.assertRuleMatchingCount(1, rule, HasSingleArgConstructor.class);
+		assertNumMatches(1, rule, HasSingleArgConstructor.class);
 	}
 	
 	public void testSingleArgNonMatchingConstructor() throws IOException {
-		Rule rule = new ConstructorRule(new Class[] {Integer.class});
+		Rule rule = createConstructorRule(new String[] {Integer.class.getName()});
 		
-		testUtil.assertRuleMatchingCount(0, rule, HasTwoArgConstructor.class);
+		assertNumMatches(0, rule, HasTwoArgConstructor.class);
 	}
 
 	public void testTwoArgMatchingConstructor() throws IOException {
-		Rule rule = new ConstructorRule(new Class[] {Integer.class, String.class});
+		Rule rule = createConstructorRule(new String[] {
+			Integer.class.getName(), String.class.getName()});
 
-		testUtil.assertRuleMatchingCount(1, rule, HasTwoArgConstructor.class);		
+		assertNumMatches(1, rule, HasTwoArgConstructor.class);		
 	}
 	
 	public void testTwoArgNonMatchingConstructor() throws IOException {
-		Rule rule = new ConstructorRule(new Class[] {Integer.class, String.class});
+		Rule rule = createConstructorRule(new String[] {
+			Integer.class.getName(), String.class.getName()});
 
-		testUtil.assertRuleMatchingCount(0, rule, HasSingleArgConstructor.class);		
+		assertNumMatches(0, rule, HasSingleArgConstructor.class);		
+	}
+
+	public void testInvokingConstructor() throws IOException {
+		Rule rule = new UsesRule(ConstructorRule.create(Simple.class.getName(), (new String[0])));
+
+		assertNumMatches(1, rule, CallsSimple.class);
+	}
+
+	public void testInvokingConstructorNotRegardedAsHavingConstructor() throws IOException {
+		Rule rule = new SourceRule(createConstructorRule(new String[] {String.class.getName()}));
+		
+		assertNumMatches(0, rule, CallsSimple.class);
+	}
+
+	public void testHavingConstructorNotRegardedAsInvokingConstructor() throws IOException {
+		Rule rule = new UsesRule(ConstructorRule.create(
+			Simple.class.getName(), (new String[] {String.class.getName()})));
+		
+		assertNumMatches(0, rule, Simple.class);
+	}
+
+	private Rule createConstructorRule(String[] parameterTypes) {
+		return ConstructorRule.create(".*", parameterTypes);
 	}
 }

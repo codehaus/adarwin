@@ -10,26 +10,8 @@
 
 package org.adarwin;
 
-public class ArrayType implements IType {
-	private final IType type;
-
-	public ArrayType(IType type) {
-		this.type = type;
-	}
+public interface RuleListener {
+	void matches(ClassSummary classSummary);
 	
-	public IType getType() {
-		return type;
-	}
-	
-	public String getTypeName() {
-		return type.getTypeName();
-	}
-
-	public String getForm() {
-		return "[" + type.getForm();
-	}
-	
-	public boolean isPrimative() {
-		return type.isPrimative();
-	}
+	void matches(CodeElement codeElement);
 }

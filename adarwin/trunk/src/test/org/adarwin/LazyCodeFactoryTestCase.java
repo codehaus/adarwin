@@ -15,8 +15,8 @@ import java.io.IOException;
 import junit.framework.TestCase;
 
 import org.adarwin.rule.Rule;
-import org.adarwin.rule.TrueRule;
 
+import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
 public class LazyCodeFactoryTestCase extends TestCase {
@@ -40,11 +40,14 @@ public class LazyCodeFactoryTestCase extends TestCase {
 	public void testRealCodeCreatedOnEvaluate() throws IOException {
 		Rule rule = new TrueRule();
 		Mock mockCode = new Mock(Code.class);
+		Mock mockResultOperator = new Mock(RuleListener.class);
+		RuleListener operator = (RuleListener) mockResultOperator.proxy();
+		
 		mockCodeFactory.expectAndReturn("create", path, mockCode.proxy());
-		mockCode.expectAndReturn("evaluate", rule, new Result(false, ""));
-
+		mockCode.expectAndReturn("evaluate", C.eq(rule, operator), new Boolean(false));
 		Code code = lazyCodeFactory.create(path);
-		code.evaluate(rule);
+
+		code.evaluate(rule, operator);
 
 		mockCodeFactory.verify();
 	}

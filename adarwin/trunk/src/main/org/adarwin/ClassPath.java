@@ -10,39 +10,26 @@
 
 package org.adarwin;
 
+import org.adarwin.rule.Rule;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
-import org.adarwin.rule.Rule;
-
 public class ClassPath implements Code {
-	private Code[] path;
+	private final String path;
+	private final ICodeFactory codeFactory;
 
-	public ClassPath(Code[] path) {
+	public ClassPath(String path, ICodeFactory codeFactory) {
 		this.path = path;
+		this.codeFactory = codeFactory;
 	}
 
-	public Result evaluate(Rule rule) throws IOException {
-		AggregateResult aggregateResult = new AggregateResult();
-
-		for (int pLoop = 0; pLoop < path.length; ++pLoop) {
-			Result result = path[pLoop].evaluate(rule);
-			aggregateResult.append(result);
-        }
-
-		return aggregateResult;
-    }
-
-	public static Code[] getCodePath(ICodeFactory codeFactory, String path) throws FileNotFoundException {
+	public void evaluate(Rule rule, RuleListener ruleListener) throws IOException {
 		StringTokenizer tokenizer = new StringTokenizer(path, File.pathSeparator);
-		Code[] code = new Code[tokenizer.countTokens()];
 
-		for (int cLoop = 0; tokenizer.hasMoreTokens(); ++cLoop) {
-			code[cLoop] = codeFactory.create(tokenizer.nextToken());
+		while(tokenizer.hasMoreTokens()) {
+			codeFactory.create(tokenizer.nextToken()).evaluate(rule, ruleListener);
 		}
-
-		return code;
 	}
 }

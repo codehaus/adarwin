@@ -15,7 +15,7 @@ import java.io.IOException;
 import org.adarwin.rule.Rule;
 
 public class LazyCodeFactory implements ICodeFactory {
-	private ICodeFactory codeFactory;
+	private final ICodeFactory codeFactory;
 
 	public LazyCodeFactory(ICodeFactory codeFactory) {
 		this.codeFactory = codeFactory;
@@ -26,19 +26,19 @@ public class LazyCodeFactory implements ICodeFactory {
 	}
 
 	private class LazyCode implements Code {
-		private String name;
+		private final String name;
 		private Code realCode;
 
 		public LazyCode(String name) {
 			this.name = name;
 		}
 
-		public Result evaluate(Rule rule) throws IOException {
+		public void evaluate(Rule rule, RuleListener ruleListener) throws IOException {
 			if (realCode == null) {
 				realCode = codeFactory.create(name);
 			}
 
-			return realCode.evaluate(rule);
+			realCode.evaluate(rule, ruleListener);
 		}
 	}
 }

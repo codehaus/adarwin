@@ -11,11 +11,11 @@
 package org.adarwin;
 
 public interface IType {
-	public IType getType();
+	IType getType();
 	
-	public String getTypeName();
+	String getTypeName();
 	
-	public String getForm();
+	String getForm();
 
-	public boolean isPrimative();
+	boolean isPrimative();
 }

@@ -8,18 +8,21 @@
  * Idea and Original Code by Stacy Curl                                      *
  *****************************************************************************/
 
-package org.adarwin.rule;
+package org.adarwin;
 
 import org.adarwin.ClassSummary;
 import org.adarwin.RuleClassBindings;
+import org.adarwin.rule.Rule;
+
+import java.util.HashSet;
 
 
-public class TrueRule implements Rule {
+public class FalseRule implements Rule {
 	public String toString(RuleClassBindings ruleClassBindings) {
         return ruleClassBindings.getRule(getClass());
     }
 
-	public boolean inspect(ClassSummary classSummary) {
-		return true;
+	public ClassSummary inspect(ClassSummary classSummary) {
+		return new ClassSummary(classSummary.getClassName(), new HashSet());
 	}
 }

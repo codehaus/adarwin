@@ -21,3 +21,6 @@ test use variable
 write tests for depending on Exceptions
 
 Ensure that when rule matching classes are printed they are printed in alphanumeric order.
+
+Consider migrating the complexity of rule parsing out of
+rule builder and into the individual rule classes

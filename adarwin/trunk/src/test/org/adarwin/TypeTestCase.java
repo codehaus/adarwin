@@ -15,11 +15,7 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 
 public class TypeTestCase extends TestCase {
-	private TypeParser typeParser;
-	protected void setUp() throws Exception {
-		super.setUp();
-		typeParser = new TypeParser();
-	}
+	private final TypeParser typeParser = new TypeParser();
 
 	public void testPrimatives() {
 		assertEquals(Type.BOOLEAN, typeParser.parse("Z"));
@@ -32,7 +28,7 @@ public class TypeTestCase extends TestCase {
 		assertEquals(Type.SHORT, typeParser.parse("S"));
 		assertEquals(Type.VOID, typeParser.parse("V"));
 	}
-	
+
 	public void testPrimativeArrays() {
 		assertArrayType(Type.BOOLEAN, "[Z");
 		assertArrayType(Type.BYTE, "[B");
@@ -44,21 +40,14 @@ public class TypeTestCase extends TestCase {
 		assertArrayType(Type.SHORT, "[S");
 		assertArrayType(Type.VOID, "[V");
 	}
-	
-	private void assertArrayType(IType expected, String form) {
-		IType type = typeParser.parse(form);
-		assertTrue(type.isPrimative());
-		assertEquals(form, type.getForm());
-		assertEquals(expected, type.getType());
-	}
 
 	public void testClasses() {
-		assertEquals(String.class.getName(), typeParser.parse("Ljava/lang/String;").getTypeName());
-		assertEquals(Integer.class.getName(), typeParser.parse("Ljava/lang/Integer;").getTypeName());
+		assertEquals(String.class.getName(), typeName("Ljava/lang/String;"));
+		assertEquals(Integer.class.getName(), typeName("Ljava/lang/Integer;"));
 	}
-	
+
 	public void testClassArrays() {
-		assertEquals(String.class.getName(), typeParser.parse("[Ljava/lang/String;").getTypeName());
+		assertEquals(String.class.getName(), typeName("[Ljava/lang/String;"));
 	}
 
 	public void testPrimativeMethodReturn() {
@@ -69,31 +58,33 @@ public class TypeTestCase extends TestCase {
 		assertEquals(String.class.getName(),
 			typeParser.parseMethodReturn("()Ljava/lang/String;").getTypeName());
 	}
-	
+
 	public void testPrimativeMethodParameter() {
-		Type[] expected = new Type[] {Type.BOOLEAN};
-		
-		assertTrue(Arrays.equals(expected, typeParser.parseMethodParameters("(Z)V")));
+		assertTrue(Arrays.equals(new Type[] {Type.BOOLEAN},
+			typeParser.parseMethodParameters("(Z)V")));
 	}
-	
+
 	public void testClassMethodParameter() {
-		IType[] expected = new IType[] {new Type(String.class.getName())};
-		
-		assertTrue(Arrays.equals(expected,
+		assertTrue(Arrays.equals(new IType[] {new Type(String.class.getName())},
 			typeParser.parseMethodParameters("(Ljava/lang/String;)V")));
 	}
-	
+
 	public void testClassMethodParameters() {
 		IType stringType = new Type(String.class.getName());
 		IType[] expected = new IType[] {stringType, stringType};
-		
+
 		assertTrue(Arrays.equals(expected,
 			typeParser.parseMethodParameters("(Ljava/lang/String;Ljava/lang/String;)V")));
 	}
 
-	private void printArray(String prefix, IType[] methodParams) {
-		for (int i = 0; i < methodParams.length; i++) {
-			System.out.println(prefix + "[" + i + "] = " + methodParams[i]);
-		}
+	private void assertArrayType(IType expected, String form) {
+		IType type = typeParser.parse(form);
+		assertTrue(type.isPrimative());
+		assertEquals(form, type.getForm());
+		assertEquals(expected, type.getType());
+	}
+
+	private String typeName(String form) {
+		return typeParser.parse(form).getTypeName();
 	}
 }

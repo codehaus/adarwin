@@ -16,10 +16,8 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
-import org.adarwin.rule.FalseRule;
 import org.adarwin.rule.NotRule;
 import org.adarwin.rule.Rule;
-import org.adarwin.rule.TrueRule;
 
 public class RuleClassBindingsTestCase extends TestCase {
     public void testSingleMapping() {
@@ -48,7 +46,7 @@ public class RuleClassBindingsTestCase extends TestCase {
         assertEquals(rule, ruleClassBindings.getRule(TrueRule.class));
     }
 
-	public void testAddSynonymForNegate() throws BuilderException, ClassNotFoundException {
+	public void testAddSynonymForNegate() throws BuilderException {
 		RuleClassBindings ruleClassBindings = new RuleClassBindings(
 			new String[] {"not", "true"},
 			new Class[] {NotRule.class, TrueRule.class});

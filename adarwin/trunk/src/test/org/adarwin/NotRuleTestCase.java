@@ -10,36 +10,31 @@
 
 package org.adarwin;
 
-import java.io.IOException;
-
-import junit.framework.TestCase;
-
 import org.adarwin.rule.NotRule;
-import org.adarwin.rule.PackageRule;
 import org.adarwin.rule.Rule;
-import org.adarwin.rule.TrueRule;
 import org.adarwin.rule.UsesRule;
 import org.adarwin.testmodel.a.InPackageA;
 import org.adarwin.testmodel.a.UsesPackageAAndPackageB;
 import org.adarwin.testmodel.b.InPackageB;
 
-public class NotRuleTestCase extends TestCase {
+import java.io.IOException;
+
+public class NotRuleTestCase extends RuleTestCase {
     public void testNegatation() throws IOException {
         Rule rule = new NotRule(new TrueRule());
 
-        assertEquals(0, new ClassFile(InPackageA.class).evaluate(rule).getCount());
+        assertNumMatches(0, rule, InPackageA.class);
     }
 
     public void testDoubleNegation() throws IOException {
         Rule rule = new NotRule(new NotRule(new TrueRule()));
 
-        assertTrue(new ClassFile(InPackageA.class).evaluate(rule).getCount() > 0);
+        assertNumMatches(1, rule, InPackageA.class);
     }
 
 	public void testComplexNegation() throws IOException {
-		Rule doesNotUseRule = new NotRule(new UsesRule(PackageRule.create(InPackageB.class)));
+		Rule rule = new NotRule(new UsesRule(createPackageRule(InPackageB.class)));
 
-		assertEquals(0,
-			new ClassFile(UsesPackageAAndPackageB.class).evaluate(doesNotUseRule).getCount());
+		assertNumMatches(0, rule, UsesPackageAAndPackageB.class);
 	}
 }

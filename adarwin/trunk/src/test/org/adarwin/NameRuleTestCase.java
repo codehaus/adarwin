@@ -15,7 +15,6 @@ import junit.framework.TestCase;
 import org.adarwin.rule.AndRule;
 import org.adarwin.rule.NameRule;
 import org.adarwin.rule.Rule;
-import org.adarwin.rule.TrueRule;
 
 public class NameRuleTestCase extends TestCase {
 	private static final String SOME_NAME = "some name";

@@ -88,6 +88,9 @@
             <excludes>
                 <exclude>**/Abstract*.java</exclude>
             </excludes>
+            <excludes>
+                <exclude>**/RuleTestCase.java</exclude>
+            </excludes>
             <resources>
                 <resource>
                     <directory>${basedir}/src/test</directory>

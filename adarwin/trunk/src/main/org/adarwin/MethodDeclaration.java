@@ -10,26 +10,24 @@
 
 package org.adarwin;
 
+import org.adarwin.rule.ElementType;
+
 import java.util.Arrays;
 
-public class Method {
-	private final String name;
+public class MethodDeclaration extends CodeElement implements Method {
+	private final String methodName;
 	private final String returnType;
 	private final String[] parameterTypes;
-	private String toString;
 
-	public Method(String name, Class returnType, Class[] parameterTypes) {
-		this(name, returnType.getName(), Util.convertClassArrayToStringArray(parameterTypes));
-	}
-
-	public Method(String name, String returnType, String[] parameterTypes)  {
-		this.name = name;
+	public MethodDeclaration(ClassName className, String methodName, String returnType, String[] parameterTypes)  {
+		super(className, ElementType.SOURCE);
+		this.methodName = methodName;
 		this.parameterTypes = parameterTypes;
 		this.returnType = returnType;
 	}
-	
-	public String getName() {
-		return name;
+
+	public String getMethodName() {
+		return methodName;
 	}
 
 	public String getReturnType() {
@@ -44,40 +42,33 @@ public class Method {
 		return toString().hashCode();
 	}
 
-	public String toString() {
-		synchronized (this) {
-			if (toString == null) {
-
-				StringBuffer buffer = new StringBuffer(getReturnType() + " " + getName() + '(');
-				
-				for (int pLoop = 0; pLoop < parameterTypes.length; pLoop++) {
-					if (pLoop != 0) {
-						buffer.append(", ");
-					}
-					buffer.append(parameterTypes[pLoop]);
-				}
-				
-				buffer.append(')');
-				
-				toString = buffer.toString();				
-			}
-		}
-		return toString;
-	}
-	
 	public boolean equals(Object object) {
 		if (object == null ||
 			!object.getClass().equals(getClass())) {
 			return false;
 		}
-		
+
 		if (object == this) {
 			return true;
 		}
-		
-		Method other = (Method) object;
-		
+
+		return equalsMethod((MethodDeclaration) object);
+	}
+
+	public String toString() {
+		StringBuffer buffer =
+			new StringBuffer(getReturnType() + " " + getMethodName() + '(');
+
+		Util.appendArray(buffer, parameterTypes);
+
+		buffer.append(')');
+
+		return buffer.toString();
+	}
+
+	public boolean equalsMethod(Method other) {
 		return getReturnType().equals(other.getReturnType()) &&
+			getMethodName().equals(other.getMethodName()) &&
 			Arrays.equals(getParameterTypes(), other.getParameterTypes());
 	}
 }

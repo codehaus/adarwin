@@ -10,31 +10,34 @@
 
 package org.adarwin.rule;
 
-import java.util.Iterator;
-import java.util.regex.Pattern;
-
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
 import org.adarwin.RuleClassBindings;
+import org.adarwin.UsesCodeElement;
 
-public class ClassRule implements Rule {
-	private String pattern;
+import java.util.regex.Pattern;
+
+public class ClassRule implements Rule, Filter {
+	private final String pattern;
 
 	public ClassRule(String pattern) {
         this.pattern = pattern;
     }
 
-	public boolean inspect(ClassSummary classSummary) {
-		for (Iterator iterator = classSummary.getDependancies().iterator(); iterator.hasNext();) {
-			CodeElement codeElement = (CodeElement) iterator.next();
-
-			if (Pattern.matches(pattern, codeElement.getClassName())) {
-				return true;
-			}
+	public ClassSummary inspect(ClassSummary classSummary) {
+		if (Pattern.matches(pattern, classSummary.getClassName().getClassName())) {
+			return classSummary;
 		}
-		return false;
+		else {
+			return classSummary.filter(this);
+		}
 	}
-
+	
+	public boolean matches(CodeElement codeElement) {
+		return codeElement instanceof UsesCodeElement && 
+			Pattern.matches(pattern, codeElement.getClassName().getClassName());
+	}
+	
 	public String toString(RuleClassBindings ruleClassBindings) {
         return ruleClassBindings.getRule(getClass()) + '(' + pattern + ')';
     }

@@ -16,7 +16,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Iterator;
 
 import org.adarwin.rule.Rule;
 
@@ -33,8 +32,8 @@ public class Runner {
 	private String classPath;
 	private String ruleExpression;
 	private String ruleFileName;
-	private boolean print;
 	private boolean failOnMatch = true;
+	private boolean print;
 
 	public void setFailOnMatch(boolean failOnMatch) {
 		this.failOnMatch = failOnMatch;
@@ -106,7 +105,7 @@ public class Runner {
 			for (int rLoop = 0; rLoop < rules.length; rLoop++) {
 				throwException = throwException | executeRule(ruleClassBindings, rules[rLoop]);	
 			}
-			
+
 			if (throwException) {
 				throw new RuleException(Runner.RULE_VIOLATED);
 			}
@@ -127,19 +126,15 @@ public class Runner {
 	}
 
 	private boolean executeRule(RuleClassBindings ruleClassBindings, Rule rule) throws IOException, FileNotFoundException {
-		String ruleExpression = rule.toString(ruleClassBindings);
-		
-		Result result = createCodeFactory().create(getClassPath()).evaluate(rule);
-		if (result.getCount() > 0) {
-			logger.log(result.getCount() + " classes violated: " + ruleExpression);
-			if (getPrint()) {
-				for (Iterator iterator = result.iterator(); iterator.hasNext();) {
-					logger.log("  " + (String) iterator.next());
-				}
-			}
-		}
+		final String ruleExpression = rule.toString(ruleClassBindings);
 
-		return isFailOnMatch() && result.getCount() > 0;
+		Code code = createCodeFactory().create(getClassPath());
+
+		logger.reset("classes violated: " + ruleExpression);
+		LoggingOperator operator = new LoggingOperator(ruleExpression);
+		code.evaluate(rule, operator);
+
+		return isFailOnMatch() && operator.isMatched();
 	}
 
 	private ICodeFactory createCodeFactory() {
@@ -188,6 +183,33 @@ public class Runner {
 		this.logger = logger;
 	}
 	
+	private final class LoggingOperator implements RuleListener {
+		private boolean loggedHeader = false;
+		private final String ruleExpression;
+		private boolean matched;
+
+		private LoggingOperator(String ruleExpression) {
+			this.ruleExpression = ruleExpression;
+		}
+
+		public boolean isMatched() {
+			return matched;
+		}
+
+		public void matches(ClassSummary classSummary) {
+			matched = true;
+//			if (!loggedHeader) {
+//				loggedHeader = true;
+//				logger.log("classes violated: " + ruleExpression);
+//			}
+
+			classSummary.log(logger, getPrint());
+		}
+
+		public void matches(CodeElement codeElement) {
+		}
+	}
+
 	public static class Main {
 		public static final int MIN_ARGS = 6;
 		public static final int MAX_ARGS = 7;
@@ -255,8 +277,7 @@ public class Runner {
 	
 	public static void main(String[] args) throws Exception {
 		try {
-			Main main = new Main(args);
-			main.getRunner().run();
+			new Main(args).getRunner().run();
 		} catch (UsageException e) {
 			System.out.println(e.getMessage());
 		}

@@ -10,21 +10,30 @@
 
 package org.adarwin;
 
-import java.io.FileNotFoundException;
+import org.adarwin.rule.Rule;
+
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
+
+import java.io.IOException;
 
 import junit.framework.TestCase;
 
-import com.mockobjects.dynamic.Mock;
-
 public class ClassPathTestCase extends TestCase {
-	public void testPathParsing() throws FileNotFoundException {
-		String fileName = "test.class";
-		Mock mockCodeFactory = new Mock(ICodeFactory.class);
-		mockCodeFactory.expect("create", fileName);
-		ICodeFactory codeFactory = (ICodeFactory) mockCodeFactory.proxy();
+	public void testStringPath() throws IOException {
+		Mock codeFactory = new Mock(ICodeFactory.class);
+		Mock code = new Mock(Code.class);
+		RuleListener listener = (RuleListener) new Mock(RuleListener.class).proxy();
+		
+		Rule rule = new TrueRule();
 
-		ClassPath.getCodePath(codeFactory, fileName);
+		codeFactory.expectAndReturn("create", "first", code.proxy());
+		codeFactory.expectAndReturn("create", "second", code.proxy());
+		code.expectAndReturn("evaluate", C.eq(rule, listener), new Boolean(true));
+		code.expectAndReturn("evaluate", C.eq(rule, listener), new Boolean(true));
 
-		mockCodeFactory.verify();
+		new ClassPath("first;second", (ICodeFactory) codeFactory.proxy()).evaluate(rule, listener);
+
+		codeFactory.verify();
 	}
 }

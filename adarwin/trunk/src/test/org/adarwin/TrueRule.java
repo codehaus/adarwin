@@ -10,30 +10,17 @@
 
 package org.adarwin;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import org.adarwin.ClassSummary;
+import org.adarwin.RuleClassBindings;
+import org.adarwin.rule.Rule;
 
-public class AggregateResult extends Result {
-	private final Set matchingClasses;
 
-	public AggregateResult() {
-		matchingClasses = new HashSet();
-	}
+public class TrueRule implements Rule {
+	public String toString(RuleClassBindings ruleClassBindings) {
+        return ruleClassBindings.getRule(getClass());
+    }
 
-	public void append(Result result) {
-		if (result != null) {
-			for(Iterator iterator = result.iterator(); iterator.hasNext();) {
-				matchingClasses.add(iterator.next());
-			}
-		}
-	}
-
-	public int getCount() {
-		return super.getCount() + matchingClasses.size();
-	}
-	
-	public Iterator iterator() {
-		return matchingClasses.iterator();
+	public ClassSummary inspect(ClassSummary classSummary) {
+		return classSummary;
 	}
 }

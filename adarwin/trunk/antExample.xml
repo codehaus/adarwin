@@ -34,6 +34,21 @@
              ruleExpression="${ruleUsingB}, ${ruleUsingC}"/>
   </target>
 
+  <target name="date">
+    <adarwin binding="rules.properties"
+             classPath="${basedir}/target/test-classes"
+             print="true"
+             ruleExpression="constructor(.*Simple())"/>
+  </target>
+
+  <target name="boolean">
+    <adarwin binding="rules.properties"
+             classPath="${basedir}/target/test-classes"
+             print="true"
+             ruleExpression="method(.* inspect(.*))"/>
+  </target>
+
+
   <target name="file">
     <adarwin binding="rules.properties"
              classPath="${basedir}/target/test-classes"
@@ -48,18 +63,34 @@
   </target>
 
   <target name="ant">
+<!--
     <adarwin binding="rules.properties"
              classPath="C:\Documents and Settings\scurl\.maven\repository\ant\jars\ant-1.5.2.jar"
-             ruleExpression="uses(package(org.apache.tools.ant))"/>
+             ruleExpression="uses(package(org.apache.tools.ant))"
+             failOnMatch="false"/>
 
     <adarwin binding="rules.properties"
              classPath="C:\Documents and Settings\scurl\.maven\repository\ant\jars\ant-1.5.2.jar"
-             ruleExpression="parent(org.apache.tools.ant, Task)"/>
+             ruleExpression="parent(org.apache.tools.ant.Task)"
+             failOnMatch="false"/>
 
     <adarwin binding="rules.properties"
              classPath="C:\Documents and Settings\scurl\.maven\repository\ant\jars\ant-1.5.2.jar"
              print="true"
-             ruleExpression="uses(class(.*Task))"/>
+             ruleExpression="uses(class(.*Task))"
+             failOnMatch="false"/>
+-->
 
+    <adarwin binding="rules.properties"
+             classPath="C:\Documents and Settings\scurl\.maven\repository\ant\jars\ant-1.5.2.jar"
+             print="true"
+             ruleExpression="src(constructor(java.lang.String))"
+             failOnMatch="false"/>
+
+    <adarwin binding="rules.properties"
+             classPath="C:\Documents and Settings\scurl\.maven\repository\ant\jars\ant-1.5.2.jar"
+             print="true"
+             ruleExpression="uses(constructor(java.util.Date()))"
+             failOnMatch="false"/>
   </target>
 </project>

@@ -15,36 +15,28 @@ import org.adarwin.rule.ElementType;
 public class CodeElement {
 	public static final CodeElement[] EMPTY_ARRAY = new CodeElement[0];
 
-	private final String packageName;
-	private final String className;
-	private final String fullyQualifiedClassName;
-	private ElementType elementType;
-	
-	public CodeElement(IType type, ElementType codeType) {
-		this(type.getTypeName(), codeType);
+	private final ClassName className;
+	private final ElementType elementType;
+
+	public static CodeElement create(ClassName className, ElementType codeType) {
+		if (ElementType.USES.equals(codeType)) {
+			return UsesCodeElement.create(className, codeType);
+		}
+
+		return new CodeElement(className, codeType);
 	}
 
-	public CodeElement(String fullyQualifiedClassName, ElementType codeType) {
-		this.packageName = packageName(fullyQualifiedClassName);
-		this.className = className(fullyQualifiedClassName);
-		this.fullyQualifiedClassName = fullyQualifiedClassName;
+	protected CodeElement(ClassName className, ElementType codeType) {
+		this.className = className;
 		this.elementType = codeType;
 	}
 
-	public String getPackageName() {
-		return packageName;
-	}
-
-	public String getClassName() {
+	public ClassName getClassName() {
 		return className;
 	}
 
 	public ElementType getType() {
 		return elementType;
-	}
-
-	public String getFullyQualifiedClassName() {
-		return fullyQualifiedClassName;
 	}
 
 	public boolean equals(Object object) {
@@ -55,7 +47,7 @@ public class CodeElement {
 		CodeElement other = (CodeElement) object;
 
 		return getType().equals(other.getType()) &&
-			getFullyQualifiedClassName().equals(other.getFullyQualifiedClassName());
+			getClassName().equals(other.getClassName());
 	}
 
 	public int hashCode() {
@@ -63,24 +55,6 @@ public class CodeElement {
 	}
 
 	public String toString() {
-		return "CodeElement(" + packageName + ", " + className + ", " + elementType + ")";
-	}
-
-	private static String packageName(String fullyQualifiedClassName) {
-		if (fullyQualifiedClassName.indexOf('.') != -1) {
-			return fullyQualifiedClassName.substring(0, fullyQualifiedClassName.lastIndexOf('.'));
-		}
-		else {
-			return "";
-		}
-	}
-
-	private static String className(String fullyQualifiedClassName) {
-		if (fullyQualifiedClassName.indexOf('.') != -1) {
-			return fullyQualifiedClassName.substring(fullyQualifiedClassName.lastIndexOf('.') + 1);
-		}
-		else {
-			return fullyQualifiedClassName;
-		}
+		return Util.className(getClass()) + "(" + getClassName() + ", " + elementType + ")";
 	}
 }

@@ -15,7 +15,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.adarwin.Runner.Main;
 import org.adarwin.Runner.UsageException;
+import org.adarwin.testmodel.a.InPackageA;
+import org.adarwin.testmodel.a.InPackageAUsesClassFromPackageB;
+import org.adarwin.testmodel.a.UsesPackageAAndPackageB;
 
 import junit.framework.TestCase;
 
@@ -40,76 +44,68 @@ public class RunnerTestCase extends TestCase {
 	}
 
 	public void testRuleInAntFile() {
-		mockLogger.expect("log", "3 classes violated: " + RULE);
-		
+		mockLogger.expect("reset", "classes violated: " + RULE);
+
 		runner.setRuleExpression(RULE);
-		
-		try {
-			runner.run();
-			fail("RuleException expected");
-		}
-		catch (RuleException e) {
-			assertEquals(Runner.RULE_VIOLATED, e.getMessage());
-		}
+
+		runAndExpectException();
 
 		mockLogger.verify();
 	}
-	
+
 	public void testRuleInFile() throws IOException {
-		mockLogger.expect("log", "3 classes violated: " + RULE);
-		
+		mockLogger.expect("reset", "classes violated: " + RULE);
+
 		runner.setRuleFileName(createTempRuleFile(RULE));
-		
-		executeTask();		
+
+		runAndExpectException();		
 
 		mockLogger.verify();
 	}
 
 	public void testMultipleRulesOneRuleMatches() {
-		mockLogger.expect("log", "3 classes violated: " + RULE);
-				
+		mockLogger.expect("reset", "classes violated: " + RULE);
+		mockLogger.expect("reset", "classes violated: " + SECOND_RULE);
+
 		runner.setRuleExpression(COMPOSITE_RULE);
-		
-		executeTask();
-		
+
+		runAndExpectException();
+
 		mockLogger.verify();
 	}
-	
+
 	public void testMissingBinding() {
 		runner.setBinding("");
-		
-		try {
-			runner.run();
-			fail("RuleException expected");
-		}
-		catch (RuleException e) {
-			assertEquals(Runner.BINDING + Runner.MISSING_OR_EMPTY, e.getMessage());
-		}
+
+		runAndExpectException(Runner.BINDING + Runner.MISSING_OR_EMPTY);
 	}
 	
 	public void testMissingClassPath() {
 		runner.setClassPath("");
-		
-		try {
-			runner.run();
-			fail("RuleException expected");
-		}
-		catch (RuleException e) {
-			assertEquals(Runner.CLASSPATH + Runner.MISSING_OR_EMPTY, e.getMessage());
-		}
+
+		runAndExpectException(Runner.CLASSPATH + Runner.MISSING_OR_EMPTY);
 	}
 
 	public void testMissingRuleExpressionAndRuleFileName() {
 		runner.setRuleExpression("");
 		runner.setRuleFileName("");
-		
-		try {
-			runner.run();
-			fail("RuleException expected");
-		}
-		catch (RuleException e) {
-			assertEquals(Runner.RULE_EXPRESSION_AND_RULE_FILE_NAME_MISSING, e.getMessage());
-		}
+
+		runAndExpectException(Runner.RULE_EXPRESSION_AND_RULE_FILE_NAME_MISSING);
+	}
+
+	public void testPrintClasses() {
+		runner.setPrint(true);
+
+		mockLogger.expect("reset", "classes violated: " + RULE);
+		mockLogger.expect("log", "  " + InPackageA.class.getName());
+		mockLogger.expect("log", "  " + InPackageAUsesClassFromPackageB.class.getName());
+		mockLogger.expect("log", "  " + UsesPackageAAndPackageB.class.getName());
+
+		runner.setRuleExpression(RULE);
+
+		runAndExpectException();		
+
+		mockLogger.verify();
 	}
 	
  	public void testMainNotEnoughArgs() {
@@ -123,13 +119,13 @@ public class RunnerTestCase extends TestCase {
 
 	public void testMainTooManyArgs() {
 		try {
-			new Runner.Main(new String[Runner.Main.MAX_ARGS + 1]);
+			new Main((new String[Runner.Main.MAX_ARGS + 1]));
 			fail("UsageException expected");
 		} catch (UsageException e) {
 			assertEquals(Runner.Main.USAGE, e.getMessage());
 		}
 	} 
-	
+
 	public void testMainMissingBinding() throws UsageException {
 		try {
 			new Runner.Main(new String[] {
@@ -172,20 +168,24 @@ public class RunnerTestCase extends TestCase {
 		}
 	}
 
-	private void executeTask() {
+	private void runAndExpectException() {
+		runAndExpectException(Runner.RULE_VIOLATED);
+	}
+
+	private void runAndExpectException(String expectedMessage) {
 		try {
 			runner.run();
 			fail("RuleException expected");
 		}		
 		catch (RuleException e) {
-			assertEquals(Runner.RULE_VIOLATED, e.getMessage());
+			assertEquals(expectedMessage, e.getMessage());
 		}
 	}
-	
+
 	private String createTempRuleFile(String contents) throws IOException {
 		File ruleFile = File.createTempFile("test-rule", "txt");
 		OutputStream outputStream = new FileOutputStream(ruleFile);
-		
+
 		try {
 			outputStream.write(contents.getBytes());
 		}
@@ -197,8 +197,7 @@ public class RunnerTestCase extends TestCase {
 			} catch (IOException e) {
 			}	
 		}
-		
+
 		return ruleFile.getAbsolutePath();
 	}
-	
 }

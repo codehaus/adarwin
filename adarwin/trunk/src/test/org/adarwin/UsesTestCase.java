@@ -10,22 +10,19 @@
 
 package org.adarwin;
 
-import java.io.IOException;
-
-import junit.framework.TestCase;
-
 import org.adarwin.rule.Rule;
-import org.adarwin.rule.TrueRule;
 import org.adarwin.rule.UsesRule;
 import org.adarwin.testmodel.a.InPackageAUsesClassFromPackageB;
 
-public class UsesTestCase extends TestCase {
+import java.io.IOException;
+
+public class UsesTestCase extends RuleTestCase {
     public void testMinimal() throws IOException, BuilderException {
         String expression = "uses(true)";
 
         Rule rule = new RuleBuilder(new RuleClassBindings(new String[] {"uses", "true"},
             new Class[] {UsesRule.class, TrueRule.class})).buildRule(expression);
 
-        assertTrue(new ClassFile(InPackageAUsesClassFromPackageB.class).evaluate(rule).getCount() > 0);
+        assertNumMatches(1, rule, InPackageAUsesClassFromPackageB.class);
     }
 }

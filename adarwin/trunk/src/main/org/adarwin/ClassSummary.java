@@ -10,42 +10,84 @@
 
 package org.adarwin;
 
+import org.adarwin.rule.Filter;
+
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 public class ClassSummary {
-	private final String className;
-	private final Set constructors;
-	private final Set methods;
+	private final ClassName className;
 	private final Set dependancies;
 
-    public ClassSummary(String className, Set constructors, Set methods, Set dependancies) {
-		this.className = className;
-    	this.constructors = constructors;
-		this.methods = methods;
-		this.dependancies = dependancies;
+	public static ClassSummary or(ClassSummary[] summaries) {
+		Set union = new HashSet();
+
+		for (int sLoop = 0; sLoop < summaries.length; sLoop++) {
+			union.addAll(summaries[sLoop].dependancies);
+		}
+
+		return new ClassSummary(summaries[0].getClassName(), union);
+	}
+
+	public static ClassSummary and(ClassSummary[] summaries) {
+		Set intersection = new HashSet(summaries[0].dependancies);
+
+		for (int sLoop = 0; sLoop < summaries.length; sLoop++) {
+			Set set = summaries[sLoop].dependancies;
+
+			if (set.isEmpty()) {
+				return new ClassSummary(summaries[0].getClassName(), new HashSet());
+			}
+
+			intersection.addAll(set);
+		}
+
+		return new ClassSummary(summaries[0].getClassName(), intersection);
+	}
+
+	public ClassSummary(ClassName className, Set dependancies) {
+    	this.className = className;
+    	this.dependancies = dependancies;
     }
 
-	public String getClassName() {
-		return className;
-	}
+    public ClassName getClassName() {
+    	return className;
+    }
 
-	public Set getConstructors() {
-		return constructors;
-	}
+	public ClassSummary filter(Filter filter) {
+		final Set filtered = new HashSet();
 
-	public Set getMethods() {
-		return methods;
-	}
+		for (Iterator iterator = dependancies.iterator(); iterator.hasNext();) {
+			CodeElement codeElement = (CodeElement) iterator.next();
 
-	public Set getDependancies() {
-		return dependancies;
-	}
-
-	public ClassSummary updateDependancies(Set dependancies) {
-		if (dependancies == null) {
-			dependancies = getDependancies();
+			if (filter.matches(codeElement)) {
+				filtered.add(codeElement);
+			}
 		}
-		
-		return new ClassSummary(getClassName(), getConstructors(), getMethods(), dependancies);
+
+		return new ClassSummary(getClassName(), filtered);
+	}
+
+	public boolean contains(CodeElement element) {
+		return dependancies.contains(element);
+	}
+
+	public String toString() {
+		return "ClassSummary(" + className + ", " + dependancies + ")";
+	}
+
+	public void log(Logger logger, boolean print) {
+		if (print && !isEmpty()) {
+			logger.log("  " + getClassName().getFullClassName());
+		}
+	}
+
+	public boolean isEmpty() {
+		return dependancies.isEmpty();
+	}
+
+	public ClassSummary negate(ClassSummary original) {
+		return isEmpty() ? original : new ClassSummary(getClassName(), new HashSet());
 	}
 }

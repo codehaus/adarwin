@@ -15,22 +15,20 @@ import org.adarwin.RuleClassBindings;
 
 
 public class AndRule implements Rule {
-	private Rule[] rules;
+	private final Rule[] rules;
 
 	public AndRule(Rule[] rules) {
 		this.rules = rules;
 	}
 
-	public boolean inspect(ClassSummary classSummary) {
-		boolean result = true;
-		
+	public ClassSummary inspect(ClassSummary classSummary) {
+		ClassSummary[] summaries = new ClassSummary[rules.length];
+
 		for (int rLoop = 0; rLoop < rules.length; ++rLoop) {
-			result &= rules[rLoop].inspect(classSummary);
+			summaries[rLoop] = rules[rLoop].inspect(classSummary);
 		}
-		
-		return result;
-		
-		//return leftRule.inspect(classSummary) && rightRule.inspect(classSummary);
+
+		return ClassSummary.and(summaries);
 	}
 
 	public String toString(RuleClassBindings ruleClassBindings) {

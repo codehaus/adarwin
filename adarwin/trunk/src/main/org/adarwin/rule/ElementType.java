@@ -19,7 +19,7 @@ public class ElementType {
 	private final String subType;
 
 	private ElementType(String type) {
-		this(type, null);
+		this(type, "");
 	}
 
 	private ElementType(String type, String subType) {
@@ -47,6 +47,11 @@ public class ElementType {
 	}
 
 	public String toString() {
-		return "ElementType(" + getType() + ", " + getSubType() + ")";
+		if (getSubType().length() == 0) {
+			return getType();
+		}
+		else {
+			return getType() + '.' + getSubType();
+		}
 	}
 }

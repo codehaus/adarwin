@@ -22,7 +22,7 @@ public class NameRule implements Rule {
 		this.rule = rule;
 	}
 	
-	public boolean inspect(ClassSummary classSummary) {
+	public ClassSummary inspect(ClassSummary classSummary) {
 		return rule.inspect(classSummary);
 	}
 

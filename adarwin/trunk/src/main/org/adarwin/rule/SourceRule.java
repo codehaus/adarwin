@@ -10,32 +10,24 @@
 
 package org.adarwin.rule;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 import org.adarwin.ClassSummary;
 import org.adarwin.CodeElement;
 import org.adarwin.RuleClassBindings;
+import org.adarwin.UsesCodeElement;
 
-public class SourceRule implements Rule {
-	private Rule wrappedRule;
+public class SourceRule implements Rule, Filter {
+	private final Rule wrappedRule;
 
 	public SourceRule(Rule wrappedRule) {
 		this.wrappedRule = wrappedRule;
     }
 
-	public boolean inspect(ClassSummary classSummary) {
-		Set sourceSet = new HashSet();
-		for (Iterator iterator = classSummary.getDependancies().iterator(); iterator.hasNext();) {
-			CodeElement codeElement = (CodeElement) iterator.next();
-			if (ElementType.SOURCE.equals(codeElement.getType())) {
-				sourceSet.add(codeElement);
-			}
-		}
-		ClassSummary newSummary = classSummary.updateDependancies(sourceSet);
-		
-		return wrappedRule.inspect(newSummary);
+	public ClassSummary inspect(ClassSummary classSummary) {
+		return wrappedRule.inspect(classSummary).filter(this);
+	}
+
+	public boolean matches(CodeElement codeElement) {
+		return !(codeElement instanceof UsesCodeElement);
 	}
 
 	public String toString(RuleClassBindings ruleClassBindings) {
