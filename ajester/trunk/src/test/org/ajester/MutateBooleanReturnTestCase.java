@@ -19,11 +19,11 @@ public class MutateBooleanReturnTestCase extends TestCase {
 
 	public void testMutatingSomeOtherClassLeavesBooleanTestPassing() throws Exception {
 		Report report = new TestRunnerWrapper().run(
-			BooleanReturnTestCase.class, new BooleanReturnMutator(IfEqualsStatement.IF_EQUAL_LOCATION));
+			BooleanReturnTestCase.class, new BooleanReturnMutator(IfEqualsStatement.LOCATION));
 
 		assertEquals(0, report.getFailures().size());
 		assertEquals(0, report.getErrors().size());
 		
-		assertFalse(report.getCoverage().contains(IfEqualsStatement.IF_EQUAL_LOCATION));
+		assertFalse(report.getCoverage().contains(IfEqualsStatement.LOCATION));
 	}
 }

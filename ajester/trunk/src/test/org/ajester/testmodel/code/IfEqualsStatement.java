@@ -3,7 +3,7 @@ package org.ajester.testmodel.code;
 import org.ajester.CodeLocation;
 
 public class IfEqualsStatement implements Model {
-	public static final CodeLocation IF_EQUAL_LOCATION =
+	public static final CodeLocation LOCATION =
 		new CodeLocation(IfEqualsStatement.class, GET_TRUE);
 	
 	private boolean bTrue = true;

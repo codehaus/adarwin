@@ -9,7 +9,7 @@ import junit.framework.TestFailure;
 public class MutateIfEqualsStatementTestCase extends TestCase {
 	public void testMutatingIFEQCausesIfStatementTestIfEqualToFail() throws Exception {
 		Report report = new TestRunnerWrapper().run(IfEqualsStatementTestCase.class,
-			new IfStatementMutator(IfEqualsStatement.IF_EQUAL_LOCATION));
+			new IfStatementMutator(IfEqualsStatement.LOCATION));
 		
 		assertEquals(1, report.getFailures().size());
 		TestFailure failure = (TestFailure) report.getFailures().toArray()[0];
@@ -17,6 +17,6 @@ public class MutateIfEqualsStatementTestCase extends TestCase {
 			"testIfEqualMethodReturnsTrue");
 		assertEquals(0, report.getErrors().size());
 		
-		assertTrue(report.getCoverage().contains(IfEqualsStatement.IF_EQUAL_LOCATION));
+		assertTrue(report.getCoverage().contains(IfEqualsStatement.LOCATION));
 	}
 }
