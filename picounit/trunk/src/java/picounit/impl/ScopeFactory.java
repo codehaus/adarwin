@@ -1,4 +1,4 @@
-package picounit.test;
+package picounit.impl;
 
 import picounit.runner.Scope;
 

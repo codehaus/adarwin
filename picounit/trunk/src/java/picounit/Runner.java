@@ -1,6 +1,6 @@
 package picounit;
 
-import picounit.test.Filter;
+import picounit.impl.Filter;
 
 public interface Runner {
 	Runner registerFixture(Class interfaceClass, Class implementationClass);

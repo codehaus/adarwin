@@ -4,10 +4,10 @@ import picounit.Mocker;
 import picounit.Test;
 import picounit.TestInstance;
 import picounit.Verify;
+import picounit.impl.MethodRunner;
 import picounit.impl.Operator;
 import picounit.runner.ResultListener;
 import picounit.runner.ScopeImpl;
-import picounit.suite.MethodRunner;
 
 import java.lang.reflect.Method;
 

@@ -6,9 +6,9 @@ import picounit.TestInstance;
 import picounit.Verify;
 import picounit.around.mock.MockAround;
 import picounit.around.setup.SetUpAround;
+import picounit.impl.PicoResolver;
 import picounit.runner.ResultListener;
 import picounit.runner.ScopeImpl;
-import picounit.test.PicoResolver;
 
 import java.lang.reflect.Method;
 

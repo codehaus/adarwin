@@ -6,7 +6,7 @@ import picounit.Test;
 import picounit.TestInstance;
 import picounit.Verify;
 import picounit.impl.MethodInvoker;
-import picounit.test.PicoResolver;
+import picounit.impl.PicoResolver;
 
 import java.util.Arrays;
 import java.util.LinkedList;

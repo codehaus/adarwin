@@ -1,6 +1,6 @@
 package picounit.runner;
 
-import picounit.test.Filter;
+import picounit.impl.Filter;
 
 public interface Registry {
 	void registerInfrastructure(Class component);

@@ -1,4 +1,4 @@
-package picounit.suite;
+package picounit.impl;
 
 import picounit.impl.Resolver;
 

@@ -1,6 +1,6 @@
-package picounit.runner;
+package picounit.impl;
 
-import picounit.test.Filter;
+import picounit.impl.Filter;
 
 import java.util.List;
 

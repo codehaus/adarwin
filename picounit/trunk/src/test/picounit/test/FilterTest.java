@@ -5,6 +5,8 @@ import picounit.Runner;
 import picounit.Suite;
 import picounit.Test;
 import picounit.Verify;
+import picounit.impl.Filter;
+import picounit.impl.NothingFilter;
 
 import java.util.LinkedList;
 import java.util.List;

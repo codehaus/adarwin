@@ -8,8 +8,8 @@ import picounit.Mocker;
 import picounit.Test;
 import picounit.around.AroundRunner;
 import picounit.around.AroundRunnerImpl;
+import picounit.impl.PicoResolver;
 import picounit.pico.DynamicHeirarchyPicoContainer;
-import picounit.test.PicoResolver;
 
 public class RegistryTest implements Test {
 	// Mocks
