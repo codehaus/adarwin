@@ -13,7 +13,7 @@ package org.adarwin;
 
 import java.util.Arrays;
 
-public class MethodDeclaration extends CodeElement implements Method {
+public class MethodDeclaration extends CodeElement {
 	private final String methodName;
 	private final String returnType;
 	private final String[] parameterTypes;
@@ -79,7 +79,7 @@ public class MethodDeclaration extends CodeElement implements Method {
 		return buffer.toString();
 	}
 
-	public boolean equalsMethod(Method other) {
+	public boolean equalsMethod(MethodDeclaration other) {
 		return getReturnType().equals(other.getReturnType()) &&
 			getMethodName().equals(other.getMethodName()) &&
 			Arrays.equals(getParameterTypes(), other.getParameterTypes());
