@@ -23,7 +23,7 @@ public class MethodCoverageTestCase extends TestCase {
 
 		Set coverage = report.getCoverage().getCoverage();
 
-		assertEquals(3, coverage.size());
+		assertEquals(2, coverage.size());
 		assertTrue(report.getCoverage().contains(BooleanReturn.LOCATION));
 	}
 }

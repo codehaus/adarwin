@@ -7,7 +7,7 @@ public class BooleanReturnAndIfStatementTestSuite {
 		TestSuite suite = new TestSuite();
 		
 		suite.addTestSuite(BooleanReturnTestCase.class);
-		suite.addTestSuite(IfStatementTestCase.class);
+		suite.addTestSuite(IfEqualsStatementTestCase.class);
 		
 		return suite;
 	}
